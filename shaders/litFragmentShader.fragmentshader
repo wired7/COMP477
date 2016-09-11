@@ -1,0 +1,28 @@
+#version 330 core
+
+layout(location = 2) in vec3 normal;
+
+// Interpolated values from the vertex shaders
+in vec4 vColor;
+in vec4 fragPos;
+
+uniform mat4 View;
+uniform mat4 Model;
+
+// Ouput data
+out vec4 color;
+
+void main(){
+
+	// Output color = color specified in the vertex shader, 
+	// interpolated between all 3 surrounding vertices
+
+	vec4 c = vColor;
+
+	vec3 lightPos = vec3(View[3]);
+	vec3 n = normalize(vec3(View * vec4(normal, 1)));
+	color = c;// / (1 + pow(length(vec3(fragPos) - lightPos), 2));
+	color *= clamp(dot(n, -normalize(fragPos.xyz - lightPos)), 0, 1);
+	color = clamp(color, vec4(0.2 * c.xyz, 1), vec4(c.xyz, 1));
+
+}
