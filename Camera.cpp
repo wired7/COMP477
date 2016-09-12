@@ -7,6 +7,10 @@ Camera::Camera(GLFWwindow* window, vec2 relativePosition, vec2 relativeDimension
 	this->window = window;
 	this->relativePosition = relativePosition;
 	this->relativeDimensions = relativeDimensions;
+
+	mat4 ratioMatrix(1);
+	ratioMatrix[1][1] *= relativeDimensions.x;
+	Projection = Projection * ratioMatrix;
 	this->Projection = Projection;
 
 	View = glm::lookAt(pos, lookAt, up);
@@ -57,7 +61,8 @@ void StateSpaceCamera::translate(vec2 offset)
 {
 	vec3 diff(cos(camTheta), 0, sin(camTheta));
 
-	camPosVector += diff * vec3(offset.x, 0, offset.y);
+	if(length(camPosVector + diff * vec3(offset.x, 0, offset.y)) < 15)
+		camPosVector += diff * vec3(offset.x, 0, offset.y);
 }
 
 void StateSpaceCamera::update()
@@ -98,4 +103,8 @@ void StateSpaceCamera::update()
 	lookAtVector = camPosVector + vec3(cos(camTheta) * cos(camPhi), sin(camPhi), sin(camTheta) * cos(camPhi));
 
 	View = lookAt(camPosVector, lookAtVector, upVector);
+
+	int width, height;
+	glfwGetWindowSize(window, &width, &height);
+	Projection = perspective(45.0f, (float)width / height, 0.1f, 100.0f);
 }

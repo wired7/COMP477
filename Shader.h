@@ -34,3 +34,11 @@ public:
 	LitShader() {};
 	LitShader(const char* vertexPath, const char* fragmentPath);
 };
+
+class CubeMapShader : public Shader
+{
+public:
+	static CubeMapShader* shader;
+	CubeMapShader() {};
+	CubeMapShader(const char* vertexPath, const char* fragmentPath);
+};

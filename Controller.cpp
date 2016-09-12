@@ -10,6 +10,7 @@ void Controller::setController(Controller* controller)
 	glfwSetScrollCallback(Camera::activeCamera->window, activeController->scroll_callback);
 	glfwSetMouseButtonCallback(Camera::activeCamera->window, activeController->mouse_callback);
 	glfwSetCursorPosCallback(Camera::activeCamera->window, activeController->mousePos_callback);
+	glfwSetWindowSizeCallback(Camera::activeCamera->window, activeController->windowResize_callback);
 }
 
 StateSpaceController* StateSpaceController::controller = NULL;
@@ -20,6 +21,7 @@ StateSpaceController::StateSpaceController()
 	scroll_callback = sC;
 	mouse_callback = mC;
 	mousePos_callback = mPC;
+	windowResize_callback = wRC;
 }
 
 StateSpaceController::~StateSpaceController()
@@ -68,7 +70,7 @@ void StateSpaceController::sC(GLFWwindow* window, double xOffset, double yOffset
 {
 
 	StateSpaceCamera* activeCam = (StateSpaceCamera*)Camera::activeCamera;
-	activeCam->camTheta += 0.1 * (GLfloat)xOffset;
+	activeCam->camTheta -= 0.1 * (GLfloat)xOffset;
 
 	if (InputState::shiftPressed)
 	{
@@ -100,6 +102,11 @@ void StateSpaceController::mC(GLFWwindow* window, int button, int action, int mo
 void StateSpaceController::mPC(GLFWwindow* window, double xpos, double ypos)
 {
 
+}
+
+void StateSpaceController::wRC(GLFWwindow*, int, int)
+{
+	Camera::activeCamera->update();
 }
 
 Controller* StateSpaceController::getController()

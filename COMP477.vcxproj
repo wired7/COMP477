@@ -23,11 +23,13 @@
     <ClInclude Include="Camera.h" />
     <ClInclude Include="Context.h" />
     <ClInclude Include="Controller.h" />
+    <ClInclude Include="Cubemap.h" />
     <ClInclude Include="GraphicsObject.h" />
     <ClInclude Include="InputState.h" />
     <ClInclude Include="NoiseTexture.h" />
     <ClInclude Include="Shader.h" />
     <ClInclude Include="Shape.h" />
+    <ClInclude Include="Skybox.h" />
     <ClInclude Include="StateSpace.h" />
     <ClInclude Include="Terrain.h" />
     <ClInclude Include="TextureManager.h" />
@@ -37,10 +39,12 @@
     <ClCompile Include="Camera.cpp" />
     <ClCompile Include="Context.cpp" />
     <ClCompile Include="Controller.cpp" />
+    <ClCompile Include="Cubemap.cpp" />
     <ClCompile Include="GraphicsObject.cpp" />
     <ClCompile Include="InputState.cpp" />
     <ClCompile Include="Shader.cpp" />
     <ClCompile Include="Shape.cpp" />
+    <ClCompile Include="Skybox.cpp" />
     <ClCompile Include="Source.cpp" />
     <ClCompile Include="StateSpace.cpp" />
     <ClCompile Include="Terrain.cpp" />
