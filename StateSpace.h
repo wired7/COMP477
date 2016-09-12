@@ -1,5 +1,6 @@
 #pragma once
 #include "GraphicsObject.h"
+#include "Skybox.h"
 #include "Terrain.h"
 #include "Controller.h"
 
@@ -9,8 +10,9 @@ public:
 	static StateSpace* activeStateSpace;
 	vector<Camera*> observers;
 	vector<GraphicsObject*> models;
+	Skybox* skybox;
 	Terrain* terrain;
-	StateSpace(GLFWwindow*);
+	StateSpace(GLFWwindow*, Skybox*);
 	~StateSpace();
 	void draw();
 };

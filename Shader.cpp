@@ -119,3 +119,10 @@ LitShader::LitShader(const char* vertexPath, const char* fragmentPath) : Shader(
 	shininessID = glGetUniformLocation(Program, "shininess");
 	ambientID = glGetUniformLocation(Program, "ambient");*/
 };
+
+CubeMapShader* CubeMapShader::shader;
+
+CubeMapShader::CubeMapShader(const char* vertexPath, const char* fragmentPath)
+{
+
+}

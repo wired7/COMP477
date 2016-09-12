@@ -72,5 +72,4 @@ public:
 	Polyhedron() {};
 	Polyhedron(int, double, vec3, vec4);
 	void draw();
-	void draw(mat4);
 };

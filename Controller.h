@@ -16,7 +16,7 @@ public:
 	void(*scroll_callback)(GLFWwindow*, double, double) = NULL;
 	void(*mouse_callback)(GLFWwindow*, int, int, int) = NULL;
 	void(*mousePos_callback)(GLFWwindow*, double, double) = NULL;
-
+	void(*windowResize_callback)(GLFWwindow*, int, int) = NULL;
 };
 
 class StateSpaceController : public Controller
@@ -29,6 +29,7 @@ private:
 	static void sC(GLFWwindow*, double, double);
 	static void mC(GLFWwindow*, int, int, int);
 	static void mPC(GLFWwindow*, double, double);
+	static void wRC(GLFWwindow*, int, int);
 public:
 	static Controller* getController();
 };
