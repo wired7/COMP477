@@ -50,6 +50,12 @@
     <ClCompile Include="Terrain.cpp" />
     <ClCompile Include="TextureManager.cpp" />
   </ItemGroup>
+  <ItemGroup>
+    <None Include="shaders\Cubemap.FRAGMENTSHADER" />
+    <None Include="shaders\Cubemap.VERTEXSHADER" />
+    <None Include="shaders\litFragmentShader.fragmentshader" />
+    <None Include="shaders\litShader.vertexshader" />
+  </ItemGroup>
   <PropertyGroup Label="Globals">
     <ProjectGuid>{72546485-4EBD-4C30-B519-FA85F3119B18}</ProjectGuid>
     <RootNamespace>COMP477</RootNamespace>
@@ -106,10 +112,10 @@
       <WarningLevel>Level3</WarningLevel>
       <Optimization>Disabled</Optimization>
       <SDLCheck>true</SDLCheck>
-      <AdditionalIncludeDirectories>C:\Users\Wired\Documents\Visual Studio 2015\Projects\COMP477\Resources\GLM\glm;C:\Users\Wired\Documents\Visual Studio 2015\Projects\COMP477\Resources\Simple OpenGL Image Library\SOIL;C:\Users\Wired\Documents\Visual Studio 2015\Projects\COMP477\Resources\GLFW\include\GLFW;C:\Users\Wired\Documents\Visual Studio 2015\Projects\COMP477\Resources\GLEW\include\GL;%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
+      <AdditionalIncludeDirectories>..\COMP477\Resources\GLM\glm;..\COMP477\Resources\Simple OpenGL Image Library\SOIL;..\COMP477\Resources\GLFW\include\GLFW;..\COMP477\Resources\GLEW\include\GL;%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
     </ClCompile>
     <Link>
-      <AdditionalLibraryDirectories>C:\Users\Wired\Documents\Visual Studio 2015\Projects\COMP477\Resources\Simple OpenGL Image Library\lib;C:\Users\Wired\Documents\Visual Studio 2015\Projects\COMP477\Resources\GLFW\lib-vc2015;C:\Users\Wired\Documents\Visual Studio 2015\Projects\COMP477\Resources\GLEW\lib\Release\Win32;%(AdditionalLibraryDirectories)</AdditionalLibraryDirectories>
+      <AdditionalLibraryDirectories>..\COMP477\Resources\Simple OpenGL Image Library\lib;..\COMP477\Resources\GLFW\lib-vc2015;..\COMP477\Resources\GLEW\lib\Release\Win32;%(AdditionalLibraryDirectories)</AdditionalLibraryDirectories>
       <AdditionalDependencies>opengl32.lib;glew32.lib;glfw3.lib;soil.lib;%(AdditionalDependencies)</AdditionalDependencies>
     </Link>
   </ItemDefinitionGroup>
@@ -118,11 +124,11 @@
       <WarningLevel>Level3</WarningLevel>
       <Optimization>Disabled</Optimization>
       <SDLCheck>true</SDLCheck>
-      <AdditionalIncludeDirectories>C:\Users\dkowk\Source\Repos\COMP477\Resources\Simple OpenGL Image Library\SOIL;C:\Users\dkowk\Source\Repos\COMP477\Resources\GLM\glm;C:\Users\dkowk\Source\Repos\COMP477\Resources\GLM\glm\detail;C:\Users\dkowk\Source\Repos\COMP477\Resources\GLM\glm\gtc;C:\Users\dkowk\Source\Repos\COMP477\Resources\GLM\glm\gtx;C:\Users\dkowk\Source\Repos\COMP477\Resources\GLEW\include\GL;C:\Users\dkowk\Source\Repos\COMP477\Resources\GLFW\include\GLFW;%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
+      <AdditionalIncludeDirectories>..\COMP477\Resources\Simple OpenGL Image Library\SOIL;..\COMP477\Resources\GLM\glm;..\COMP477\Resources\GLM\glm\detail;..\COMP477\Resources\GLM\glm\gtc;..\COMP477\Resources\GLM\glm\gtx;..\COMP477\Resources\GLEW\include\GL;..\COMP477\Resources\GLFW\include\GLFW;%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
     </ClCompile>
     <Link>
-      <AdditionalLibraryDirectories>C:\Users\dkowk\Source\Repos\COMP477\Resources\GLEW\lib\Release\Win32;C:\Users\dkowk\Source\Repos\COMP477\Resources\GLFW\lib-vc2015</AdditionalLibraryDirectories>
-      <AdditionalDependencies>opengl32.lib;glew32.lib;glfw3.lib;%(AdditionalDependencies)</AdditionalDependencies>
+      <AdditionalLibraryDirectories>..\COMP477\Resources\Simple OpenGL Image Library\lib;..\COMP477\Resources\GLEW\lib\Release\Win32;..\COMP477\Resources\GLFW\lib-vc2015</AdditionalLibraryDirectories>
+      <AdditionalDependencies>opengl32.lib;glew32.lib;glfw3.lib;soil.lib;%(AdditionalDependencies)</AdditionalDependencies>
     </Link>
   </ItemDefinitionGroup>
   <ItemDefinitionGroup Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">
