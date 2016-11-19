@@ -219,7 +219,7 @@ void Rectangle::draw()
 	glDrawArrays(GL_TRIANGLE_STRIP, 0, vertices.size());
 }
 
-ImportedMesh::ImportedMesh(char* s, vec3 position, vec3 dimensions)
+/*ImportedMesh::ImportedMesh(char* s, vec3 position, vec3 dimensions)
 {
 	shader = LitShader::shader;
 	loadTexture("textures\\blank.jpg");
@@ -266,4 +266,4 @@ void ImportedMesh::draw()
 	enableBuffers();
 	glBindTexture(GL_TEXTURE_2D, texture);
 	glDrawArrays(GL_TRIANGLES, 0, vertices.size());
-}
+}*/

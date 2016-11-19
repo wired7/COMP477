@@ -7,11 +7,11 @@
 #include <glm.hpp>
 #include <gtc/matrix_transform.hpp>
 #include <gtx/rotate_vector.hpp>
-#include <Importer.hpp>
+/*#include <Importer.hpp>
 #include <scene.h>
 #include <postprocess.h>
 
-using namespace Assimp;
+using namespace Assimp;*/
 using namespace glm;
 using namespace std;
 
@@ -69,14 +69,14 @@ public:
 	vec4 specularColor;
 };
 
-class ImportedMesh : public MeshObject
+/*class ImportedMesh : public MeshObject
 {
 public:
 	ImportedMesh(char*, vec3, vec3);
 	void draw();
 private:
 	void loadFile(char*);
-};
+};*/
 
 class Polyhedron : public MeshObject
 {
