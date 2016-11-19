@@ -91,7 +91,7 @@ float SPH::calcDensity(Particle particle)
 	for (int i = 0; i < particle.neighbors.size(); ++i)
 	{
 		Particle* currParticle = sys->particles[particle.neighbors.at(i)];
-		float distance = glm::length(particle.position - currParticle->position);
+		vec3 distance = particle.position - currParticle->position;
 		density += currParticle->params.mass * calcKernel(distance, sys->sysParams.searchRadius);
 	}
 
@@ -104,101 +104,82 @@ float SPH::calcPressure(const Particle& particle)
 	return sys->sysParams.stiffness * (particle.params.density - sys->sysParams.restDensity);
 }
 
-float SPH::calcKernel(float distance, float h)
+// Derived Kernel functions were found in this paper
+// http://image.diku.dk/projects/media/kelager.06.pdf
+// For reference go to page 16
+
+// Using poly5 Kernel
+float SPH::calcKernel(vec3 distance, float h)
 {
-	//TODO: ASK TEACHER ABOUT THIS CONDITION
-	if (distance < 0 || distance > h)
+	float magnitude = glm::length(distance);
+	if (magnitude > h)
 	{
 		return 0.0f;
 	}
 
 	float first = 15.0 / ((2 * glm::pi<float>())*(pow(h, 3)));
-	float second = pow(-distance, 3) / (2 * (pow(h, 3)));
-	float third = pow(distance, 2) / pow(h, 2);
-	float fourth = h / (2 * distance);
+	float second = pow(-magnitude, 3) / (2 * (pow(h, 3)));
+	float third = pow(magnitude, 2) / pow(h, 2);
+	float fourth = h / (2 * magnitude);
 	float fifth = -1.0;
 
 	return first * (second + third + fourth + fifth);
 }
 
+// Calculates the vector field
 vec3 SPH::calcGradientW(vec3 distance, float h)
-{
-	float x = 0.0f;
-	float y = 0.0f;
-	float z = 0.0f;
+{	
+	float magnitude = glm::length(distance);
 
-	//TODO: ASK TEACHER ABOUT THIS CONDITION
-	if (distance.x > 0 && distance.x < h)
-	{
-		x = pow((h*h) - (distance.x*distance.x), 2);
-	}
+	float coefficient = -945.0f / (32.0f*glm::pi<float>()*pow(h, 9));
+	float derivedValue = pow((h*h) - (magnitude*magnitude), 2);	
 
-	if (distance.y > 0 && distance.y < h)
-	{
-		y = pow((h*h) - (distance.y*distance.y), 2);
-	}
-
-	if (distance.z > 0 && distance.z < h)
-	{
-		z = pow((h*h) - (distance.z*distance.z), 2);
-	}
-	
-	vec3 temp(x, y, z);
-
-	return (float)(1 / ((32.0f*glm::pi<float>()*pow(h, 9)))) * ((315.0f * 3.0f * distance) * temp);
+	return coefficient * distance * derivedValue;
 }
 
-vec3 SPH::calcLaplacianW(vec3 distance, float h)
+// Calculates the divergence of the vector field
+float SPH::calcLaplacianW(vec3 distance, float h)
 {
-	float x = 0.0f;
-	float y = 0.0f;
-	float z = 0.0f;
+	float magnitude = glm::length(distance);
 
-	if (distance.x > 0 && distance.x < h)
-	{
-		x = (h*h) - (distance.x*distance.x);
-	}
+	float coefficient = -945.0f / (32.0f*glm::pi<float>()*pow(h, 9));
+	float derivedFirstValue = ((h*h) - (magnitude*magnitude));
+	float derivedSecondValue = (3 * (h*h) - 7 * (magnitude*magnitude));
 
-	if (distance.y > 0 && distance.y < h)
-	{
-		y = (h*h) - (distance.y*distance.y);
-	}
-
-	if (distance.z > 0 && distance.z < h)
-	{
-		z = (h*h) - (distance.z*distance.z);
-	}
-	
-	vec3 temp(x, y, z);
-
-	return (float)(1 / (8.0f*glm::pi<float>()*pow(h, 9))) * ((315.0f * 3.0f * distance * distance)  * (temp));
+	return coefficient * derivedFirstValue * derivedSecondValue;
 }
 
-vec3 SPH::calcGradient(Particle particle)
+vec3 SPH::calcGradientPressure(Particle particle)
 {
 	ParticleSystem* sys = ParticleSystem::getInstance();
 	vec3 ret;
 	for (int i = 0; i < particle.neighbors.size(); ++i)
 	{
 		int index = particle.neighbors[i];
-		vec3 distance = particle.position - sys->particles[index]->position; //glm::length(particle.position - sys->particles[index]->position);
+		vec3 distance = particle.position - sys->particles[index]->position;
 		float h = sys->sysParams.searchRadius;
-		ret += (float)((sys->particles[index]->params.mass / sys->particles[index]->params.density) * (sys->particles[index]->params.pressure)) * (calcGradientW(distance, h));
+
+		// forces between two particles should be equal & opposite
+		// pressure has to be symmetric, to guarantee symmetry we take the average of the two pressures
+		ret += (sys->particles[index]->params.mass / sys->particles[index]->params.density) * ((sys->particles[index]->params.pressure + particle.params.pressure) / 2.0f) * (calcGradientW(distance, h));
 	}
 
-	return ret;
+	return -ret; // return the negated vector --> -pressureGradient
 }
 
-vec3 SPH::calcLaplacian(Particle particle)
+vec3 SPH::calcLaplacianVelocity(Particle particle)
 {
 	ParticleSystem* sys = ParticleSystem::getInstance();
 	vec3 ret;
 	for (int i = 0; i < particle.neighbors.size(); ++i)
 	{
 		int index = particle.neighbors[i];
-		vec3 distance = particle.position - sys->particles[index]->position; //glm::length(particle.position - sys->particles[index]->position);
+		vec3 distance = particle.position - sys->particles[index]->position;
 		float h = sys->sysParams.searchRadius;
-		ret += (sys->particles[index]->params.mass / sys->particles[index]->params.density) * (sys->particles[index]->params.pressure) * (calcLaplacianW(distance, h));
+
+		// forces between two particles should be equal & opposite
+		// viscocity force is non-symmetric, finding the difference in velocities 
+		ret += (sys->particles[index]->params.mass / sys->particles[index]->params.density) * (sys->particles[index]->params.velocity - particle.params.velocity) * (calcLaplacianW(distance, h));
 	}
 
 	return ret;
@@ -207,7 +188,7 @@ vec3 SPH::calcLaplacian(Particle particle)
 vec3 SPH::calcAcceleration(const Particle& particle)
 {
 	ParticleSystem* sys = ParticleSystem::getInstance();
-	return ((-1.0f)*calcGradient(particle) + sys->sysParams.viscocity*calcLaplacian(particle) + particle.params.density * sys->sysParams.gravity) / particle.params.density;
+	return (calcGradientPressure(particle) + sys->sysParams.viscocity*calcLaplacianVelocity(particle) + particle.params.density * sys->sysParams.gravity) / particle.params.density;
 }
 
 

@@ -25,11 +25,15 @@
     <ClInclude Include="Controller.h" />
     <ClInclude Include="Cubemap.h" />
     <ClInclude Include="GraphicsObject.h" />
+    <ClInclude Include="Grid3D.h" />
     <ClInclude Include="InputState.h" />
     <ClInclude Include="NoiseTexture.h" />
+    <ClInclude Include="Particle.h" />
+    <ClInclude Include="ParticleSystem.h" />
     <ClInclude Include="Shader.h" />
     <ClInclude Include="Shape.h" />
     <ClInclude Include="Skybox.h" />
+    <ClInclude Include="SPH.h" />
     <ClInclude Include="StateSpace.h" />
     <ClInclude Include="Terrain.h" />
     <ClInclude Include="TextureManager.h" />
@@ -41,16 +45,21 @@
     <ClCompile Include="Controller.cpp" />
     <ClCompile Include="Cubemap.cpp" />
     <ClCompile Include="GraphicsObject.cpp" />
+    <ClCompile Include="Grid3D.cpp" />
     <ClCompile Include="InputState.cpp" />
+    <ClCompile Include="Particle.cpp" />
+    <ClCompile Include="ParticleSystem.cpp" />
     <ClCompile Include="Shader.cpp" />
     <ClCompile Include="Shape.cpp" />
     <ClCompile Include="Skybox.cpp" />
     <ClCompile Include="Source.cpp" />
+    <ClCompile Include="SPH.cpp" />
     <ClCompile Include="StateSpace.cpp" />
     <ClCompile Include="Terrain.cpp" />
     <ClCompile Include="TextureManager.cpp" />
   </ItemGroup>
   <ItemGroup>
+    <None Include="COMP477.VC.db" />
     <None Include="shaders\Cubemap.FRAGMENTSHADER" />
     <None Include="shaders\Cubemap.VERTEXSHADER" />
     <None Include="shaders\litFragmentShader.fragmentshader" />

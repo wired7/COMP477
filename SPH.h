@@ -8,10 +8,10 @@ public:
 private:
 	float calcDensity(Particle particle);
 	float calcPressure(const Particle& particle);
-	float calcKernel(float distance, float h);
+	float calcKernel(glm::vec3 distance, float h);
 	glm::vec3 calcGradientW(glm::vec3 distance, float h);
-	glm::vec3 calcLaplacianW(glm::vec3 distance, float h);
-	glm::vec3 calcGradient(Particle particle);
-	glm::vec3 calcLaplacian(Particle particle);
+	float calcLaplacianW(glm::vec3 distance, float h);
+	glm::vec3 calcGradientPressure(Particle particle);
+	glm::vec3 calcLaplacianVelocity(Particle particle);
 	glm::vec3 calcAcceleration(const Particle& particle);
 };
