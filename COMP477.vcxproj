@@ -25,12 +25,17 @@
     <ClInclude Include="Controller.h" />
     <ClInclude Include="Cubemap.h" />
     <ClInclude Include="GraphicsObject.h" />
+    <ClInclude Include="Grid3D.h" />
     <ClInclude Include="InputState.h" />
     <ClInclude Include="Menu.h" />
     <ClInclude Include="NoiseTexture.h" />
+    <ClInclude Include="Particle.h" />
+    <ClInclude Include="ParticleSystem.h" />
+    <ClInclude Include="Rigidbody.h" />
     <ClInclude Include="Shader.h" />
     <ClInclude Include="Shape.h" />
     <ClInclude Include="Skybox.h" />
+    <ClInclude Include="SPH.h" />
     <ClInclude Include="StateSpace.h" />
     <ClInclude Include="Terrain.h" />
     <ClInclude Include="TextureManager.h" />
@@ -41,18 +46,26 @@
     <ClCompile Include="Context.cpp" />
     <ClCompile Include="Controller.cpp" />
     <ClCompile Include="Cubemap.cpp" />
-    <ClCompile Include="GraphicsObject.cpp" />
+    <ClCompile Include="GraphicsObject.cpp">
+      <AdditionalIncludeDirectories Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">..\COMP477\Resources\assimp-win\include\assimp;..\COMP477\Resources\GLM\glm;..\COMP477\Resources\Simple OpenGL Image Library\SOIL;..\COMP477\Resources\GLFW\include\GLFW;..\COMP477\Resources\GLEW\include\GL;%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
+    </ClCompile>
+    <ClCompile Include="Grid3D.cpp" />
     <ClCompile Include="InputState.cpp" />
     <ClCompile Include="Menu.cpp" />
+    <ClCompile Include="Particle.cpp" />
+    <ClCompile Include="ParticleSystem.cpp" />
+    <ClCompile Include="Rigidbody.cpp" />
     <ClCompile Include="Shader.cpp" />
     <ClCompile Include="Shape.cpp" />
     <ClCompile Include="Skybox.cpp" />
     <ClCompile Include="Source.cpp" />
+    <ClCompile Include="SPH.cpp" />
     <ClCompile Include="StateSpace.cpp" />
     <ClCompile Include="Terrain.cpp" />
     <ClCompile Include="TextureManager.cpp" />
   </ItemGroup>
   <ItemGroup>
+    <None Include="COMP477.VC.db" />
     <None Include="shaders\Cubemap.FRAGMENTSHADER" />
     <None Include="shaders\Cubemap.VERTEXSHADER" />
     <None Include="shaders\litFragmentShader.fragmentshader" />
@@ -114,10 +127,10 @@
       <WarningLevel>Level3</WarningLevel>
       <Optimization>Disabled</Optimization>
       <SDLCheck>true</SDLCheck>
-      <AdditionalIncludeDirectories>C:\Users\Wired\Documents\Visual Studio 2015\Projects\COMP477\Resources\assimp-win\include\assimp;..\COMP477\Resources\GLM\glm;..\COMP477\Resources\Simple OpenGL Image Library\SOIL;..\COMP477\Resources\GLFW\include\GLFW;..\COMP477\Resources\GLEW\include\GL;%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
+      <AdditionalIncludeDirectories>..\COMP477\Resources\assimp-win\include\assimp;..\COMP477\Resources\GLM\glm;..\COMP477\Resources\Simple OpenGL Image Library\SOIL;..\COMP477\Resources\GLFW\include\GLFW;..\COMP477\Resources\GLEW\include\GL;%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
     </ClCompile>
     <Link>
-      <AdditionalLibraryDirectories>C:\Users\Wired\Documents\Visual Studio 2015\Projects\COMP477\Resources\assimp-win\lib32;..\COMP477\Resources\Simple OpenGL Image Library\lib;..\COMP477\Resources\GLFW\lib-vc2015;..\COMP477\Resources\GLEW\lib\Release\Win32;%(AdditionalLibraryDirectories)</AdditionalLibraryDirectories>
+      <AdditionalLibraryDirectories>..\COMP477\Resources\assimp-win\lib32;..\COMP477\Resources\Simple OpenGL Image Library\lib;..\COMP477\Resources\GLFW\lib-vc2015;..\COMP477\Resources\GLEW\lib\Release\Win32;%(AdditionalLibraryDirectories)</AdditionalLibraryDirectories>
       <AdditionalDependencies>opengl32.lib;glew32.lib;glfw3.lib;soil.lib;assimp.lib;%(AdditionalDependencies)</AdditionalDependencies>
     </Link>
   </ItemDefinitionGroup>

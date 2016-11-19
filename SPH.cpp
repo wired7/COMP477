@@ -76,10 +76,8 @@ void SPH::calcSPH()
 							sys->sysParams.tStep = t;
 						}
 						
-						// TODO: Reflection
-
-
-
+						// Update particle velocity with reflected, assuming no loss in energy in terms of heat
+						currParticle->params.velocity = glm::reflect(currParticle->params.velocity, plane.normal);
 					}
 				}				
 				else {
