@@ -64,6 +64,11 @@ void StateSpaceController::kC(GLFWwindow* window, int key, int scancode, int act
 	{
 		InputState::altPressed = false;
 	}
+
+	if (key == GLFW_KEY_P && action == GLFW_PRESS)
+	{
+		StateSpace::activeStateSpace->playModeOn ^= true;
+	}
 }
 
 void StateSpaceController::sC(GLFWwindow* window, double xOffset, double yOffset)

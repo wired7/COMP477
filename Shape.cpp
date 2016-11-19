@@ -124,6 +124,13 @@ bool Triangle::intersects(vec3 origin, vec3 direction)
 	return false;
 }
 
+bool Triangle::intersects(Triangle triangle)
+{
+	return intersects(triangle.point1, triangle.point2 - triangle.point1) || intersects(triangle.point2, triangle.point3 - triangle.point2)
+			|| intersects(triangle.point3, triangle.point1 - triangle.point3) || triangle.intersects(point1, point2 - point1)
+			|| triangle.intersects(point2, point3 - point2) || triangle.intersects(point3, point1 - point3);
+}
+
 float Triangle::intersection(vec3 origin, vec3 direction)
 {
 	float t = -1;

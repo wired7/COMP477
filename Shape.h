@@ -59,5 +59,6 @@ public:
 	~Triangle() {};
 	float area(vec3, vec3, vec3);
 	bool intersects(vec3, vec3);
+	bool intersects(Triangle);
 	float intersection(vec3, vec3);
 };

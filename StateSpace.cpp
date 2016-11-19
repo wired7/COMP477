@@ -8,14 +8,15 @@ StateSpace::StateSpace(GLFWwindow* window, Skybox* skybox)
 	milliseconds ms = duration_cast<milliseconds>(system_clock::now().time_since_epoch());
 	time = ms.count();
 	frameCount = 0;
+	playModeOn = false;
 	this->skybox = skybox;
 //	terrain = new Terrain(1, 40, 40, 32, STATIC);
 	int width, height;
 	glfwGetWindowSize(window, &width, &height);
-	Camera::activeCamera = new StateSpaceCamera(window, vec2(0, 0), vec2(1, 1), vec3(0, 0, 5), vec3(0, 0, 0), vec3(0, 1, 0), perspective(45.0f, (float)width / height, 0.1f, 100.0f), terrain);
+	Camera::activeCamera = new StateSpaceCamera(window, vec2(0, 0), vec2(1, 1), vec3(0, 0, -5), vec3(0, 0, 0), vec3(0, 1, 0), perspective(45.0f, (float)width / height, 0.1f, 100.0f), terrain);
 	
 	float radius = 0.1f;
-	int blockSize = 20;
+	int blockSize = 10;
 	
 	vector<vec3> pos;
 	for(int k = 0; k < blockSize; k++)

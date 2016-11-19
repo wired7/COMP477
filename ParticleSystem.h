@@ -1,6 +1,7 @@
 #pragma once
 #include <vector>
 #include "Particle.h"
+#include "Rigidbody.h"
 #include "Grid3D.h"
 
 using namespace std;
@@ -23,6 +24,7 @@ public:
 	static ParticleSystem* getInstance();
 	SystemParameters sysParams;
 	vector<Particle*> particles;
+	vector<Rigidbody*> rigidbodies;
 	void updateList();
 	void calcNeighbors(Particle* particle);
 	Grid3D grid;

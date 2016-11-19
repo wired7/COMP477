@@ -7,6 +7,14 @@
 void SPH::calcSPH()
 {
 	ParticleSystem* sys = ParticleSystem::getInstance();
+
+	// UPDATE GRID-RIGIDBODY INTERSECTIONS. ONLY DO THIS HERE IF YOU WANT RIGIDBODY PHYSICS. DO ONCE OUTSIDE OTHERWISE. O(GRIDSIZE * MESH_TRIANGLE_COUNT * 12)
+/*	auto vec = sys->grid.data;
+	for (int j = 0; j < vec.size(); ++j)
+	{
+
+	}*/
+
 	for (int i = 0; i < sys->particles.size(); ++i)
 	{
 		sys->calcNeighbors(sys->particles[i]);

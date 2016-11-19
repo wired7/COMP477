@@ -39,6 +39,7 @@ SphericalCamera::SphericalCamera(GLFWwindow* window, vec2 relativePosition, vec2
 Camera(window, relativePosition, relativeDimensions, pos, lookAt, up, Projection)
 {
 	distance = length(camPosVector - lookAtVector);
+	camTheta = atan2(pos.z - lookAt.z, pos.x - lookAt.x);
 	update();
 }
 
@@ -53,6 +54,7 @@ StateSpaceCamera::StateSpaceCamera(GLFWwindow* window, vec2 relativePosition, ve
 	Camera(window, relativePosition, relativeDimensions, pos, lookAt, up, Projection)
 {
 	this->terrain = terrain;
+	camTheta = atan2(lookAt.z - pos.z, lookAt.x - pos.x);
 
 	update();
 }
