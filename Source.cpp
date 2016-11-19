@@ -13,6 +13,7 @@
 #include "Shader.h"
 #include "StateSpace.h"
 #include "Menu.h"
+#include <windows.h>
 
 using namespace std;
 using namespace glm;
@@ -22,6 +23,11 @@ StateSpace* stateSpace;
 Skybox* skybox;
 Menu* menu;
 GraphicsObject* selectedObject;
+
+//Nvidia GPU support
+extern "C" {
+	_declspec(dllexport) DWORD NvOptimusEnablement = 0x00000001;
+}
 
 // GLEW and GLFW initialization. Projection and View matrix setup
 int init() {

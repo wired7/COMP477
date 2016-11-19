@@ -31,7 +31,7 @@ void SPH::calcSPH()
 	{
 		//calc right side equation
 		vec3 acceleration = calcAcceleration(*sys->particles[i]);
-		// float h; //TODO: =;
+
 		sys->particles[i]->params.velocity += sys->sysParams.tStep * acceleration;
 		sys->particles[i]->nextPosition = sys->particles[i]->position;
 		sys->particles[i]->nextPosition += sys->sysParams.tStep * sys->particles[i]->params.velocity;
