@@ -22,6 +22,7 @@ class ParticleSystem
 public:
 	~ParticleSystem();
 	static ParticleSystem* getInstance();
+	vector<glm::vec3>* getParticlePositions();
 	SystemParameters sysParams;
 	vector<Particle*> particles;
 	vector<Rigidbody*> rigidbodies;
