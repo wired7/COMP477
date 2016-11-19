@@ -12,10 +12,6 @@ Cubemap::Cubemap(string path) {
     glGenBuffers(1, &this->VBO);
     
     glGenTextures(1, &this->textureId);
-    
-    #ifndef NDEBUG
-    std::cout << "=== Cubemap ===" << std::endl;
-    #endif
 }
 
 /**
@@ -38,10 +34,6 @@ Cubemap::~Cubemap() {
  * @param filename
  */
 void Cubemap::addFace(CubemapFaces face, std::string filename) {
-    #ifndef NDEBUG
-    std::cout << "Adding face " << face << ", filename: " << filename << std::endl;
-    #endif
-    
     this->faces[face] = filename;
 }
 

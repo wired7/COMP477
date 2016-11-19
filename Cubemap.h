@@ -43,13 +43,8 @@ public:
     virtual void draw();
     
 protected:
-    /**< We really don't need all the complex stuff from GraphicsObject here. */
     std::vector<GLfloat> points;
-    
-    /**< It's a gaphics object like any other except we don't need all the other stuff */
     GLuint VAO;
-    
-    /**< It's a graphics object like any other except we don't need all the other stuff */
     GLuint VBO;
 
 private:

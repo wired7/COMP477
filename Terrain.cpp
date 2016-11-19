@@ -135,12 +135,12 @@ void Terrain::createMesh(glm::vec2 cornerPosition, int cellSize, int width, int 
 			vertex_3.position = glm::vec3(cornerPositionCol.x + cellSize, heights[i + 1][j + 1], cornerPositionCol.y + cellSize);
 			vertex_3.texCoord = glm::vec2(cornerTexturecol.x + textureCellSize, cornerTexturecol.y + textureCellSize);
 
-			addToVertices(vertex_0, indicesCounter, noiseText.colors[i][j]);
-			addToVertices(vertex_1, indicesCounter, noiseText.colors[i][j + 1]);
-			addToVertices(vertex_2, indicesCounter, noiseText.colors[i + 1][j]);
-			addToVertices(vertex_1, indicesCounter, noiseText.colors[i][j + 1]);
-			addToVertices(vertex_2, indicesCounter, noiseText.colors[i + 1][j]);
-			addToVertices(vertex_3, indicesCounter, noiseText.colors[i + 1][j + 1]);
+			addToVertices(vertex_0, indicesCounter, vec3((GLfloat)rand() * 0.5 / RAND_MAX, 1, (GLfloat)rand() * 0.3 / RAND_MAX));
+			addToVertices(vertex_1, indicesCounter, vec3((GLfloat)rand() * 0.5 / RAND_MAX, 1, (GLfloat)rand() * 0.3 / RAND_MAX));
+			addToVertices(vertex_2, indicesCounter, vec3((GLfloat)rand() * 0.5 / RAND_MAX, 1, (GLfloat)rand() * 0.3 / RAND_MAX));
+			addToVertices(vertex_1, indicesCounter, vec3((GLfloat)rand() * 0.5 / RAND_MAX, 1, (GLfloat)rand() * 0.3 / RAND_MAX));
+			addToVertices(vertex_2, indicesCounter, vec3((GLfloat)rand() * 0.5 / RAND_MAX, 1, (GLfloat)rand() * 0.3 / RAND_MAX));
+			addToVertices(vertex_3, indicesCounter, vec3((GLfloat)rand() * 0.5 / RAND_MAX, 1, (GLfloat)rand() * 0.3 / RAND_MAX));
 
 
 			cornerPositionCol = glm::vec2(cornerPositionCol.x + cellSize, cornerPositionCol.y);
@@ -163,7 +163,7 @@ void Terrain::addToVertices(Vertex2 newVertex, GLuint &indicesCount, vec3 color)
 	int index; // to keep track of the ids in the vertices vector
 	if (!search_vertices(vertices, newVertex.position, index)) {
 		newVertex.id = indicesCount;
-		newVertex.color = vec4((color / 255.0f) * vec3(0.2f, 0.2f, 0.0f), 1);
+		newVertex.color = vec4(color, 1);
 		index = newVertex.id;
 		this->vertices.push_back(newVertex);
 		indicesCount++;

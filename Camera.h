@@ -52,3 +52,10 @@ public:
 	void update();
 };
 
+class MenuCamera : public Camera
+{
+public:
+	MenuCamera(GLFWwindow*, vec2, vec2, vec3, vec3, vec3, mat4);
+	void update();
+};
+

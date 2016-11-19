@@ -69,37 +69,41 @@ void StateSpaceCamera::update()
 {
 	vector<double> minDiff = {INFINITY, INFINITY, INFINITY};
 	vector<int> minIndex = {-1, -1, -1};
-	for (int i = 0; i < terrain->vertices.size(); i++)
+
+	if (terrain != nullptr)
 	{
-		vec3 temp(terrain->vertices[i].position);
-		temp = vec3(terrain->model * vec4(temp, 1));
-		vec2 diff2D(camPosVector.x - temp.x, camPosVector.z - temp.z);
-		if (length(diff2D) < minDiff[0])
+		for (int i = 0; i < terrain->vertices.size(); i++)
 		{
-			minDiff[2] = minDiff[1];
-			minDiff[1] = minDiff[0];
-			minDiff[0] = length(diff2D);
-			minIndex[2] = minIndex[1];
-			minIndex[1] = minIndex[0];
-			minIndex[0] = i;
+			vec3 temp(terrain->vertices[i].position);
+			temp = vec3(terrain->model * vec4(temp, 1));
+			vec2 diff2D(camPosVector.x - temp.x, camPosVector.z - temp.z);
+			if (length(diff2D) < minDiff[0])
+			{
+				minDiff[2] = minDiff[1];
+				minDiff[1] = minDiff[0];
+				minDiff[0] = length(diff2D);
+				minIndex[2] = minIndex[1];
+				minIndex[1] = minIndex[0];
+				minIndex[0] = i;
+			}
+			else if (length(diff2D) < minDiff[1])
+			{
+				minDiff[2] = minDiff[1];
+				minDiff[1] = length(diff2D);
+				minIndex[2] = minIndex[1];
+				minIndex[1] = i;
+			}
+			else if (length(diff2D) < minDiff[2])
+			{
+				minDiff[2] = length(diff2D);
+				minIndex[2] = i;
+			}
 		}
-		else if (length(diff2D) < minDiff[1])
-		{
-			minDiff[2] = minDiff[1];
-			minDiff[1] = length(diff2D);
-			minIndex[2] = minIndex[1];
-			minIndex[1] = i;
-		}
-		else if (length(diff2D) < minDiff[2])
-		{
-			minDiff[2] = length(diff2D);
-			minIndex[2] = i;
-		}
+
+		Plane plane(vec3(terrain->model * vec4(terrain->vertices[minIndex[0]].position, 1)), vec3(terrain->model * vec4(terrain->vertices[minIndex[1]].position, 1)), vec3(terrain->model * vec4(terrain->vertices[minIndex[2]].position, 1)));
+
+		camPosVector.y = plane.intersection(vec3(camPosVector.x, 0, camPosVector.z), vec3(0, 1, 0)) + 2;
 	}
-
-	Plane plane(vec3(terrain->model * vec4(terrain->vertices[minIndex[0]].position, 1)), vec3(terrain->model * vec4(terrain->vertices[minIndex[1]].position, 1)), vec3(terrain->model * vec4(terrain->vertices[minIndex[2]].position, 1)));
-
-	camPosVector.y = plane.intersection(vec3(camPosVector.x, 0, camPosVector.z), vec3(0, 1, 0)) + 2;
 	lookAtVector = camPosVector + vec3(cos(camTheta) * cos(camPhi), sin(camPhi), sin(camTheta) * cos(camPhi));
 
 	View = lookAt(camPosVector, lookAtVector, upVector);
@@ -107,4 +111,15 @@ void StateSpaceCamera::update()
 	int width, height;
 	glfwGetWindowSize(window, &width, &height);
 	Projection = perspective(45.0f, (float)width / height, 0.1f, 100.0f);
+}
+
+MenuCamera::MenuCamera(GLFWwindow* window, vec2 relativePosition, vec2 relativeDimensions, vec3 pos, vec3 lookAt, vec3 up, mat4 Projection) :
+	Camera(window, relativePosition, relativeDimensions, pos, lookAt, up, Projection)
+{
+
+}
+
+void MenuCamera::update()
+{
+
 }

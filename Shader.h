@@ -35,10 +35,20 @@ public:
 	LitShader(const char* vertexPath, const char* fragmentPath);
 };
 
+class InstancedLitShader : public Shader
+{
+public:
+	static InstancedLitShader* shader;
+	GLuint ExternalTransformID;
+	InstancedLitShader() {};
+	InstancedLitShader(const char* vertexPath, const char* fragmentPath);
+};
+
 class CubeMapShader : public Shader
 {
 public:
 	static CubeMapShader* shader;
+	GLuint cubeMap;
 	CubeMapShader() {};
 	CubeMapShader(const char* vertexPath, const char* fragmentPath);
 };

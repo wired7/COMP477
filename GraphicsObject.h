@@ -7,7 +7,11 @@
 #include <glm.hpp>
 #include <gtc/matrix_transform.hpp>
 #include <gtx/rotate_vector.hpp>
+#include <Importer.hpp>
+#include <scene.h>
+#include <postprocess.h>
 
+using namespace Assimp;
 using namespace glm;
 using namespace std;
 
@@ -41,8 +45,8 @@ public:
 	GLuint EBO;
 	MeshObject() {};
 	~MeshObject() {};
-	void bindBuffers(void);
-	void enableBuffers(void);
+	virtual void bindBuffers(void);
+	virtual void enableBuffers(void);
 	void addVertex(vec3, vec4, vec2, vec3);
 };
 
@@ -52,8 +56,8 @@ public:
 	vector<mat4> matrices;
 	InstancedMeshObject() {};
 	~InstancedMeshObject() {};
-	void bindInstances(void);
-	void enableInstances(void);
+	virtual void bindInstances(void);
+	virtual void enableInstances(void);
 };
 
 class LitObject
@@ -65,11 +69,44 @@ public:
 	vec4 specularColor;
 };
 
+class ImportedMesh : public MeshObject
+{
+public:
+	ImportedMesh(char*, vec3, vec3);
+	void draw();
+private:
+	void loadFile(char*);
+};
+
 class Polyhedron : public MeshObject
 {
 public:
 	int resolution;
 	Polyhedron() {};
 	Polyhedron(int, double, vec3, vec4);
+	void draw();
+};
+
+class InstancedSpheres : public InstancedMeshObject
+{
+public:
+	static Polyhedron* sphere;
+	GLuint positionsVertexBuffer;
+	vector<vec3> positions;
+	InstancedSpheres(float, int, vec4, vector<vec3> positions = {});
+	InstancedSpheres(Polyhedron*) {};
+	~InstancedSpheres() {};
+	virtual void bindInstances(void);
+	virtual void updateInstances(void);
+	virtual void updateInstances(vector<vec3>*);
+	virtual void enableInstances(void);
+	virtual void draw();
+};
+
+class Rectangle : public MeshObject
+{
+public:
+	Rectangle() {};
+	Rectangle(vec3, vec3, vec4);
 	void draw();
 };

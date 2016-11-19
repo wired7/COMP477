@@ -28,7 +28,7 @@ void MeshObject::bindBuffers(void)
 		glBufferData(GL_ELEMENT_ARRAY_BUFFER, indices.size()*sizeof(GLuint), &indices[0], GL_DYNAMIC_DRAW);
 	}
 
-	glVertexAttribPointer(0, 3, GL_FLOAT, GL_FALSE, sizeof(Vertex2), (GLvoid*)0);
+	glVertexAttribPointer(0, 3, GL_FLOAT, GL_FALSE, sizeof(Vertex2), (GLvoid*)offsetof(Vertex2, position));
 	glVertexAttribPointer(1, 4, GL_FLOAT, GL_FALSE, sizeof(Vertex2), (GLvoid*)offsetof(Vertex2, color));
 	glVertexAttribPointer(2, 3, GL_FLOAT, GL_FALSE, sizeof(Vertex2), (GLvoid*)offsetof(Vertex2, normal));
 	glVertexAttribPointer(3, 2, GL_FLOAT, GL_FALSE, sizeof(Vertex2), (GLvoid*)offsetof(Vertex2, texCoord));
@@ -93,7 +93,7 @@ Polyhedron::Polyhedron(int resolution, double radius, vec3 pos, vec4 color)
 	shader = LitShader::shader;
 	
 	loadTexture("textures\\blank.jpg");
-//	model = rotate(scale(translate(mat4(1.0f), pos), vec3(radius, radius, radius)), 3.1415f / 2, vec3(1, 0, 0));
+	model = scale(translate(mat4(1.0f), pos), vec3(radius, radius, radius));
 	this->resolution = resolution;
 	double angle = 2 * 3.1415 / resolution;
 	vector<vector<vec3>> circles;
@@ -128,4 +128,142 @@ void Polyhedron::draw(void)
 	glUniformMatrix4fv(((LitShader*)shader)->modelID, 1, GL_FALSE, &model[0][0]);
 	glBindTexture(GL_TEXTURE_2D, texture);
 	glDrawElements(GL_TRIANGLE_STRIP, indices.size(), GL_UNSIGNED_INT, 0);
+}
+
+Polyhedron* InstancedSpheres::sphere;
+
+InstancedSpheres::InstancedSpheres(float radius, int resolution, vec4 color, vector<vec3> positions)
+{
+	shader = InstancedLitShader::shader;
+	sphere = new Polyhedron(resolution, radius, vec3(0, 0, 0), color);
+	model = scale(mat4(1.0f), vec3(radius, radius, radius));
+
+	vertices = sphere->vertices;
+	indices = sphere->indices;
+
+	this->positions = positions;
+
+	if (this->positions.size())
+	{
+		InstancedMeshObject::bindBuffers();
+		bindInstances();
+	}
+}
+
+void InstancedSpheres::bindInstances(void)
+{
+	GLuint positionsVertexBuffer;
+	glBindVertexArray(VAO);
+	glGenBuffers(1, &positionsVertexBuffer);
+	glBindBuffer(GL_ARRAY_BUFFER, positionsVertexBuffer);
+	glBufferData(GL_ARRAY_BUFFER, positions.size() * sizeof(vec3), &(positions[0]), GL_DYNAMIC_DRAW);
+	// Vertex Attributes
+	glVertexAttribPointer(4, 3, GL_FLOAT, GL_FALSE, sizeof(vec3), (GLvoid*)0);
+	glVertexAttribDivisor(4, 1);
+
+	glBindVertexArray(0);
+}
+
+void InstancedSpheres::updateInstances()
+{
+	glBindVertexArray(VAO);
+	glBindBuffer(GL_ARRAY_BUFFER, 6);
+	glBufferData(GL_ARRAY_BUFFER, positions.size() * sizeof(vec3), &(positions[0]), GL_DYNAMIC_DRAW);
+
+	glBindVertexArray(0);
+}
+
+void InstancedSpheres::updateInstances(vector<vec3>* positions)
+{
+	glBindVertexArray(VAO);
+	glBindBuffer(GL_ARRAY_BUFFER, 6);
+	glBufferData(GL_ARRAY_BUFFER, positions->size() * sizeof(vec3), &((*positions)[0]), GL_DYNAMIC_DRAW);
+
+	glBindVertexArray(0);
+}
+
+void InstancedSpheres::enableInstances(void)
+{
+	glEnableVertexAttribArray(4);
+}
+
+void InstancedSpheres::draw()
+{
+	InstancedMeshObject::enableBuffers();
+	enableInstances();
+	glUniformMatrix4fv(((InstancedLitShader*)shader)->ExternalTransformID, 1, GL_FALSE, &(model[0][0]));
+	glBindTexture(GL_TEXTURE_2D, texture);
+	glDrawElementsInstanced(GL_TRIANGLE_STRIP, indices.size(), GL_UNSIGNED_INT, 0, positions.size());
+}
+
+Rectangle::Rectangle(vec3 position, vec3 dimensions, vec4 color)
+{
+	shader = LitShader::shader;
+	loadTexture("textures\\blank.jpg");
+
+	addVertex(vec3(0, 0, 0), color, vec2(), vec3(0, 0, -1));
+	addVertex(vec3(0, 1, 0), color, vec2(), vec3(0, 0, -1));
+	addVertex(vec3(1, 0, 0), color, vec2(), vec3(0, 0, -1));
+	addVertex(vec3(1, 1, 0), color, vec2(), vec3(0, 0, -1));
+
+	model = scale(translate(mat4(), position), dimensions);
+
+	bindBuffers();
+}
+
+void Rectangle::draw()
+{
+	enableBuffers();
+	glUniformMatrix4fv(((LitShader*)shader)->modelID, 1, GL_FALSE, &model[0][0]);
+	glBindTexture(GL_TEXTURE_2D, texture);
+	glDrawArrays(GL_TRIANGLE_STRIP, 0, vertices.size());
+}
+
+ImportedMesh::ImportedMesh(char* s, vec3 position, vec3 dimensions)
+{
+	shader = LitShader::shader;
+	loadTexture("textures\\blank.jpg");
+
+	loadFile(s);
+	bindBuffers();
+
+	model = rotate(scale(mat4(), 0.07f * dimensions), -3.1415f / 2, vec3(1, 0, 0));
+	model[3] = vec4(position, 1);
+}
+
+void ImportedMesh::loadFile(char* s)
+{
+	Importer importer;
+	const aiScene* scene = importer.ReadFile(s, aiProcess_CalcTangentSpace | aiProcess_Triangulate | aiProcess_JoinIdenticalVertices | aiProcess_SortByPType);
+
+	if (!scene)
+	{
+		cout << "Couldn't load " << s << endl;
+		return;
+	}
+
+	for(int i = 0; i < scene->mNumMeshes; i++)
+	{
+		aiMesh* mesh = scene->mMeshes[i];
+		int iMeshFaces = mesh->mNumFaces;
+		for(int j = 0; j < iMeshFaces; j++)
+		{
+			const aiFace& face = mesh->mFaces[j];
+			for(int k = 0; k < 3; k++)
+			{
+				aiVector3D pos = mesh->mVertices[face.mIndices[k]];
+				aiVector3D uv = mesh->mTextureCoords[0][face.mIndices[k]];
+				aiVector3D normal = mesh->HasNormals() ? mesh->mNormals[face.mIndices[k]] : aiVector3D(1.0f, 1.0f, 1.0f);
+				addVertex(vec3(pos.x, pos.y, pos.z), vec4(0.5, 0.5, 0.5, 1), vec2(uv.x, uv.y), vec3(normal.x, normal.y, normal.z));
+			}
+		}
+	}
+}
+
+void ImportedMesh::draw()
+{
+	glUniformMatrix4fv(((LitShader*)shader)->modelID, 1, GL_FALSE, &model[0][0]);
+	enableBuffers();
+	glBindTexture(GL_TEXTURE_2D, texture);
+	glDrawArrays(GL_TRIANGLES, 0, vertices.size());
 }

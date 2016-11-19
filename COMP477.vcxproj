@@ -26,6 +26,7 @@
     <ClInclude Include="Cubemap.h" />
     <ClInclude Include="GraphicsObject.h" />
     <ClInclude Include="InputState.h" />
+    <ClInclude Include="Menu.h" />
     <ClInclude Include="NoiseTexture.h" />
     <ClInclude Include="Shader.h" />
     <ClInclude Include="Shape.h" />
@@ -42,6 +43,7 @@
     <ClCompile Include="Cubemap.cpp" />
     <ClCompile Include="GraphicsObject.cpp" />
     <ClCompile Include="InputState.cpp" />
+    <ClCompile Include="Menu.cpp" />
     <ClCompile Include="Shader.cpp" />
     <ClCompile Include="Shape.cpp" />
     <ClCompile Include="Skybox.cpp" />
@@ -112,11 +114,11 @@
       <WarningLevel>Level3</WarningLevel>
       <Optimization>Disabled</Optimization>
       <SDLCheck>true</SDLCheck>
-      <AdditionalIncludeDirectories>..\COMP477\Resources\GLM\glm;..\COMP477\Resources\Simple OpenGL Image Library\SOIL;..\COMP477\Resources\GLFW\include\GLFW;..\COMP477\Resources\GLEW\include\GL;%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
+      <AdditionalIncludeDirectories>C:\Users\Wired\Documents\Visual Studio 2015\Projects\COMP477\Resources\assimp-win\include\assimp;..\COMP477\Resources\GLM\glm;..\COMP477\Resources\Simple OpenGL Image Library\SOIL;..\COMP477\Resources\GLFW\include\GLFW;..\COMP477\Resources\GLEW\include\GL;%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
     </ClCompile>
     <Link>
-      <AdditionalLibraryDirectories>..\COMP477\Resources\Simple OpenGL Image Library\lib;..\COMP477\Resources\GLFW\lib-vc2015;..\COMP477\Resources\GLEW\lib\Release\Win32;%(AdditionalLibraryDirectories)</AdditionalLibraryDirectories>
-      <AdditionalDependencies>opengl32.lib;glew32.lib;glfw3.lib;soil.lib;%(AdditionalDependencies)</AdditionalDependencies>
+      <AdditionalLibraryDirectories>C:\Users\Wired\Documents\Visual Studio 2015\Projects\COMP477\Resources\assimp-win\lib32;..\COMP477\Resources\Simple OpenGL Image Library\lib;..\COMP477\Resources\GLFW\lib-vc2015;..\COMP477\Resources\GLEW\lib\Release\Win32;%(AdditionalLibraryDirectories)</AdditionalLibraryDirectories>
+      <AdditionalDependencies>opengl32.lib;glew32.lib;glfw3.lib;soil.lib;assimp.lib;%(AdditionalDependencies)</AdditionalDependencies>
     </Link>
   </ItemDefinitionGroup>
   <ItemDefinitionGroup Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">
@@ -138,13 +140,13 @@
       <FunctionLevelLinking>true</FunctionLevelLinking>
       <IntrinsicFunctions>true</IntrinsicFunctions>
       <SDLCheck>true</SDLCheck>
-      <AdditionalIncludeDirectories>C:\Users\Wired\Documents\Visual Studio 2015\Projects\COMP477\Resources\GLM\glm;C:\Users\Wired\Documents\Visual Studio 2015\Projects\COMP477\Resources\Simple OpenGL Image Library\SOIL;C:\Users\Wired\Documents\Visual Studio 2015\Projects\COMP477\Resources\GLFW\include\GLFW;C:\Users\Wired\Documents\Visual Studio 2015\Projects\COMP477\Resources\GLEW\include\GL;%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
+      <AdditionalIncludeDirectories>C:\Users\Wired\Documents\Visual Studio 2015\Projects\COMP477\Resources\assimp-win\include\assimp;C:\Users\Wired\Documents\Visual Studio 2015\Projects\COMP477\Resources\GLM\glm;C:\Users\Wired\Documents\Visual Studio 2015\Projects\COMP477\Resources\Simple OpenGL Image Library\SOIL;C:\Users\Wired\Documents\Visual Studio 2015\Projects\COMP477\Resources\GLFW\include\GLFW;C:\Users\Wired\Documents\Visual Studio 2015\Projects\COMP477\Resources\GLEW\include\GL;%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
     </ClCompile>
     <Link>
       <EnableCOMDATFolding>true</EnableCOMDATFolding>
       <OptimizeReferences>true</OptimizeReferences>
-      <AdditionalLibraryDirectories>C:\Users\Wired\Documents\Visual Studio 2015\Projects\COMP477\Resources\Simple OpenGL Image Library\lib;C:\Users\Wired\Documents\Visual Studio 2015\Projects\COMP477\Resources\GLFW\lib-vc2015;C:\Users\Wired\Documents\Visual Studio 2015\Projects\COMP477\Resources\GLEW\lib\Release\Win32;%(AdditionalLibraryDirectories)</AdditionalLibraryDirectories>
-      <AdditionalDependencies>opengl32.lib;glew32.lib;glfw3.lib;soil.lib;%(AdditionalDependencies)</AdditionalDependencies>
+      <AdditionalLibraryDirectories>C:\Users\Wired\Documents\Visual Studio 2015\Projects\COMP477\Resources\assimp-win\lib32;C:\Users\Wired\Documents\Visual Studio 2015\Projects\COMP477\Resources\Simple OpenGL Image Library\lib;C:\Users\Wired\Documents\Visual Studio 2015\Projects\COMP477\Resources\GLFW\lib-vc2015;C:\Users\Wired\Documents\Visual Studio 2015\Projects\COMP477\Resources\GLEW\lib\Release\Win32;%(AdditionalLibraryDirectories)</AdditionalLibraryDirectories>
+      <AdditionalDependencies>opengl32.lib;glew32.lib;glfw3.lib;soil.lib;assimp.lib;%(AdditionalDependencies)</AdditionalDependencies>
     </Link>
   </ItemDefinitionGroup>
   <ItemDefinitionGroup Condition="'$(Configuration)|$(Platform)'=='Release|x64'">

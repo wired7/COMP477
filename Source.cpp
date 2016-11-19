@@ -12,6 +12,7 @@
 #include <thread>
 #include "Shader.h"
 #include "StateSpace.h"
+#include "Menu.h"
 
 using namespace std;
 using namespace glm;
@@ -19,6 +20,8 @@ using namespace glm;
 GLFWwindow* window;
 StateSpace* stateSpace;
 Skybox* skybox;
+Menu* menu;
+GraphicsObject* selectedObject;
 
 // GLEW and GLFW initialization. Projection and View matrix setup
 int init() {
@@ -37,7 +40,7 @@ int init() {
 	glfwWindowHint(GLFW_OPENGL_PROFILE, GLFW_OPENGL_CORE_PROFILE);
 
 	// Open a window and create its OpenGL context
-	window = glfwCreateWindow(1200, 800, "CoolProject", NULL, NULL);
+	window = glfwCreateWindow(1200, 800, "COMP477", NULL, NULL);
 	if (window == NULL) {
 		fprintf(stderr, "Failed to open GLFW window.\n");
 		getchar();
@@ -71,7 +74,8 @@ int init() {
 
 	glPointSize(3.0f);
 
-	LitShader::shader = new LitShader("shaders\\litShader.VERTEXSHADER", "shaders\\litFragmentShader.FRAGMENTSHADER");
+	LitShader::shader = new LitShader("shaders\\litShader.VERTEXSHADER", "shaders\\InstancedFragmentShader.FRAGMENTSHADER");
+	InstancedLitShader::shader = new InstancedLitShader("shaders\\InstancedVertexShader.VERTEXSHADER", "shaders\\InstancedFragmentShader.FRAGMENTSHADER");
 	CubeMapShader::shader = new CubeMapShader("shaders\\CubeMap.VERTEXSHADER", "shaders\\CubeMap.FRAGMENTSHADER");
 	
 	skybox = new Skybox("skyboxes\\ame_majesty\\");
@@ -80,6 +84,8 @@ int init() {
 	StateSpace::activeStateSpace = stateSpace;
 
 	Controller::setController(StateSpaceController::getController());
+
+	menu = new Menu(window);
 
 	srand(time(NULL));
 }
@@ -94,6 +100,8 @@ int main()
 		glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
 
 		stateSpace->draw();
+
+//		menu->draw();
 
 		// Swap buffers
 		glfwSwapBuffers(window);

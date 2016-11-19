@@ -120,9 +120,16 @@ LitShader::LitShader(const char* vertexPath, const char* fragmentPath) : Shader(
 	ambientID = glGetUniformLocation(Program, "ambient");*/
 };
 
+InstancedLitShader* InstancedLitShader::shader;
+
+InstancedLitShader::InstancedLitShader(const char* vertexPath, const char* fragmentPath) : Shader(vertexPath, fragmentPath)
+{
+	ExternalTransformID = glGetUniformLocation(Program, "ExternalTransform");
+}
+
 CubeMapShader* CubeMapShader::shader;
 
-CubeMapShader::CubeMapShader(const char* vertexPath, const char* fragmentPath)
+CubeMapShader::CubeMapShader(const char* vertexPath, const char* fragmentPath) : Shader(vertexPath, fragmentPath)
 {
-
+	cubeMap = glGetUniformLocation(Program, "cubemap");
 }

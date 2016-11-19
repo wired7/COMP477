@@ -10,6 +10,4 @@ public:
 	static bool shiftPressed;
 	static bool controlPressed;
 	static bool altPressed;
-	static bool wireframeModeOn;
-	static bool surfaceModeOn;
 };
