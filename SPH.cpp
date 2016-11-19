@@ -69,7 +69,6 @@ void SPH::calcSPH()
 						}
 						
 						// TODO: Reflection
-						
 
 
 
@@ -126,27 +125,36 @@ float SPH::calcKernel(vec3 distance, float h)
 	return first * (second + third + fourth + fifth);
 }
 
+// Using Spiky Kernel for calculating pressure
 // Calculates the vector field
-vec3 SPH::calcGradientW(vec3 distance, float h)
+vec3 SPH::calcGradientPressureKernel(vec3 distance, float h)
 {	
 	float magnitude = glm::length(distance);
 
-	float coefficient = -945.0f / (32.0f*glm::pi<float>()*pow(h, 9));
-	float derivedValue = pow((h*h) - (magnitude*magnitude), 2);	
+	if (magnitude > h) {
+		return vec3(0,0,0);
+	}
 
-	return coefficient * distance * derivedValue;
-}
-
-// Calculates the divergence of the vector field
-float SPH::calcLaplacianW(vec3 distance, float h)
-{
-	float magnitude = glm::length(distance);
-
-	float coefficient = -945.0f / (32.0f*glm::pi<float>()*pow(h, 9));
-	float derivedFirstValue = ((h*h) - (magnitude*magnitude));
-	float derivedSecondValue = (3 * (h*h) - 7 * (magnitude*magnitude));
+	float coefficient = -45.0f / (glm::pi<float>()*pow(h, 6));
+	vec3 derivedFirstValue = distance / magnitude;
+	float derivedSecondValue = pow((h - magnitude), 2);	
 
 	return coefficient * derivedFirstValue * derivedSecondValue;
+}
+
+// Using viscosity Kernel for calculating viscosity
+// Calculates the divergence of the vector field
+float SPH::calcLaplacianViscosityKernel(vec3 distance, float h)
+{
+	float magnitude = glm::length(distance);
+	if (magnitude > h) {
+		return 0.0f;
+	}
+
+	float coefficient = -45.0f / (glm::pi<float>()*pow(h, 6));
+	float derivedFirstValue = ((h - magnitude));
+
+	return coefficient * derivedFirstValue;
 }
 
 vec3 SPH::calcGradientPressure(Particle particle)
@@ -161,10 +169,12 @@ vec3 SPH::calcGradientPressure(Particle particle)
 
 		// forces between two particles should be equal & opposite
 		// pressure has to be symmetric, to guarantee symmetry we take the average of the two pressures
-		ret += (sys->particles[index]->params.mass / sys->particles[index]->params.density) * ((sys->particles[index]->params.pressure + particle.params.pressure) / 2.0f) * (calcGradientW(distance, h));
+		float symmetricPressure = (sys->particles[index]->params.pressure + particle.params.pressure) / 2;
+
+		ret += (sys->particles[index]->params.mass / sys->particles[index]->params.density) * symmetricPressure * (calcGradientPressureKernel(distance, h));
 	}
 
-	return -ret; // return the negated vector --> -pressureGradient
+	return -ret; // return the negated vector
 }
 
 vec3 SPH::calcLaplacianVelocity(Particle particle)
@@ -177,9 +187,10 @@ vec3 SPH::calcLaplacianVelocity(Particle particle)
 		vec3 distance = particle.position - sys->particles[index]->position;
 		float h = sys->sysParams.searchRadius;
 
-		// forces between two particles should be equal & opposite
-		// viscocity force is non-symmetric, finding the difference in velocities 
-		ret += (sys->particles[index]->params.mass / sys->particles[index]->params.density) * (sys->particles[index]->params.velocity - particle.params.velocity) * (calcLaplacianW(distance, h));
+		// forces between two particles should be equal & opposite, symmetrize the velocity fields
+		vec3 symmetricVelocity = sys->particles[index]->params.velocity - particle.params.velocity;
+		
+		ret += (sys->particles[index]->params.mass / sys->particles[index]->params.density) * symmetricVelocity * (calcLaplacianViscosityKernel(distance, h));
 	}
 
 	return ret;
