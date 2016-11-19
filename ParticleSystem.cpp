@@ -2,6 +2,8 @@
 #include "ParticleSystem.h"
 #include "glm.hpp"
 
+ParticleSystem* ParticleSystem::particleSystem;
+
 ParticleSystem* ParticleSystem::getInstance()
 {
 	if (particleSystem == nullptr)

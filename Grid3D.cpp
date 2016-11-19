@@ -61,16 +61,8 @@ void Grid3D::update(Particle particle)
 
 }
 
-vector<int> Grid3D::getNeighbors(Particle particle)
+vector<GridCube> Grid3D::getNeighborCubes(Particle particle)
 {
-	glm::vec3 currCell = particle.getGridCellCoord();
-	int x = currCell.x;
-	int y = currCell.y;
-	int z = currCell.z;
-	vector<GridCube> neighborCubes;
-
-	vector<int> ret;
-
 	//+00, 0+0, 00+
 	//++-, +-+, -++
 	//+--, --+, -+-
@@ -81,6 +73,12 @@ vector<int> Grid3D::getNeighbors(Particle particle)
 	//+++
 	//---
 
+	glm::vec3 currCell = particle.getGridCellCoord();
+	int x = currCell.x;
+	int y = currCell.y;
+	int z = currCell.z;
+
+	vector<GridCube> neighborCubes;
 	glm::vec3 incr(0, -1, 1);
 	for (int i = 0; i < 3; ++i)
 	{
@@ -88,14 +86,20 @@ vector<int> Grid3D::getNeighbors(Particle particle)
 		{
 			for (int k = 0; k < 3; k++)
 			{
-				if (i == 0 && j == 0 && k == 0) {
-					continue;
-				}
-				GridCube temp = data[x+incr[i]][y+incr[j]][z+incr[k]];
+				GridCube temp = data[x + incr[i]][y + incr[j]][z + incr[k]];
 				neighborCubes.push_back(temp);
 			}
 		}
 	}
+	return neighborCubes;
+}
+
+vector<int> Grid3D::getNeighbors(Particle particle)
+{
+
+	vector<GridCube> neighborCubes = getNeighborCubes(particle);
+
+	vector<int> ret;
 
 	for (int i = 0; i < neighborCubes.size(); ++i)
 	{
@@ -116,7 +120,7 @@ vector<int> Grid3D::getNeighbors(Particle particle)
 	return ret;
 }
 
-bool inRadius(glm::vec3 pos1, glm::vec3 pos2)
+bool Grid3D::inRadius(glm::vec3 pos1, glm::vec3 pos2)
 {
 	return (glm::length(pos1 - pos2) <= ParticleSystem::getInstance()->sysParams.searchRadius);
 }

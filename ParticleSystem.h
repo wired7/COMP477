@@ -6,11 +6,14 @@
 using namespace std;
 
 struct SystemParameters {
-	double searchRadius;
-	double viscocity;
-	double stiffness;
-	double restDensity;
-	double gravity;
+	float particleRadius;
+	float searchRadius;
+	float viscocity;
+	float stiffness;
+	float restDensity;
+	float gravity;
+	float tStep;
+	float maxTStep;
 };
 
 class ParticleSystem 

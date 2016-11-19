@@ -10,7 +10,7 @@ using namespace std;
 
 struct GridCube {
 	vector<int> particles;
-	vector<pair<int, GraphicsObject*>> rigidData;
+	vector<pair<int, MeshObject*>> rigidData;
 };
 
 class Grid3D {
@@ -19,14 +19,13 @@ public:
 	Grid3D();
 	~Grid3D();
 	int getCellSize();
-	void remove(Particle particle);
 	void update(Particle particle);
 	vector<int> getNeighbors(Particle particle);
+	vector<GridCube> getNeighborCubes(Particle particle);
 private:
 	vector<vector<vector<GridCube>>> data;
 	int cellSize;
 	int numCells;
-
 	bool inRadius(glm::vec3 pos1, glm::vec3 pos2);
 };
 

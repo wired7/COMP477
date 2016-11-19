@@ -4,6 +4,16 @@
 
 using namespace std;
 
+struct ParticleParameters {
+	float mass;
+	glm::vec3 velocity;
+	float density;
+	float pressure;
+	float kernel;
+	glm::vec3 gradientPressure;
+	glm::vec3 laplacianVelocity;
+};
+
 class Particle {
 public:
 	Particle();
@@ -13,20 +23,11 @@ public:
 	int getIndex();
 	glm::vec3 getGridCellCoord();
 	void setGridCellCoord(glm::vec3 gridCellCoord);
-	const double g = -9.81;
+	const float g = -9.81f;
 	vector<int> neighbors;
 	ParticleParameters params;
+	glm::vec3 collisionNormal;
 private:
 	int index;
 	glm::vec3 gridCellCoord;
-};
-
-struct ParticleParameters{
-	double mass;
-	double velocity;
-	double density;
-	double pressure;
-	double kernel;
-	double gradientPressure = 0;
-	double laplacianVelocity = 0;
 };
