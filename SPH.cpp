@@ -90,7 +90,7 @@ float SPH::calcDensity(Particle particle)
 	{
 		Particle* currParticle = sys->particles[particle.neighbors.at(i)];
 		vec3 distance = particle.position - currParticle->position;
-		density += currParticle->params.mass * calcKernel(distance, sys->sysParams.searchRadius);
+		density += currParticle->params.mass * calcDensityKernel(distance, sys->sysParams.searchRadius);
 	}
 
 	return density;
@@ -106,8 +106,8 @@ float SPH::calcPressure(const Particle& particle)
 // http://image.diku.dk/projects/media/kelager.06.pdf
 // For reference go to page 16
 
-// Using poly5 Kernel
-float SPH::calcKernel(vec3 distance, float h)
+// Using poly6 Kernel
+float SPH::calcDensityKernel(vec3 distance, float h)
 {
 	float magnitude = glm::length(distance);
 	if (magnitude > h)
