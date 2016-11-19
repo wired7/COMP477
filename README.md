@@ -7,7 +7,7 @@
 - Select Clone, and add "github.com/wired7/COMP477"
 - Enjoy.
 
-# For Visual Studio 2013 or later:
+# For Visual Studio 2013 or later, follow the steps above and do the following:
 - In the menu tab, click on Project > Properties
 - Go to Linker > General
 - Find 'Additional Library Directories' and click on the dropdown arrow to edit directory for GLFW
