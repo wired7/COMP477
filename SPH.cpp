@@ -86,6 +86,9 @@ void SPH::calcSPH()
 			}
 		}
 	}
+
+	// update list of particles
+	sys->updateList();	
 }
 
 float SPH::calcDensity(Particle particle)

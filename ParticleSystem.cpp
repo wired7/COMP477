@@ -23,7 +23,9 @@ ParticleSystem::~ParticleSystem()
 }
 
 void ParticleSystem::updateList() {
-	
+	for (int i = 0; i < particles.size(); ++i) {
+		grid.update(*particles[i]);
+	}	
 }
 
 void ParticleSystem::calcNeighbors(Particle* particle)
