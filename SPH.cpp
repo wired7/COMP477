@@ -80,7 +80,6 @@ void SPH::calcSPH()
 			}
 		}
 	}
-
 }
 
 float SPH::calcDensity(Particle particle)
@@ -116,13 +115,10 @@ float SPH::calcKernel(vec3 distance, float h)
 		return 0.0f;
 	}
 
-	float first = 15.0 / ((2 * glm::pi<float>())*(pow(h, 3)));
-	float second = pow(-magnitude, 3) / (2 * (pow(h, 3)));
-	float third = pow(magnitude, 2) / pow(h, 2);
-	float fourth = h / (2 * magnitude);
-	float fifth = -1.0;
+	float first = 315.0f / (64.0f * glm::pi<float>() * pow(h, 9));
+	float second = pow((h * h) - (magnitude * magnitude), 3);
 
-	return first * (second + third + fourth + fifth);
+	return first * second;
 }
 
 // Using Spiky Kernel for calculating pressure
