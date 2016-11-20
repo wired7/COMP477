@@ -99,12 +99,12 @@ vector<GridCube> Grid3D::getNeighborCubes(Particle particle)
 		}
 		for (int j = 0; j < 3; ++j)
 		{
-			if (y + incr[j] < 0 || y + incr[j] > data.size()) {
+			if (y + incr[j] < 0 || y + incr[j] > data[x + incr[i]].size()) {
 				continue;
 			}
 			for (int k = 0; k < 3; ++k)
 			{
-				if (z + incr[k] < 0 || z + incr[k] > data.size()) {
+				if (z + incr[k] < 0 || z + incr[k] > data[x + incr[i]][y + incr[j]].size()) {
 					continue;
 				}
 				GridCube temp = data[x + incr[i]][y + incr[j]][z + incr[k]];
