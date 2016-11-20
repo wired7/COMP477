@@ -94,10 +94,19 @@ vector<GridCube> Grid3D::getNeighborCubes(Particle particle)
 	glm::vec3 incr(0, -1, 1);
 	for (int i = 0; i < 3; ++i)
 	{
+		if (x + incr[i] < 0 || x + incr[i] > data.size()) {
+			continue;
+		}
 		for (int j = 0; j < 3; ++j)
 		{
+			if (y + incr[j] < 0 || y + incr[j] > data.size()) {
+				continue;
+			}
 			for (int k = 0; k < 3; ++k)
 			{
+				if (z + incr[k] < 0 || z + incr[k] > data.size()) {
+					continue;
+				}
 				GridCube temp = data[x + incr[i]][y + incr[j]][z + incr[k]];
 				neighborCubes.push_back(temp);
 			}
@@ -117,7 +126,7 @@ vector<int> Grid3D::getNeighbors(Particle particle)
 	{
 		int particlesSize = neighborCubes.at(i).particles.size();
 		GridCube* currCube = &neighborCubes.at(i);
-		for (int j = 0; particlesSize; j++)
+		for (int j = 0; j < particlesSize; j++)
 		{
 			ParticleSystem* ps = ParticleSystem::getInstance();
 			int particleIndex = currCube->particles.at(j);
