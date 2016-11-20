@@ -13,10 +13,11 @@ ParticleSystem* ParticleSystem::getInstance()
 	return particleSystem;
 }
 
-ParticleSystem::ParticleSystem() 
+ParticleSystem::ParticleSystem()
 {
 
 }
+
 ParticleSystem::~ParticleSystem()
 {
 

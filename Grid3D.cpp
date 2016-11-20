@@ -2,10 +2,21 @@
 #include "Grid3D.h"
 #include "ParticleSystem.h"
 
-Grid3D::Grid3D(int numCells, int cellSize): numCells(numCells), cellSize(cellSize)
+Grid3D::Grid3D(int numCells, float cellSize): numCells(numCells), cellSize(cellSize)
 {
 	//initializes our 3D vector to be (numCell X numCells X numCells)
-	data = vector<vector<vector<GridCube>>>(numCells, vector<vector<GridCube>>(numCells, vector<GridCube>(numCells, GridCube())));
+	data = vector<vector<vector<GridCube>>>();
+
+	for (int i = 0; i < numCells; i++)
+	{
+		data.push_back(vector<vector<GridCube>>());
+		for (int j = 0; j < numCells; j++)
+		{
+			data[i].push_back(vector<GridCube>());
+			for (int k = 0; k < numCells; k++)
+				data[i][j].push_back(GridCube());
+		}
+	}
 }
 
 Grid3D::Grid3D() {
@@ -39,6 +50,7 @@ void Grid3D::update(Particle particle)
 
 	if (remove)
 	{
+		// This can probably be optimized using the object's name
 		for (int i = 0; i < cubeptr->particles.size(); ++i)
 		{
 			if (cubeptr->particles.at(i) == particle.getIndex())
@@ -82,9 +94,9 @@ vector<GridCube> Grid3D::getNeighborCubes(Particle particle)
 	glm::vec3 incr(0, -1, 1);
 	for (int i = 0; i < 3; ++i)
 	{
-		for (int j = 0; j < 3; j++)
+		for (int j = 0; j < 3; ++j)
 		{
-			for (int k = 0; k < 3; k++)
+			for (int k = 0; k < 3; ++k)
 			{
 				GridCube temp = data[x + incr[i]][y + incr[j]][z + incr[k]];
 				neighborCubes.push_back(temp);

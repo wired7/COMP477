@@ -1,17 +1,17 @@
 #pragma once
 #include "Particle.h"
 
-class SPH
+static class SPH
 {
 public:
-	void calcSPH();
+	static void calcSPH();
 private:
-	float calcDensity(Particle particle);
-	float calcPressure(const Particle& particle);
-	float calcDensityKernel(glm::vec3 distance, float h);
-	glm::vec3 calcGradientPressureKernel(glm::vec3 distance, float h);
-	float calcLaplacianViscosityKernel(glm::vec3 distance, float h);
-	glm::vec3 calcGradientPressure(Particle particle);
-	glm::vec3 calcLaplacianVelocity(Particle particle);
-	glm::vec3 calcAcceleration(const Particle& particle);
+	static float calcDensity(Particle particle);
+	static float calcPressure(const Particle& particle);
+	static float calcDensityKernel(glm::vec3 distance, float h);
+	static glm::vec3 calcGradientPressureKernel(glm::vec3 distance, float h);
+	static float calcLaplacianViscosityKernel(glm::vec3 distance, float h);
+	static glm::vec3 calcGradientPressure(Particle particle);
+	static glm::vec3 calcLaplacianVelocity(Particle particle);
+	static glm::vec3 calcAcceleration(const Particle& particle);
 };
