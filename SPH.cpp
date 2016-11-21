@@ -3,6 +3,39 @@
 #include "ParticleSystem.h"
 #include "Shape.h"
 #include <math.h>
+#include <chrono>
+#include <thread>
+
+#define THREADSIZE 200
+
+using namespace std::chrono;
+
+void neighbors(ParticleSystem* pS, int i, int* count)
+{
+	for(int j = i; j < i + THREADSIZE; j++, *count++)
+		pS->calcNeighbors(pS->particles[j]);
+}
+
+void densitiesPressures(ParticleSystem* pS, int i, int* count)
+{
+	for (int j = i; j < i + THREADSIZE; j++, *count++)
+	{
+		pS->particles[j]->params.density = SPH::calcDensity(*pS->particles[j]);
+		pS->particles[j]->params.pressure = SPH::calcPressure(*pS->particles[j]);
+	}
+}
+
+void eulerTimeIntegrations(ParticleSystem* pS, int i, int* count)
+{
+	for (int j = i; j < i + THREADSIZE; j++, *count++)
+	{
+		//calc right side equation
+		vec3 acceleration = SPH::calcAcceleration(*pS->particles[j]);
+		pS->particles[j]->params.velocity += pS->sysParams.tStep * acceleration;
+		pS->particles[j]->nextPosition = pS->particles[j]->position;
+		pS->particles[j]->nextPosition += pS->sysParams.tStep * pS->particles[j]->params.velocity;
+	}
+}
 
 void SPH::calcSPH()
 {
@@ -14,27 +47,45 @@ void SPH::calcSPH()
 	{
 
 	}*/
-
-	for (int i = 0; i < sys->particles.size(); ++i)
+	
+	int threadCount = sys->particles.size() / THREADSIZE;
+	std::thread* threads = new thread[threadCount];
+	
+	for (int i = 0, count = 0; i < sys->particles.size(); i += THREADSIZE)
 	{
-		sys->calcNeighbors(sys->particles[i]);
+		threads[i / THREADSIZE] = std::thread(neighbors, sys, i, &count);
 		//if debug draw lines
 	}
 
-	for (int i = 0; i < sys->particles.size(); ++i)
+	for (int i = 0; i < threadCount; ++i)
 	{
-		sys->particles[i]->params.density = calcDensity(*sys->particles[i]);
-		sys->particles[i]->params.pressure = calcPressure(*sys->particles[i]);
+		threads[i].join();
 	}
 
-	for (int i = 0; i < sys->particles.size(); ++i)
+
+	for (int i = 0, count = 0; i < sys->particles.size(); i += THREADSIZE)
 	{
-		//calc right side equation
-		vec3 acceleration = calcAcceleration(*sys->particles[i]);
-		sys->particles[i]->params.velocity += sys->sysParams.tStep * acceleration;
-		sys->particles[i]->nextPosition = sys->particles[i]->position;
-		sys->particles[i]->nextPosition += sys->sysParams.tStep * sys->particles[i]->params.velocity;
+		threads[i / THREADSIZE] = std::thread(densitiesPressures, sys, i, &count);
 	}
+
+	for (int i = 0; i < threadCount; ++i)
+	{
+		threads[i].join();
+	}
+
+
+	for (int i = 0, count = 0; i < sys->particles.size(); i += THREADSIZE)
+	{
+		threads[i / THREADSIZE] = std::thread(eulerTimeIntegrations, sys, i, &count);
+	}
+
+	for (int i = 0; i < threadCount; ++i)
+	{
+		threads[i].join();
+	}
+
+	delete[] threads;
+
 
 /*	for (int i = 0; i < sys->particles.size(); ++i)
 	{
@@ -87,13 +138,14 @@ void SPH::calcSPH()
 	}*/
 
 	// update list of particles
-	sys->updateList();	
+	sys->updateList();
 }
 
 float SPH::calcDensity(Particle particle)
 {
 	ParticleSystem* sys = ParticleSystem::getInstance();
 	float density = 0.0f;
+
 	for (int i = 0; i < particle.neighbors.size(); ++i)
 	{
 		Particle* currParticle = sys->particles[particle.neighbors.at(i)];

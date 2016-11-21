@@ -15,19 +15,20 @@ StateSpace::StateSpace(GLFWwindow* window, Skybox* skybox)
 //	terrain = new Terrain(1, 40, 40, 32, STATIC);
 	int width, height;
 	glfwGetWindowSize(window, &width, &height);
-	Camera::activeCamera = new StateSpaceCamera(window, vec2(0, 0), vec2(1, 1), vec3(0, 0, -1), vec3(0, 0, 0), vec3(0, 1, 0), perspective(45.0f, (float)width / height, 0.1f, 1000.0f), terrain);
+	Camera::activeCamera = new StateSpaceCamera(window, vec2(0, 0), vec2(1, 1), vec3(5, 5, 0), vec3(5, 5, 5), vec3(0, 1, 0), perspective(45.0f, (float)width / height, 0.1f, 1000.0f), terrain);
 	
 	float radius = 0.1f;
-	int blockSize = 6;
+	int blockSize = 10;
+	float density = 27;
 	
 	vector<Particle*> pos;
 	for(int k = 0; k < blockSize; k++)
 		for(int j = 0; j < blockSize; j++)
 			for (int i = 0; i < blockSize; i++)
-				pos.push_back(new Particle(vec3(10.0f + radius * (float)i, 10.0f + radius * (float)j, 10.0f + radius * (float)k)));
+				pos.push_back(new Particle(vec3(5.0f + (float)i / density, 5.0f + (float)j / density, 5.0f + (float)k / density)));
 
-	ParticleSystem::getInstance()->sysParams = SystemParameters(radius, 5, 0.01, 1, 10, 0, 0.01, 0.01);
-	ParticleSystem::getInstance()->grid = Grid3D(30, 0.5);
+	ParticleSystem::getInstance()->sysParams = SystemParameters(radius, 3, 0.01, 1000, 27, 0, 0.001, 0.001);
+	ParticleSystem::getInstance()->grid = Grid3D(20, 0.5);
 	ParticleSystem::getInstance()->addParticles(pos);
 	ParticleSystem::getInstance()->updateList();
 
@@ -36,7 +37,7 @@ StateSpace::StateSpace(GLFWwindow* window, Skybox* skybox)
 	delete p;
 
 	float t = 0;
-	for (float simTime = 0; simTime < 20; simTime += t)
+	for (float simTime = 0; simTime < 5; simTime += t)
 	{
 		if (t >= 0.016f)
 		{
@@ -90,7 +91,8 @@ void StateSpace::draw()
 
 		if (ms.count() - time >= 16 && playModeOn)
 		{
-			((InstancedSpheres*)models[0])->updateInstances(&(frames[(frameCount + 1) % frames.size()]));
+			frameCount = (frameCount + 1) % frames.size();
+			((InstancedSpheres*)models[0])->updateInstances(&(frames[frameCount]));
 
 			time = ms.count();
 		}

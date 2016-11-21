@@ -5,7 +5,7 @@ static class SPH
 {
 public:
 	static void calcSPH();
-private:
+
 	static float calcDensity(Particle particle);
 	static float calcPressure(const Particle& particle);
 	static float calcDensityKernel(glm::vec3 distance, float h);
