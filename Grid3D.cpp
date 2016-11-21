@@ -48,7 +48,7 @@ void Grid3D::update(Particle particle)
 
 	if (remove)
 	{
-		GridCube* cubeptr = &data[gridX][gridY][gridZ];
+		GridCube* cubeptr = &data[(int)currCell.x][(int)currCell.y][(int)currCell.z];
 		// This can probably be optimized using the object's name
 		for (int i = 0; i < cubeptr->particles.size(); ++i)
 		{
