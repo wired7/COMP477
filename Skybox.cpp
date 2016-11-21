@@ -54,7 +54,7 @@ Skybox::Skybox(string path) : Cubemap(path) {
     this->addFace(CUBEMAP_FRONT, "front.jpg");
     
     // HERE IS THE SKYBOX SIZE. CHANGE IT HERE.
-    const GLuint SKYBOX_SIZE = 18;
+    const GLuint SKYBOX_SIZE = 50;
     
     
     for (unsigned int i = 0; i < sizeof(skyboxVertices) / sizeof(GLfloat); i++) {

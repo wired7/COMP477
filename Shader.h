@@ -39,7 +39,7 @@ class InstancedLitShader : public Shader
 {
 public:
 	static InstancedLitShader* shader;
-	GLuint ExternalTransformID;
+	GLuint scaleID;
 	InstancedLitShader() {};
 	InstancedLitShader(const char* vertexPath, const char* fragmentPath);
 };

@@ -29,6 +29,7 @@ public:
 	SystemParameters sysParams;
 	vector<Particle*> particles;
 	vector<Rigidbody*> rigidbodies;
+	void addParticles(vector<Particle*>);
 	void updateList();
 	void calcNeighbors(Particle* particle);
 	Grid3D grid;

@@ -27,7 +27,7 @@ Grid3D::~Grid3D() {
 
 }
 
-int Grid3D::getCellSize()
+float Grid3D::getCellSize()
 {
 	return cellSize;
 }
@@ -131,7 +131,7 @@ vector<int> Grid3D::getNeighbors(Particle particle)
 			ParticleSystem* ps = ParticleSystem::getInstance();
 			int particleIndex = currCube->particles.at(j);
 
-			if (inRadius(particle.position, ps->particles[particleIndex]->position))
+			if (particleIndex != particle.getIndex() && inRadius(particle.position, ps->particles[particleIndex]->position))
 			{
 				ret.push_back(particleIndex);
 			}

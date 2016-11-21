@@ -11,12 +11,13 @@ layout(location = 4) in vec3 position;
 out vec4 vColor;
 
 // Values that stay constant for the whole mesh.
-uniform mat4 ExternalTransform;
+uniform vec3 Scale;
 uniform mat4 View;
 uniform mat4 Projection;
 
-void main(){	
-	gl_Position = Projection * View * (ExternalTransform * vec4(vertexPosition_modelspace, 1)) + vec4(position, 0);
+void main(){
+
+	gl_Position = Projection * View * vec4(Scale * vertexPosition_modelspace + position, 1);
 	vColor = vertexColor;
 }
 
