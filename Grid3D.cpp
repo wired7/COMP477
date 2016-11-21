@@ -62,13 +62,12 @@ void Grid3D::update(Particle particle)
 	if (!offGrid && remove)
 	{
 		data[gridX][gridY][gridZ].particles.push_back(particle.getIndex());
+		particle.setGridCellCoord(glm::vec3(gridX, gridY, gridZ));
 	}
 	else
 	{
 		//TODO
 	}
-
-	particle.setGridCellCoord(glm::vec3(gridX, gridY, gridZ));
 
 }
 
