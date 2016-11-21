@@ -27,7 +27,7 @@ StateSpace::StateSpace(GLFWwindow* window, Skybox* skybox)
 				pos.push_back(new Particle(vec3(10.0f + radius * (float)i, 10.0f + radius * (float)j, 10.0f + radius * (float)k)));
 
 	ParticleSystem::getInstance()->sysParams = SystemParameters(radius, 5, 0.01, 1, 1, 0, 0.01, 0.01);
-	ParticleSystem::getInstance()->grid = Grid3D(30, 1);
+	ParticleSystem::getInstance()->grid = Grid3D(30, 0.5);
 	ParticleSystem::getInstance()->addParticles(pos);
 	ParticleSystem::getInstance()->updateList();
 

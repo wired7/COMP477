@@ -81,7 +81,7 @@
     <ClInclude Include="Win32Utils.h">
       <Filter>Header Files</Filter>
     </ClInclude>
-    <ClInclude Include="OpenFileDialog.h">
+    <ClInclude Include="FileStorage.h">
       <Filter>Header Files</Filter>
     </ClInclude>
   </ItemGroup>
@@ -144,6 +144,9 @@
       <Filter>Source Files</Filter>
     </ClCompile>
     <ClCompile Include="SPH.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="FileStorage.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
   </ItemGroup>
