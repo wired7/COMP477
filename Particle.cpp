@@ -1,8 +1,11 @@
 #pragma once
 #include "Particle.h"
+#include <iostream>
 
-Particle::Particle(glm::vec3 pos) : position(pos), params(ParticleParameters(0.1f, 0.5f * glm::normalize(glm::vec3((float)rand() / RAND_MAX, (float)rand() / RAND_MAX, (float)rand() / RAND_MAX))))
+
+Particle::Particle(glm::vec3 pos) : position(pos), nextPosition(pos), params(ParticleParameters(0.1f, glm::vec3()))
 {
+
 }
 
 Particle::~Particle()

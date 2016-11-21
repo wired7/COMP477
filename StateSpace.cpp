@@ -15,35 +15,41 @@ StateSpace::StateSpace(GLFWwindow* window, Skybox* skybox)
 //	terrain = new Terrain(1, 40, 40, 32, STATIC);
 	int width, height;
 	glfwGetWindowSize(window, &width, &height);
-	Camera::activeCamera = new StateSpaceCamera(window, vec2(0, 0), vec2(1, 1), vec3(0, 0, -5), vec3(0, 0, 0), vec3(0, 1, 0), perspective(45.0f, (float)width / height, 0.1f, 100.0f), terrain);
+	Camera::activeCamera = new StateSpaceCamera(window, vec2(0, 0), vec2(1, 1), vec3(0, 0, -1), vec3(0, 0, 0), vec3(0, 1, 0), perspective(45.0f, (float)width / height, 0.1f, 1000.0f), terrain);
 	
-	float radius = 0.01f;
-	int blockSize = 60;
+	float radius = 0.1f;
+	int blockSize = 10;
 	
 	vector<Particle*> pos;
 	for(int k = 0; k < blockSize; k++)
 		for(int j = 0; j < blockSize; j++)
 			for (int i = 0; i < blockSize; i++)
-				pos.push_back(new Particle(vec3(1.0f + radius * (float)i, 1.0f + radius * (float)j, 1.0f + radius * (float)k)));
+				pos.push_back(new Particle(vec3(10.0f + radius * (float)i, 10.0f + radius * (float)j, 10.0f + radius * (float)k)));
 
-/*	for (int j = 0; j < 1000; j++)
-	{
-		frames.push_back(vector<vec3>());
-		for (int i = 0; i < pos.size(); i++)
-			if (!j)
-				frames[j].push_back(pos[i]);
-			else
- 				frames[j].push_back(frames[j - 1][i] + vec3((float)rand() * 0.001f / RAND_MAX, (float)rand() * 0.001f / RAND_MAX, (float)rand() * 0.001f / RAND_MAX));
-	}*/
-
-	ParticleSystem::getInstance()->sysParams = SystemParameters(radius, 5, 0.01, 1, 1000, 0, 0.001, 0.001);
-	ParticleSystem::getInstance()->particles = pos;
-	ParticleSystem::getInstance()->grid = Grid3D(10, 1);
+	ParticleSystem::getInstance()->sysParams = SystemParameters(radius, 5, 0.01, 1, 1, 0, 0.01, 0.01);
+	ParticleSystem::getInstance()->grid = Grid3D(30, 1);
+	ParticleSystem::getInstance()->addParticles(pos);
 	ParticleSystem::getInstance()->updateList();
 
-	auto positions = ParticleSystem::getInstance()->getParticlePositions();
-	models.push_back(new InstancedSpheres(radius, 8, vec4(0.5, 0.5, 1, 1), *positions));
-	delete positions;
+	auto p = ParticleSystem::getInstance()->getParticlePositions();
+	models.push_back(new InstancedSpheres(radius, 8, vec4(0.5, 0.5, 1, 1), *p));
+	delete p;
+
+	float t = 0;
+	for (float simTime = 0; simTime < 20; simTime += t)
+	{
+		if (t >= 0.016f)
+		{
+			auto partPos = ParticleSystem::getInstance()->getParticlePositions();
+			frames.push_back(*partPos);
+			delete partPos;
+			t = 0;
+		}
+
+		t += ParticleSystem::getInstance()->sysParams.tStep;
+		SPH::calcSPH();
+	}
+
 	observers.push_back(Camera::activeCamera);
 }
 
@@ -84,17 +90,13 @@ void StateSpace::draw()
 
 		if (ms.count() - time >= 16 && playModeOn)
 		{
-//			if (frameCount < frames.size() - 1)
+			if (frameCount < frames.size() - 1)
 			{
-//				((InstancedSpheres*)models[0])->updateInstances(&(frames[++frameCount]));
+				((InstancedSpheres*)models[0])->updateInstances(&(frames[++frameCount]));
 			}
-			
-			auto positions = ParticleSystem::getInstance()->getParticlePositions();
-			((InstancedSpheres*)models[0])->updateInstances(positions);
-			delete positions;
+
 			time = ms.count();
 		}
 
-		SPH::calcSPH();
 	}
 }

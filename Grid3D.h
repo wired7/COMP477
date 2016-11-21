@@ -19,7 +19,7 @@ public:
 	Grid3D::Grid3D(int numCells, float cellSize);
 	Grid3D();
 	~Grid3D();
-	int getCellSize();
+	float getCellSize();
 	void update(Particle particle);
 	vector<int> getNeighbors(Particle particle);
 	vector<GridCube> getNeighborCubes(Particle particle);

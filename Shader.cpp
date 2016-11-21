@@ -124,7 +124,7 @@ InstancedLitShader* InstancedLitShader::shader;
 
 InstancedLitShader::InstancedLitShader(const char* vertexPath, const char* fragmentPath) : Shader(vertexPath, fragmentPath)
 {
-	ExternalTransformID = glGetUniformLocation(Program, "ExternalTransform");
+	scaleID = glGetUniformLocation(Program, "Scale");
 }
 
 CubeMapShader* CubeMapShader::shader;

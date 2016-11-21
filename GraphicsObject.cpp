@@ -191,7 +191,7 @@ void InstancedSpheres::draw()
 {
 	InstancedMeshObject::enableBuffers();
 	enableInstances();
-	glUniformMatrix4fv(((InstancedLitShader*)shader)->ExternalTransformID, 1, GL_FALSE, &(model[0][0]));
+	glUniform3fv(((InstancedLitShader*)shader)->scaleID, 1, &(vec3(model[0][0], model[1][1], model[2][2])[0]));
 	glBindTexture(GL_TEXTURE_2D, texture);
 	glDrawElementsInstanced(GL_TRIANGLE_STRIP, indices.size(), GL_UNSIGNED_INT, 0, positions.size());
 }

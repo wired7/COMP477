@@ -31,17 +31,16 @@ void SPH::calcSPH()
 	{
 		//calc right side equation
 		vec3 acceleration = calcAcceleration(*sys->particles[i]);
-
 		sys->particles[i]->params.velocity += sys->sysParams.tStep * acceleration;
 		sys->particles[i]->nextPosition = sys->particles[i]->position;
 		sys->particles[i]->nextPosition += sys->sysParams.tStep * sys->particles[i]->params.velocity;
 	}
 
-	for (int i = 0; i < sys->particles.size(); ++i)
+/*	for (int i = 0; i < sys->particles.size(); ++i)
 	{
 		Particle* currParticle = sys->particles[i];
-		currParticle->position = currParticle->nextPosition;
-		sys->grid.update(*currParticle);
+//		currParticle->position = currParticle->nextPosition;
+//		sys->grid.update(*currParticle);
 		
 		sys->sysParams.tStep = sys->sysParams.maxTStep;
 		vector<GridCube> vec = sys->grid.getNeighborCubes(*currParticle);
@@ -85,7 +84,7 @@ void SPH::calcSPH()
 				}
 			}
 		}
-	}
+	}*/
 
 	// update list of particles
 	sys->updateList();	
@@ -93,8 +92,8 @@ void SPH::calcSPH()
 
 float SPH::calcDensity(Particle particle)
 {
-	float density = 0.0;
 	ParticleSystem* sys = ParticleSystem::getInstance();
+	float density = 0.0f;
 	for (int i = 0; i < particle.neighbors.size(); ++i)
 	{
 		Particle* currParticle = sys->particles[particle.neighbors.at(i)];
@@ -123,7 +122,7 @@ float SPH::calcDensityKernel(vec3 distance, float h)
 	{
 		return 0.0f;
 	}
-
+	
 	float first = 315.0f / (64.0f * glm::pi<float>() * pow(h, 9));
 	float second = pow((h * h) - (magnitude * magnitude), 3);
 
@@ -170,11 +169,12 @@ vec3 SPH::calcGradientPressure(Particle particle)
 	{
 		int index = particle.neighbors[i];
 		vec3 distance = particle.position - sys->particles[index]->position;
+
 		float h = sys->sysParams.searchRadius;
 
 		// forces between two particles should be equal & opposite
 		// pressure has to be symmetric, to guarantee symmetry we take the average of the two pressures
-		float symmetricPressure = (sys->particles[index]->params.pressure + particle.params.pressure) / 2;
+		float symmetricPressure = (sys->particles[index]->params.pressure + particle.params.pressure) / 2.0f;
 
 		ret += (sys->particles[index]->params.mass / sys->particles[index]->params.density) * symmetricPressure * (calcGradientPressureKernel(distance, h));
 	}
@@ -204,7 +204,11 @@ vec3 SPH::calcLaplacianVelocity(Particle particle)
 vec3 SPH::calcAcceleration(const Particle& particle)
 {
 	ParticleSystem* sys = ParticleSystem::getInstance();
-	return (calcGradientPressure(particle) + sys->sysParams.viscocity*calcLaplacianVelocity(particle) + particle.params.density * sys->sysParams.gravity) / particle.params.density;
+	auto gP = calcGradientPressure(particle);
+	auto lV = sys->sysParams.viscocity*calcLaplacianVelocity(particle);
+	auto g = vec3();//particle.params.density * sys->sysParams.gravity;
+
+	return (gP + lV + g) / particle.params.density;
 }
 
 

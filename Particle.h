@@ -18,6 +18,8 @@ struct ParticleParameters {
 
 class Particle {
 public:
+	int index;
+	glm::vec3 gridCellCoord;
 	Particle(glm::vec3);
 	~Particle();
 	glm::vec3 position;
@@ -28,7 +30,4 @@ public:
 	vector<int> neighbors;
 	ParticleParameters params;
 	glm::vec3 collisionNormal;
-private:
-	int index;
-	glm::vec3 gridCellCoord;
 };

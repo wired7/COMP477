@@ -23,8 +23,21 @@ ParticleSystem::~ParticleSystem()
 
 }
 
+void ParticleSystem::addParticles(vector<Particle*> part)
+{
+	particles = part;
+
+	for (int i = 0; i < particles.size(); i++)
+	{
+		particles[i]->index = i;
+		particles[i]->gridCellCoord = particles[i]->position / grid.getCellSize();
+		grid.data[(int)particles[i]->gridCellCoord.x][(int)particles[i]->gridCellCoord.y][(int)particles[i]->gridCellCoord.z].particles.push_back(i);
+	}
+}
+
 void ParticleSystem::updateList() {
 	for (int i = 0; i < particles.size(); ++i) {
+		particles[i]->position = particles[i]->nextPosition;
 		grid.update(*particles[i]);
 	}	
 }
