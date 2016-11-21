@@ -45,11 +45,10 @@ void Grid3D::update(Particle particle)
 	
 	glm::vec3 currCell = particle.getGridCellCoord();
 	bool remove = (gridX != (int)currCell.x || gridY != (int)currCell.y || gridZ != (int)currCell.z);
-	
-	GridCube* cubeptr = &data[gridX][gridY][gridZ];
 
 	if (remove)
 	{
+		GridCube* cubeptr = &data[gridX][gridY][gridZ];
 		// This can probably be optimized using the object's name
 		for (int i = 0; i < cubeptr->particles.size(); ++i)
 		{
@@ -62,7 +61,7 @@ void Grid3D::update(Particle particle)
 
 	if (!offGrid && remove)
 	{
-		cubeptr->particles.push_back(particle.getIndex());
+		data[gridX][gridY][gridZ].particles.push_back(particle.getIndex());
 	}
 	else
 	{
