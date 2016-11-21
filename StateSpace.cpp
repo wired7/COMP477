@@ -18,7 +18,7 @@ StateSpace::StateSpace(GLFWwindow* window, Skybox* skybox)
 	Camera::activeCamera = new StateSpaceCamera(window, vec2(0, 0), vec2(1, 1), vec3(0, 0, -1), vec3(0, 0, 0), vec3(0, 1, 0), perspective(45.0f, (float)width / height, 0.1f, 1000.0f), terrain);
 	
 	float radius = 0.1f;
-	int blockSize = 10;
+	int blockSize = 6;
 	
 	vector<Particle*> pos;
 	for(int k = 0; k < blockSize; k++)
@@ -26,7 +26,7 @@ StateSpace::StateSpace(GLFWwindow* window, Skybox* skybox)
 			for (int i = 0; i < blockSize; i++)
 				pos.push_back(new Particle(vec3(10.0f + radius * (float)i, 10.0f + radius * (float)j, 10.0f + radius * (float)k)));
 
-	ParticleSystem::getInstance()->sysParams = SystemParameters(radius, 5, 0.01, 1, 1, 0, 0.01, 0.01);
+	ParticleSystem::getInstance()->sysParams = SystemParameters(radius, 5, 0.01, 1, 10, 0, 0.01, 0.01);
 	ParticleSystem::getInstance()->grid = Grid3D(30, 0.5);
 	ParticleSystem::getInstance()->addParticles(pos);
 	ParticleSystem::getInstance()->updateList();
@@ -90,10 +90,7 @@ void StateSpace::draw()
 
 		if (ms.count() - time >= 16 && playModeOn)
 		{
-			if (frameCount < frames.size() - 1)
-			{
-				((InstancedSpheres*)models[0])->updateInstances(&(frames[++frameCount]));
-			}
+			((InstancedSpheres*)models[0])->updateInstances(&(frames[(frameCount + 1) % frames.size()]));
 
 			time = ms.count();
 		}
