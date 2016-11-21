@@ -29,9 +29,11 @@
     <ClInclude Include="InputState.h" />
     <ClInclude Include="Menu.h" />
     <ClInclude Include="NoiseTexture.h" />
+    <ClInclude Include="OpenFileDialog.h" />
     <ClInclude Include="Particle.h" />
     <ClInclude Include="ParticleSystem.h" />
     <ClInclude Include="Rigidbody.h" />
+    <ClInclude Include="SaveFileDialog.h" />
     <ClInclude Include="Shader.h" />
     <ClInclude Include="Shape.h" />
     <ClInclude Include="Skybox.h" />
@@ -39,6 +41,7 @@
     <ClInclude Include="StateSpace.h" />
     <ClInclude Include="Terrain.h" />
     <ClInclude Include="TextureManager.h" />
+    <ClInclude Include="Win32Utils.h" />
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="Arrow.cpp" />

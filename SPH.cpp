@@ -179,7 +179,7 @@ vec3 SPH::calcGradientPressure(Particle particle)
 		ret += (sys->particles[index]->params.mass / sys->particles[index]->params.density) * symmetricPressure * (calcGradientPressureKernel(distance, h));
 	}
 
-	return -ret; // return the negated vector
+	return (-1.0f)*ret; // return the negated vector
 }
 
 vec3 SPH::calcLaplacianVelocity(Particle particle)

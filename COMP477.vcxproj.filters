@@ -75,6 +75,15 @@
     <ClInclude Include="SPH.h">
       <Filter>Header Files</Filter>
     </ClInclude>
+    <ClInclude Include="SaveFileDialog.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="Win32Utils.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="OpenFileDialog.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="TextureManager.cpp">

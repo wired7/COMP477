@@ -6,7 +6,7 @@ using namespace std;
 
 struct ParticleParameters {
 	float mass;
-	glm::vec3 velocity;
+	glm::vec3 velocity = glm::vec3(0,0,0);
 	float density;
 	float pressure;
 	float kernel;
@@ -20,8 +20,8 @@ class Particle {
 public:
 	Particle(glm::vec3);
 	~Particle();
-	glm::vec3 position;
-	glm::vec3 nextPosition;
+	glm::vec3 position = glm::vec3(0,0,0);
+	glm::vec3 nextPosition = glm::vec3(0, 0, 0);
 	int getIndex();
 	glm::vec3 getGridCellCoord();
 	void setGridCellCoord(glm::vec3 gridCellCoord);
