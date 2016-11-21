@@ -24,6 +24,7 @@
     <ClInclude Include="Context.h" />
     <ClInclude Include="Controller.h" />
     <ClInclude Include="Cubemap.h" />
+    <ClInclude Include="FileStorage.h" />
     <ClInclude Include="GraphicsObject.h" />
     <ClInclude Include="Grid3D.h" />
     <ClInclude Include="InputState.h" />
@@ -46,6 +47,7 @@
     <ClCompile Include="Context.cpp" />
     <ClCompile Include="Controller.cpp" />
     <ClCompile Include="Cubemap.cpp" />
+    <ClCompile Include="FileStorage.cpp" />
     <ClCompile Include="GraphicsObject.cpp">
       <AdditionalIncludeDirectories Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">..\COMP477\Resources\assimp-win\include\assimp;..\COMP477\Resources\GLM\glm;..\COMP477\Resources\Simple OpenGL Image Library\SOIL;..\COMP477\Resources\GLFW\include\GLFW;..\COMP477\Resources\GLEW\include\GL;%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
     </ClCompile>
