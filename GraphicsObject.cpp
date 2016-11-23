@@ -162,12 +162,14 @@ void InstancedSpheres::bindInstances(void)
 	glVertexAttribDivisor(4, 1);
 
 	glBindVertexArray(0);
+
+//	positionsVertexBuffer = VBO;
 }
 
 void InstancedSpheres::updateInstances()
 {
 	glBindVertexArray(VAO);
-	glBindBuffer(GL_ARRAY_BUFFER, 6);
+	glBindBuffer(GL_ARRAY_BUFFER, 8);
 	glBufferData(GL_ARRAY_BUFFER, positions.size() * sizeof(vec3), &(positions[0]), GL_DYNAMIC_DRAW);
 
 	glBindVertexArray(0);
@@ -176,10 +178,13 @@ void InstancedSpheres::updateInstances()
 void InstancedSpheres::updateInstances(vector<vec3>* positions)
 {
 	glBindVertexArray(VAO);
-	glBindBuffer(GL_ARRAY_BUFFER, 6);
+//	GLuint VBO = positionsVertexBuffer;
+	glBindBuffer(GL_ARRAY_BUFFER, 8);
 	glBufferData(GL_ARRAY_BUFFER, positions->size() * sizeof(vec3), &((*positions)[0]), GL_DYNAMIC_DRAW);
 
 	glBindVertexArray(0);
+
+//	positionsVertexBuffer = VBO;
 }
 
 void InstancedSpheres::enableInstances(void)
@@ -217,6 +222,31 @@ void Rectangle::draw()
 	glUniformMatrix4fv(((LitShader*)shader)->modelID, 1, GL_FALSE, &model[0][0]);
 	glBindTexture(GL_TEXTURE_2D, texture);
 	glDrawArrays(GL_TRIANGLE_STRIP, 0, vertices.size());
+}
+
+Cube::Cube(vec3 center, vec3 dimensions, vec4 color)
+{
+	shader = LitShader::shader;
+	loadTexture("textures\\blank.jpg");
+
+	for(int i = 0; i < 2; i++)
+		for(int j = 0; j < 2; j++)
+			for(int k = 0; k < 2; k++)
+				addVertex(0.5f * vec3(i * 2 - 1, j * 2 - 1, k * 2 - 1), color, vec2(), normalize(0.5f * vec3(i * 2 - 1, j * 2 - 1, k * 2 - 1) - center));
+
+	indices = {0, 1, 2, 1, 3, 2, 0, 2, 4, 2, 6, 4, 4, 6, 5, 6, 7, 5, 5, 7, 1, 7, 3, 1, 1, 0, 4, 1, 4, 5, 2, 3, 6, 3, 7, 6};
+
+	model = translate(mat4(1.0f), center) * scale(mat4(1.0f), dimensions);
+
+	bindBuffers();
+}
+
+void Cube::draw()
+{
+	enableBuffers();
+	glUniformMatrix4fv(((LitShader*)shader)->modelID, 1, GL_FALSE, &model[0][0]);
+	glBindTexture(GL_TEXTURE_2D, texture);
+	glDrawElements(GL_TRIANGLES, indices.size(), GL_UNSIGNED_INT, 0);
 }
 
 /*ImportedMesh::ImportedMesh(char* s, vec3 position, vec3 dimensions)

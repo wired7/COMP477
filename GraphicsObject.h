@@ -110,3 +110,10 @@ public:
 	Rectangle(vec3, vec3, vec4);
 	void draw();
 };
+
+class Cube : public MeshObject
+{
+public:
+	Cube(vec3, vec3, vec4);
+	void draw();
+};

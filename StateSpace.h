@@ -3,9 +3,6 @@
 #include "Skybox.h"
 #include "Terrain.h"
 #include "Controller.h"
-#include <chrono>
-
-using namespace std::chrono;
 
 class StateSpace
 {
@@ -20,7 +17,8 @@ public:
 	double time;
 	vector<vector<vec3>> frames;
 	vector<Camera*> observers;
-	vector<GraphicsObject*> models;
+	vector<InstancedMeshObject*> instancedModels;
+	vector<MeshObject*> models;
 	Skybox* skybox;
 	Terrain* terrain;
 	StateSpace(GLFWwindow*, Skybox*);

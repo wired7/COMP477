@@ -115,18 +115,18 @@ vector<GridCube> Grid3D::getNeighborCubes(Particle particle)
 
 vector<int> Grid3D::getNeighbors(Particle particle)
 {
-
 	vector<GridCube> neighborCubes = getNeighborCubes(particle);
-
+	
 	vector<int> ret;
-
+	
+	ParticleSystem* ps = ParticleSystem::getInstance();
 	for (int i = 0; i < neighborCubes.size(); ++i)
 	{
-		int particlesSize = neighborCubes.at(i).particles.size();
-		GridCube* currCube = &neighborCubes.at(i);
+		int particlesSize = neighborCubes[i].particles.size();
+
+		GridCube* currCube = &neighborCubes[i];
 		for (int j = 0; j < particlesSize; j++)
 		{
-			ParticleSystem* ps = ParticleSystem::getInstance();
 			int particleIndex = currCube->particles.at(j);
 
 			if (particleIndex != particle.getIndex() && inRadius(particle.position, ps->particles[particleIndex]->position))

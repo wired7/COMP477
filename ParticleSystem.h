@@ -30,6 +30,7 @@ public:
 	vector<Particle*> particles;
 	vector<Rigidbody*> rigidbodies;
 	void addParticles(vector<Particle*>);
+	void addRigidbodies(vector<Rigidbody*>);
 	void updateList();
 	void calcNeighbors(Particle* particle);
 	Grid3D grid;

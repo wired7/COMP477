@@ -10,7 +10,12 @@ class Rigidbody : public MeshObject
 public:
 	float mass;
 	mat3 inertiaTensor;
-	Rigidbody(); 
+	bool dynamic;
+	Rigidbody(vector<Vertex2>, vector<GLuint>, mat4, float, bool rendered, bool dynamic = false); 
 	~Rigidbody();
+	void draw();
+	void applyTransform();
+private:
+	void calculateInertiaTensor(void);
 };
 

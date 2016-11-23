@@ -1,7 +1,9 @@
 #include "StateSpace.h"
 #include "ParticleSystem.h"
 #include "SPH.h"
+#include <chrono>
 
+using namespace std::chrono;
 
 StateSpace* StateSpace::activeStateSpace = NULL;
 
@@ -17,9 +19,13 @@ StateSpace::StateSpace(GLFWwindow* window, Skybox* skybox)
 	glfwGetWindowSize(window, &width, &height);
 	Camera::activeCamera = new StateSpaceCamera(window, vec2(0, 0), vec2(1, 1), vec3(5, 5, 0), vec3(5, 5, 5), vec3(0, 1, 0), perspective(45.0f, (float)width / height, 0.1f, 1000.0f), terrain);
 	
-	float radius = 0.1f;
-	int blockSize = 10;
-	float density = 27;
+	float viscocity = 0.01f;
+	float stiffness = 0.01f;
+	float timeStep = 0.001f;
+	float density = 1000.0f;
+	float radius = 0.1f;//1.0f / density;
+
+	int blockSize = 4;
 	
 	vector<Particle*> pos;
 	for(int k = 0; k < blockSize; k++)
@@ -27,30 +33,54 @@ StateSpace::StateSpace(GLFWwindow* window, Skybox* skybox)
 			for (int i = 0; i < blockSize; i++)
 				pos.push_back(new Particle(vec3(5.0f + (float)i / density, 5.0f + (float)j / density, 5.0f + (float)k / density)));
 
-	ParticleSystem::getInstance()->sysParams = SystemParameters(radius, 3, 0.01, 1000, 27, 0, 0.001, 0.001);
-	ParticleSystem::getInstance()->grid = Grid3D(20, 0.5);
+	Cube cube(vec3(5.0f, 5.0f, 5.0f), vec3(1.0f, 1.0f, 1.0f), vec4(1.0f, 0.0f, 0.0f, 0.5f));
+	Rigidbody* rB = new Rigidbody(cube.vertices, cube.indices, cube.model, 1000, false);
+	vector<Rigidbody*> rigidbodies;
+	rigidbodies.push_back(rB);
+
+	ParticleSystem::getInstance()->sysParams = SystemParameters(radius, 0.5f, viscocity, stiffness, density, 0, timeStep, timeStep);
+	ParticleSystem::getInstance()->grid = Grid3D(30, 0.5);
 	ParticleSystem::getInstance()->addParticles(pos);
+	ParticleSystem::getInstance()->addRigidbodies(rigidbodies);
 	ParticleSystem::getInstance()->updateList();
 
 	auto p = ParticleSystem::getInstance()->getParticlePositions();
-	models.push_back(new InstancedSpheres(radius, 8, vec4(0.5, 0.5, 1, 1), *p));
+	instancedModels.push_back(new InstancedSpheres(radius, 8, vec4(0.5, 0.5, 1, 1.0f), *p));
+	frames.push_back(*p);
 	delete p;
 
 	float t = 0;
-	for (float simTime = 0; simTime < 5; simTime += t)
+	float playbackTime = 5;
+	float currentTimeStep = 0;
+
+	for (float simTime = 0; simTime < playbackTime; simTime += currentTimeStep)
 	{
+		ms = duration_cast<milliseconds>(system_clock::now().time_since_epoch());
+
 		if (t >= 0.016f)
 		{
 			auto partPos = ParticleSystem::getInstance()->getParticlePositions();
 			frames.push_back(*partPos);
 			delete partPos;
 			t = 0;
+
+			system("CLS");
+
+			float deltaTime = duration_cast<milliseconds>(system_clock::now().time_since_epoch()).count() - ms.count();
+			cout << (simTime / playbackTime) * 100 << "%" << endl;
+			cout << "ETA: " << deltaTime * (playbackTime - simTime) / 1000 / 60 << " mins" << endl;
 		}
 
-		t += ParticleSystem::getInstance()->sysParams.tStep;
 		SPH::calcSPH();
-	}
 
+		currentTimeStep = ParticleSystem::getInstance()->sysParams.tStep;
+
+		t += currentTimeStep;
+	}
+	
+	for (int i = 0; i < ParticleSystem::getInstance()->rigidbodies.size(); i++)
+		models.push_back(new Rigidbody(ParticleSystem::getInstance()->rigidbodies[i]->vertices, ParticleSystem::getInstance()->rigidbodies[i]->indices, ParticleSystem::getInstance()->rigidbodies[i]->model, 0, true));
+	
 	observers.push_back(Camera::activeCamera);
 }
 
@@ -73,16 +103,19 @@ void StateSpace::draw()
 
 		skybox->draw();
 
+		InstancedLitShader::shader->Use();
+		glUniformMatrix4fv(InstancedLitShader::shader->projectionID, 1, GL_FALSE, &(observers[i]->Projection[0][0]));
+		glUniformMatrix4fv(InstancedLitShader::shader->viewID, 1, GL_FALSE, &(observers[i]->View[0][0]));
+
+		for (int i = 0; i < instancedModels.size(); i++)
+			instancedModels[i]->draw();
+
 		LitShader::shader->Use();
 		glUniformMatrix4fv(LitShader::shader->projectionID, 1, GL_FALSE, &(observers[i]->Projection[0][0]));
 		glUniformMatrix4fv(LitShader::shader->viewID, 1, GL_FALSE, &(observers[i]->View[0][0]));
 
 		if(terrain != nullptr)
 			terrain->draw();
-
-		InstancedLitShader::shader->Use();
-		glUniformMatrix4fv(InstancedLitShader::shader->projectionID, 1, GL_FALSE, &(observers[i]->Projection[0][0]));
-		glUniformMatrix4fv(InstancedLitShader::shader->viewID, 1, GL_FALSE, &(observers[i]->View[0][0]));
 
 		for (int i = 0; i < models.size(); i++)
 			models[i]->draw();
@@ -92,8 +125,7 @@ void StateSpace::draw()
 		if (ms.count() - time >= 16 && playModeOn)
 		{
 			frameCount = (frameCount + 1) % frames.size();
-			((InstancedSpheres*)models[0])->updateInstances(&(frames[frameCount]));
-
+			((InstancedSpheres*)instancedModels[0])->updateInstances(&(frames[frameCount]));
 			time = ms.count();
 		}
 

@@ -12,13 +12,15 @@ using namespace std::chrono;
 
 void neighbors(ParticleSystem* pS, int i, int* count)
 {
-	for(int j = i; j < i + THREADSIZE; j++, *count++)
+	for (int j = i; (j < i + THREADSIZE) && (j < pS->particles.size()); j++, *count++)
+	{
 		pS->calcNeighbors(pS->particles[j]);
+	}
 }
 
 void densitiesPressures(ParticleSystem* pS, int i, int* count)
 {
-	for (int j = i; j < i + THREADSIZE; j++, *count++)
+	for (int j = i; j < i + THREADSIZE && j < pS->particles.size(); j++, *count++)
 	{
 		pS->particles[j]->params.density = SPH::calcDensity(*pS->particles[j]);
 		pS->particles[j]->params.pressure = SPH::calcPressure(*pS->particles[j]);
@@ -27,7 +29,7 @@ void densitiesPressures(ParticleSystem* pS, int i, int* count)
 
 void eulerTimeIntegrations(ParticleSystem* pS, int i, int* count)
 {
-	for (int j = i; j < i + THREADSIZE; j++, *count++)
+	for (int j = i; j < i + THREADSIZE && j < pS->particles.size(); j++, *count++)
 	{
 		//calc right side equation
 		vec3 acceleration = SPH::calcAcceleration(*pS->particles[j]);
@@ -37,64 +39,14 @@ void eulerTimeIntegrations(ParticleSystem* pS, int i, int* count)
 	}
 }
 
-void SPH::calcSPH()
+void collisions(ParticleSystem* pS, int i, int* count)
 {
-	ParticleSystem* sys = ParticleSystem::getInstance();
-
-	// UPDATE GRID-RIGIDBODY INTERSECTIONS. ONLY DO THIS HERE IF YOU WANT RIGIDBODY PHYSICS. DO ONCE OUTSIDE OTHERWISE. O(GRIDSIZE * MESH_TRIANGLE_COUNT * 12)
-/*	auto vec = sys->grid.data;
-	for (int j = 0; j < vec.size(); ++j)
+	for (int j = i; j < i + THREADSIZE && j < pS->particles.size(); j++, *count++)
 	{
+		Particle* currParticle = pS->particles[i];
 
-	}*/
-	
-	int threadCount = sys->particles.size() / THREADSIZE;
-	std::thread* threads = new thread[threadCount];
-	
-	for (int i = 0, count = 0; i < sys->particles.size(); i += THREADSIZE)
-	{
-		threads[i / THREADSIZE] = std::thread(neighbors, sys, i, &count);
-		//if debug draw lines
-	}
-
-	for (int i = 0; i < threadCount; ++i)
-	{
-		threads[i].join();
-	}
-
-
-	for (int i = 0, count = 0; i < sys->particles.size(); i += THREADSIZE)
-	{
-		threads[i / THREADSIZE] = std::thread(densitiesPressures, sys, i, &count);
-	}
-
-	for (int i = 0; i < threadCount; ++i)
-	{
-		threads[i].join();
-	}
-
-
-	for (int i = 0, count = 0; i < sys->particles.size(); i += THREADSIZE)
-	{
-		threads[i / THREADSIZE] = std::thread(eulerTimeIntegrations, sys, i, &count);
-	}
-
-	for (int i = 0; i < threadCount; ++i)
-	{
-		threads[i].join();
-	}
-
-	delete[] threads;
-
-
-/*	for (int i = 0; i < sys->particles.size(); ++i)
-	{
-		Particle* currParticle = sys->particles[i];
-//		currParticle->position = currParticle->nextPosition;
-//		sys->grid.update(*currParticle);
-		
-		sys->sysParams.tStep = sys->sysParams.maxTStep;
-		vector<GridCube> vec = sys->grid.getNeighborCubes(*currParticle);
+		pS->sysParams.tStep = pS->sysParams.maxTStep;
+		vector<GridCube> vec = pS->grid.getNeighborCubes(*currParticle);
 		for (int j = 0; j < vec.size(); ++j)
 		{
 			vector<pair<int, MeshObject*>> rigidData = vec[j].rigidData;
@@ -111,31 +63,91 @@ void SPH::calcSPH()
 
 				//This should later become a triangle
 				Plane plane(point1, point2, point3);
-				float distance = -dot(plane.normal, (currParticle->position - plane.point)) / pow(length(plane.normal), 2);
+				vec3 normal = normalize(plane.normal);
+				float distance = abs(dot(normal, currParticle->nextPosition) - dot(normal, plane.point));
 
-				if (distance <= sys->sysParams.particleRadius)
+				if (distance <= pS->sysParams.particleRadius)
 				{
-					if (!(currParticle->collisionNormal == plane.normal))
+					cout << distance << endl;
+					if (currParticle->collisionNormal != vec3(0.0f, 0.0f, 0.0f) && currParticle->collisionNormal != normalize(plane.normal) && currParticle->collisionNormal != -normalize(plane.normal))
 					{
-						currParticle->collisionNormal = plane.normal;
-						float distanceToPlaneAtCollision = plane.intersection(currParticle->position, -normalize(plane.normal)) - sys->sysParams.particleRadius;
+						currParticle->collisionNormal = -normalize(plane.normal);
+						vec3 origin = currParticle->nextPosition;
+						vec3 direction = normalize(plane.normal);
+
+						float distanceToPlaneAtCollision = plane.intersection(origin, direction);
 						//theres a collision. Update velocity based on conservation of momentum.
-						float t = distanceToPlaneAtCollision / length(currParticle->params.velocity);
-						if (t < sys->sysParams.tStep)
+//						float t = distanceToPlaneAtCollision / length(currParticle->params.velocity);
+						/*						if (t < sys->sysParams.tStep)
 						{
-							sys->sysParams.tStep = t;
-						}
-						
+						sys->sysParams.tStep = t;
+						}*/
+
 						// Update particle velocity with reflected, assuming no loss in energy in terms of heat
-						currParticle->params.velocity = glm::reflect(currParticle->params.velocity, plane.normal);
+//						currParticle->params.velocity = glm::reflect(currParticle->params.velocity, -normalize(plane.normal));
+//						cout << currParticle->params.velocity.x << " " << currParticle->params.velocity.y << " " << currParticle->params.velocity.z << endl;
 					}
-				}				
+				}
 				else {
-					currParticle->collisionNormal = vec3(0,0,0);
+					currParticle->collisionNormal = glm::vec3(0, 0, 0);
 				}
 			}
 		}
-	}*/
+	}
+}
+
+void SPH::calcSPH()
+{
+	ParticleSystem* sys = ParticleSystem::getInstance();
+	
+	int threadCount = sys->particles.size() / THREADSIZE + 1;
+	std::thread* threads = new thread[threadCount];
+	
+	for (int i = 0, count = 0, step = 0; step < threadCount; i += THREADSIZE, ++step)
+	{
+		threads[step] = std::thread(neighbors, sys, i, &count);
+		//if debug draw lines
+	}
+
+	for (int i = 0; i < threadCount; ++i)
+	{
+		threads[i].join();
+	}
+
+
+	for (int i = 0, count = 0, step = 0; step < threadCount; i += THREADSIZE, ++step)
+	{
+		threads[step] = std::thread(densitiesPressures, sys, i, &count);
+	}
+
+	for (int i = 0; i < threadCount; ++i)
+	{
+		threads[i].join();
+	}
+
+
+	for (int i = 0, count = 0, step = 0; step < threadCount; i += THREADSIZE, ++step)
+	{
+		threads[step] = std::thread(eulerTimeIntegrations, sys, i, &count);
+	}
+
+	for (int i = 0; i < threadCount; ++i)
+	{
+		threads[i].join();
+	}
+
+
+	for (int i = 0, count = 0, step = 0; step < threadCount; i += THREADSIZE, ++step)
+	{
+		threads[step] = std::thread(collisions, sys, i, &count);
+	}
+
+	for (int i = 0; i < threadCount; ++i)
+	{
+		threads[i].join();
+	}
+
+	delete[] threads;
 
 	// update list of particles
 	sys->updateList();
@@ -258,7 +270,7 @@ vec3 SPH::calcAcceleration(const Particle& particle)
 	ParticleSystem* sys = ParticleSystem::getInstance();
 	auto gP = calcGradientPressure(particle);
 	auto lV = sys->sysParams.viscocity*calcLaplacianVelocity(particle);
-	auto g = vec3();//particle.params.density * sys->sysParams.gravity;
+	auto g = particle.params.density * vec3(0.0f, sys->sysParams.gravity, 0.0f);
 
 	return (gP + lV + g) / particle.params.density;
 }
