@@ -207,7 +207,7 @@ void SPH::calcSPH()
 float SPH::calcDensity(Particle particle)
 {
 	ParticleSystem* sys = ParticleSystem::getInstance();
-	float density = 0.0f;
+	float density = particle.params.mass * calcDensityKernel(vec3(0.0f, 0.0f, 0.0f), sys->sysParams.searchRadius);
 
 	for (int i = 0; i < particle.neighbors.size(); ++i)
 	{
