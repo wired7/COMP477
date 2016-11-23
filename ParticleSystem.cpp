@@ -3,6 +3,7 @@
 #include "glm.hpp"
 #include <thread>
 #include <chrono>
+#include <omp.h>
 
 using namespace std::chrono;
 
@@ -129,6 +130,8 @@ void ParticleSystem::addRigidbodies(vector<Rigidbody*> rigid)
 }
 
 void ParticleSystem::updateList() {
+	
+	//#pragma omp parallel for
 	for (int i = 0; i < particles.size(); ++i) {
 		particles[i]->position = particles[i]->nextPosition;
 		grid.update(*particles[i]);

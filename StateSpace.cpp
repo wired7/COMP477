@@ -20,12 +20,12 @@ StateSpace::StateSpace(GLFWwindow* window, Skybox* skybox)
 	Camera::activeCamera = new StateSpaceCamera(window, vec2(0, 0), vec2(1, 1), vec3(5, 5, 0), vec3(5, 5, 5), vec3(0, 1, 0), perspective(45.0f, (float)width / height, 0.1f, 1000.0f), terrain);
 	
 	float viscocity = 0.01f;
-	float stiffness = 0.01f;
-	float timeStep = 0.001f;
+	float stiffness = 1.0f;
+	float timeStep = 0.01f;
 	float density = 1000.0f;
 	float radius = 0.1f;//1.0f / density;
 
-	int blockSize = 2;
+	int blockSize = 5;
 	
 	vector<Particle*> pos;
 	for(int k = 0; k < blockSize; k++)
@@ -50,7 +50,7 @@ StateSpace::StateSpace(GLFWwindow* window, Skybox* skybox)
 	delete p;
 
 	float t = 0;
-	float playbackTime = 5;
+	float playbackTime = 3;
 	float currentTimeStep = 0;
 
 	for (float simTime = 0; simTime < playbackTime; simTime += currentTimeStep)
@@ -64,11 +64,13 @@ StateSpace::StateSpace(GLFWwindow* window, Skybox* skybox)
 			delete partPos;
 			t = 0;
 
+			
 			system("CLS");
 
 			float deltaTime = duration_cast<milliseconds>(system_clock::now().time_since_epoch()).count() - ms.count();
 			cout << (simTime / playbackTime) * 100 << "%" << endl;
 			cout << "ETA: " << deltaTime * (playbackTime - simTime) / 1000 / 60 << " mins" << endl;
+			
 		}
 
 		SPH::calcSPH();

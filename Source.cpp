@@ -14,6 +14,7 @@
 #include "StateSpace.h"
 #include "Menu.h"
 #include <windows.h>
+#include <omp.h>
 
 using namespace std;
 using namespace glm;
@@ -98,6 +99,7 @@ int init() {
 
 int main()
 {
+
 	if (init() < 0)
 		return -1;
 
