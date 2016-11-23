@@ -39,58 +39,71 @@ void eulerTimeIntegrations(ParticleSystem* pS, int i, int* count)
 	}
 }
 
+void collisionsSubFunction(ParticleSystem*, int);
+
 void collisions(ParticleSystem* pS, int i, int* count)
 {
-	for (int j = i; j < i + THREADSIZE && j < pS->particles.size(); j++, *count++)
+	for (int n = i; n < i + THREADSIZE && n < pS->particles.size(); n++, *count++)
 	{
-		Particle* currParticle = pS->particles[i];
+		collisionsSubFunction(pS, n);
+	}
+}
 
-		pS->sysParams.tStep = pS->sysParams.maxTStep;
-		vector<GridCube> vec = pS->grid.getNeighborCubes(*currParticle);
-		for (int j = 0; j < vec.size(); ++j)
+void collisionsSubFunction(ParticleSystem* pS, int n)
+{
+	Particle* currParticle = pS->particles[n];
+
+	pS->sysParams.tStep = pS->sysParams.maxTStep;
+	vector<GridCube> vec = pS->grid.getNeighborCubes(*currParticle);
+
+	for (int j = 0; j < vec.size(); ++j)
+	{
+		vector<pair<int, MeshObject*>> rigidData = vec[j].rigidData;
+		for (int k = 0; k < rigidData.size(); ++k)
 		{
-			vector<pair<int, MeshObject*>> rigidData = vec[j].rigidData;
-			for (int k = 0; k < rigidData.size(); ++k)
+			int indexInMesh = rigidData[k].first;
+			int vertexInMesh1 = rigidData[k].second->indices[indexInMesh];
+			int vertexInMesh2 = rigidData[k].second->indices[indexInMesh + 1];
+			int vertexInMesh3 = rigidData[k].second->indices[indexInMesh + 2];
+
+			vec3 point1 = rigidData[k].second->vertices[vertexInMesh1].position;
+			vec3 point2 = rigidData[k].second->vertices[vertexInMesh2].position;
+			vec3 point3 = rigidData[k].second->vertices[vertexInMesh3].position;
+
+			Plane plane(point1, point2, point3);
+			vec3 normal = normalize(plane.normal);
+			float distance = abs(dot(normal, currParticle->nextPosition) - dot(normal, plane.point));
+
+			if (distance <= pS->sysParams.particleRadius)
 			{
-				int indexInMesh = rigidData[k].first;
-				int vertexInMesh1 = rigidData[k].second->indices[indexInMesh];
-				int vertexInMesh2 = rigidData[k].second->indices[indexInMesh + 1];
-				int vertexInMesh3 = rigidData[k].second->indices[indexInMesh + 2];
-
-				vec3 point1 = rigidData[k].second->vertices[vertexInMesh1].position;
-				vec3 point2 = rigidData[k].second->vertices[vertexInMesh2].position;
-				vec3 point3 = rigidData[k].second->vertices[vertexInMesh3].position;
-
-				//This should later become a triangle
-				Plane plane(point1, point2, point3);
-				vec3 normal = normalize(plane.normal);
-				float distance = abs(dot(normal, currParticle->nextPosition) - dot(normal, plane.point));
-
-				if (distance <= pS->sysParams.particleRadius)
+				if (currParticle->collisionNormal != normal && currParticle->collisionNormal != -normal)
 				{
-					cout << distance << endl;
-					if (currParticle->collisionNormal != vec3(0.0f, 0.0f, 0.0f) && currParticle->collisionNormal != normalize(plane.normal) && currParticle->collisionNormal != -normalize(plane.normal))
-					{
-						currParticle->collisionNormal = -normalize(plane.normal);
-						vec3 origin = currParticle->nextPosition;
-						vec3 direction = normalize(plane.normal);
+					vec3 origin = currParticle->nextPosition;
+					vec3 direction = normal;
+					Triangle triangle(point1, point2, point3);
 
+					if (triangle.intersects(origin, direction))
+					{
 						float distanceToPlaneAtCollision = plane.intersection(origin, direction);
+
+						direction = -sign(distanceToPlaneAtCollision) * direction;
+						currParticle->collisionNormal = direction;
 						//theres a collision. Update velocity based on conservation of momentum.
-//						float t = distanceToPlaneAtCollision / length(currParticle->params.velocity);
+						//						float t = distanceToPlaneAtCollision / length(currParticle->params.velocity);
 						/*						if (t < sys->sysParams.tStep)
 						{
 						sys->sysParams.tStep = t;
 						}*/
 
 						// Update particle velocity with reflected, assuming no loss in energy in terms of heat
-//						currParticle->params.velocity = glm::reflect(currParticle->params.velocity, -normalize(plane.normal));
-//						cout << currParticle->params.velocity.x << " " << currParticle->params.velocity.y << " " << currParticle->params.velocity.z << endl;
+						currParticle->params.velocity = glm::reflect(currParticle->params.velocity, direction);
+						currParticle->nextPosition += pS->sysParams.tStep * currParticle->params.velocity;
+						return;
 					}
 				}
-				else {
-					currParticle->collisionNormal = glm::vec3(0, 0, 0);
-				}
+			}
+			else {
+				currParticle->collisionNormal = glm::vec3(0, 0, 0);
 			}
 		}
 	}
