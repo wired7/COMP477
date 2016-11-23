@@ -107,13 +107,13 @@ class Rectangle : public MeshObject
 {
 public:
 	Rectangle() {};
-	Rectangle(vec3, vec3, vec4);
+	Rectangle(vec3, vec3, vec4, bool);
 	void draw();
 };
 
 class Cube : public MeshObject
 {
 public:
-	Cube(vec3, vec3, vec4);
+	Cube(vec3, vec3, vec4, bool);
 	void draw();
 };

@@ -33,7 +33,8 @@ StateSpace::StateSpace(GLFWwindow* window, Skybox* skybox)
 			for (int i = 0; i < blockSize; i++)
 				pos.push_back(new Particle(vec3(5.0f + (float)i / density, 5.0f + (float)j / density, 5.0f + (float)k / density)));
 
-	Cube cube(vec3(5.0f, 5.0f, 5.0f), vec3(1.0f, 1.0f, 1.0f), vec4(1.0f, 0.0f, 0.0f, 0.5f));
+	Cube cube(vec3(5.0f, 5.0f, 5.0f), vec3(1.0f, 1.0f, 1.0f), vec4(1.0f, 0.0f, 0.0f, 0.5f), false);
+	
 	Rigidbody* rB = new Rigidbody(cube.vertices, cube.indices, cube.model, 1000, false);
 	vector<Rigidbody*> rigidbodies;
 	rigidbodies.push_back(rB);
@@ -50,7 +51,7 @@ StateSpace::StateSpace(GLFWwindow* window, Skybox* skybox)
 	delete p;
 
 	float t = 0;
-	float playbackTime = 5;
+	float playbackTime = 2;
 	float currentTimeStep = 0;
 
 	for (float simTime = 0; simTime < playbackTime; simTime += currentTimeStep)

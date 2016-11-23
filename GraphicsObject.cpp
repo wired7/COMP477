@@ -169,7 +169,7 @@ void InstancedSpheres::bindInstances(void)
 void InstancedSpheres::updateInstances()
 {
 	glBindVertexArray(VAO);
-	glBindBuffer(GL_ARRAY_BUFFER, 8);
+	glBindBuffer(GL_ARRAY_BUFFER, 6);
 	glBufferData(GL_ARRAY_BUFFER, positions.size() * sizeof(vec3), &(positions[0]), GL_DYNAMIC_DRAW);
 
 	glBindVertexArray(0);
@@ -179,7 +179,7 @@ void InstancedSpheres::updateInstances(vector<vec3>* positions)
 {
 	glBindVertexArray(VAO);
 //	GLuint VBO = positionsVertexBuffer;
-	glBindBuffer(GL_ARRAY_BUFFER, 8);
+	glBindBuffer(GL_ARRAY_BUFFER, 6);
 	glBufferData(GL_ARRAY_BUFFER, positions->size() * sizeof(vec3), &((*positions)[0]), GL_DYNAMIC_DRAW);
 
 	glBindVertexArray(0);
@@ -201,7 +201,7 @@ void InstancedSpheres::draw()
 	glDrawElementsInstanced(GL_TRIANGLE_STRIP, indices.size(), GL_UNSIGNED_INT, 0, positions.size());
 }
 
-Rectangle::Rectangle(vec3 position, vec3 dimensions, vec4 color)
+Rectangle::Rectangle(vec3 position, vec3 dimensions, vec4 color, bool isRendered)
 {
 	shader = LitShader::shader;
 	loadTexture("textures\\blank.jpg");
@@ -213,7 +213,8 @@ Rectangle::Rectangle(vec3 position, vec3 dimensions, vec4 color)
 
 	model = scale(translate(mat4(), position), dimensions);
 
-	bindBuffers();
+	if(isRendered)
+		bindBuffers();
 }
 
 void Rectangle::draw()
@@ -224,7 +225,7 @@ void Rectangle::draw()
 	glDrawArrays(GL_TRIANGLE_STRIP, 0, vertices.size());
 }
 
-Cube::Cube(vec3 center, vec3 dimensions, vec4 color)
+Cube::Cube(vec3 center, vec3 dimensions, vec4 color, bool isRendered)
 {
 	shader = LitShader::shader;
 	loadTexture("textures\\blank.jpg");
@@ -238,7 +239,8 @@ Cube::Cube(vec3 center, vec3 dimensions, vec4 color)
 
 	model = translate(mat4(1.0f), center) * scale(mat4(1.0f), dimensions);
 
-	bindBuffers();
+	if(isRendered)
+		bindBuffers();
 }
 
 void Cube::draw()
