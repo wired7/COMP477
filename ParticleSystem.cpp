@@ -108,6 +108,7 @@ void ParticleSystem::addRigidbodies(vector<Rigidbody*> rigid)
 {
 	rigidbodies = rigid;
 
+	#pragma omp parallel for
 	for (int i = 0; i < rigidbodies.size(); i++)
 	{
 		rigidbodies[i]->applyTransform();
@@ -115,16 +116,9 @@ void ParticleSystem::addRigidbodies(vector<Rigidbody*> rigid)
 
 	milliseconds ms = duration_cast<milliseconds>(system_clock::now().time_since_epoch());
 
-	int threadCount = grid.data.size();
-	std::thread* threads = new thread[threadCount];
-
+	#pragma omp parallel for
 	for(int i = 0; i < grid.data.size(); ++i)
-		threads[i] = std::thread(rigidbodyIntersections, i);
-
-	for (int i = 0; i < threadCount; i++)
-		threads[i].join();
-
-	delete[] threads;
+		rigidbodyIntersections(i);
 
 //	cout << duration_cast<milliseconds>(system_clock::now().time_since_epoch()).count() - ms.count() << endl;
 }
@@ -149,7 +143,7 @@ void ParticleSystem::calcNeighbors(Particle* particle)
 vector<glm::vec3>* ParticleSystem::getParticlePositions() {
 	
 	vector<glm::vec3>* particlePositions = new vector<glm::vec3>();
-
+	
 	for (int i = 0; i < particles.size(); ++i) {
 		particlePositions->push_back(particles[i]->position);
 	}
