@@ -34,16 +34,19 @@ StateSpace::StateSpace(GLFWwindow* window, Skybox* skybox)
 				pos.push_back(new Particle(vec3(5.0f + (float)i / density, 5.0f + (float)j / density, 5.0f + (float)k / density)));
 
 	Cube cube(vec3(5.0f, 5.0f, 5.0f), vec3(1.0f, 1.0f, 1.0f), vec4(1.0f, 0.0f, 0.0f, 0.5f), false);
-	
+	Rectangle rect(vec3(5, 4, 5), vec3(1, 2, 1), vec4(1, 1, 0, 1), false);
+	rect.model = rect.model * rotate(mat4(1.0f), 1.5f, vec3(1, 1, 1));
+
 	Rigidbody* rB = new Rigidbody(cube.vertices, cube.indices, cube.model, 1000, false);
+//	Rigidbody* rB1 = new Rigidbody(rect.vertices, rect.indices, rect.model, 1000, false);
 	vector<Rigidbody*> rigidbodies;
 	rigidbodies.push_back(rB);
+//	rigidbodies.push_back(rB1);
 
 	ParticleSystem::getInstance()->sysParams = SystemParameters(radius, 0.5f, viscocity, stiffness, density, -9.81f, timeStep, timeStep);
 	ParticleSystem::getInstance()->grid = Grid3D(30, 0.5);
 	ParticleSystem::getInstance()->addParticles(pos);
 	ParticleSystem::getInstance()->addRigidbodies(rigidbodies);
-	ParticleSystem::getInstance()->updateList();
 
 	auto p = ParticleSystem::getInstance()->getParticlePositions();
 	instancedModels.push_back(new InstancedSpheres(radius, 8, vec4(0.5, 0.5, 1, 1.0f), *p));
@@ -51,7 +54,7 @@ StateSpace::StateSpace(GLFWwindow* window, Skybox* skybox)
 	delete p;
 
 	float t = 0;
-	float playbackTime = 2;
+	float playbackTime = 5;
 	float currentTimeStep = 0;
 
 	for (float simTime = 0; simTime < playbackTime; simTime += currentTimeStep)
@@ -81,6 +84,7 @@ StateSpace::StateSpace(GLFWwindow* window, Skybox* skybox)
 	
 	for (int i = 0; i < ParticleSystem::getInstance()->rigidbodies.size(); i++)
 		models.push_back(new Rigidbody(ParticleSystem::getInstance()->rigidbodies[i]->vertices, ParticleSystem::getInstance()->rigidbodies[i]->indices, ParticleSystem::getInstance()->rigidbodies[i]->model, 0, true));
+	
 	
 	observers.push_back(Camera::activeCamera);
 }

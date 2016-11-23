@@ -211,7 +211,9 @@ Rectangle::Rectangle(vec3 position, vec3 dimensions, vec4 color, bool isRendered
 	addVertex(vec3(1, 0, 0), color, vec2(), vec3(0, 0, -1));
 	addVertex(vec3(1, 1, 0), color, vec2(), vec3(0, 0, -1));
 
-	model = scale(translate(mat4(), position), dimensions);
+	indices = {0, 1, 2, 1, 2, 3};
+
+	model = translate(mat4(1.0f), position) * scale(mat4(1.0f), dimensions);
 
 	if(isRendered)
 		bindBuffers();
@@ -222,7 +224,7 @@ void Rectangle::draw()
 	enableBuffers();
 	glUniformMatrix4fv(((LitShader*)shader)->modelID, 1, GL_FALSE, &model[0][0]);
 	glBindTexture(GL_TEXTURE_2D, texture);
-	glDrawArrays(GL_TRIANGLE_STRIP, 0, vertices.size());
+	glDrawElements(GL_TRIANGLES, indices.size(), GL_UNSIGNED_INT, 0);
 }
 
 Cube::Cube(vec3 center, vec3 dimensions, vec4 color, bool isRendered)

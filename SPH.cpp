@@ -5,6 +5,7 @@
 #include <math.h>
 #include <chrono>
 #include <thread>
+#include <omp.h>
 
 #define THREADSIZE 200
 
@@ -110,9 +111,43 @@ void collisionsSubFunction(ParticleSystem* pS, int n)
 }
 
 void SPH::calcSPH()
-{
+{	
 	ParticleSystem* sys = ParticleSystem::getInstance();
 	
+	#pragma omp parallel for
+	for (int i = 0; i < sys->particles.size(); ++i)
+	{
+		sys->calcNeighbors(sys->particles[i]);
+	}	
+
+	#pragma omp parallel for	
+	for (int i = 0; i < sys->particles.size(); ++i)
+	{
+		sys->particles[i]->params.density = SPH::calcDensity(*sys->particles[i]);
+		sys->particles[i]->params.pressure = SPH::calcPressure(*sys->particles[i]);
+	}
+
+	#pragma omp parallel for
+	for (int i = 0; i < sys->particles.size(); ++i)
+	{
+		//calc right side equation
+		vec3 acceleration = SPH::calcAcceleration(*sys->particles[i]);
+		sys->particles[i]->params.velocity += sys->sysParams.tStep * acceleration;
+		sys->particles[i]->nextPosition = sys->particles[i]->position;
+		sys->particles[i]->nextPosition += sys->sysParams.tStep * sys->particles[i]->params.velocity;
+	}
+
+	#pragma omp parallel for
+	for (int i = 0; i < sys->particles.size(); ++i)
+	{
+		collisionsSubFunction(sys, i);
+	}
+	
+	// update list of particles
+	sys->updateList();
+	
+	
+	/*
 	int threadCount = sys->particles.size() / THREADSIZE + 1;
 	std::thread* threads = new thread[threadCount];
 	
@@ -149,7 +184,7 @@ void SPH::calcSPH()
 		threads[i].join();
 	}
 
-
+	
 	for (int i = 0, count = 0, step = 0; step < threadCount; i += THREADSIZE, ++step)
 	{
 		threads[step] = std::thread(collisions, sys, i, &count);
@@ -159,17 +194,20 @@ void SPH::calcSPH()
 	{
 		threads[i].join();
 	}
+	
 
 	delete[] threads;
+	
 
 	// update list of particles
 	sys->updateList();
+	*/
 }
 
 float SPH::calcDensity(Particle particle)
 {
 	ParticleSystem* sys = ParticleSystem::getInstance();
-	float density = 0.0f;
+	float density = particle.params.mass * calcDensityKernel(vec3(0.0f, 0.0f, 0.0f), sys->sysParams.searchRadius);
 
 	for (int i = 0; i < particle.neighbors.size(); ++i)
 	{

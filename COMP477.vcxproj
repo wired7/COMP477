@@ -132,11 +132,11 @@
       <WarningLevel>Level3</WarningLevel>
       <Optimization>Disabled</Optimization>
       <SDLCheck>true</SDLCheck>
-      <AdditionalIncludeDirectories>..\COMP477\Resources\assimp-win\include\assimp;..\COMP477\Resources\GLM\glm;..\COMP477\Resources\Simple OpenGL Image Library\SOIL;..\COMP477\Resources\GLFW\include\GLFW;..\COMP477\Resources\GLEW\include\GL;%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
+      <AdditionalIncludeDirectories>..\COMP477\Resources\GLM\glm;..\COMP477\Resources\Simple OpenGL Image Library\SOIL;..\COMP477\Resources\GLFW\include\GLFW;..\COMP477\Resources\GLEW\include\GL;%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
     </ClCompile>
     <Link>
-      <AdditionalLibraryDirectories>..\COMP477\Resources\assimp-win\lib32;..\COMP477\Resources\Simple OpenGL Image Library\lib;..\COMP477\Resources\GLFW\lib-vc2015;..\COMP477\Resources\GLEW\lib\Release\Win32;%(AdditionalLibraryDirectories)</AdditionalLibraryDirectories>
-      <AdditionalDependencies>opengl32.lib;glew32.lib;glfw3.lib;soil.lib;assimp.lib;%(AdditionalDependencies)</AdditionalDependencies>
+      <AdditionalLibraryDirectories>..\COMP477\Resources\Simple OpenGL Image Library\lib;..\COMP477\Resources\GLFW\lib-vc2015;..\COMP477\Resources\GLEW\lib\Release\Win32;%(AdditionalLibraryDirectories)</AdditionalLibraryDirectories>
+      <AdditionalDependencies>opengl32.lib;glew32.lib;glfw3.lib;soil.lib;%(AdditionalDependencies)</AdditionalDependencies>
     </Link>
   </ItemDefinitionGroup>
   <ItemDefinitionGroup Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">
@@ -159,12 +159,15 @@
       <IntrinsicFunctions>true</IntrinsicFunctions>
       <SDLCheck>true</SDLCheck>
       <AdditionalIncludeDirectories>..\COMP477\Resources\assimp-win\include\assimp;..\COMP477\Resources\GLM\glm;..\COMP477\Resources\Simple OpenGL Image Library\SOIL;..\COMP477\Resources\GLFW\include\GLFW;..\COMP477\Resources\GLEW\include\GL;%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
+      <MultiProcessorCompilation>
+      </MultiProcessorCompilation>
+      <AdditionalOptions>/openmp %(AdditionalOptions)</AdditionalOptions>
     </ClCompile>
     <Link>
       <EnableCOMDATFolding>true</EnableCOMDATFolding>
       <OptimizeReferences>true</OptimizeReferences>
       <AdditionalLibraryDirectories>..\COMP477\Resources\assimp-win\lib32;..\COMP477\Resources\Simple OpenGL Image Library\lib;..\COMP477\Resources\GLFW\lib-vc2015;..\COMP477\Resources\GLEW\lib\Release\Win32;%(AdditionalLibraryDirectories)</AdditionalLibraryDirectories>
-      <AdditionalDependencies>opengl32.lib;glew32.lib;glfw3.lib;soil.lib;assimp.lib;%(AdditionalDependencies)</AdditionalDependencies>
+      <AdditionalDependencies>opengl32.lib;glew32.lib;glfw3.lib;soil.lib;%(AdditionalDependencies)</AdditionalDependencies>
     </Link>
   </ItemDefinitionGroup>
   <ItemDefinitionGroup Condition="'$(Configuration)|$(Platform)'=='Release|x64'">
