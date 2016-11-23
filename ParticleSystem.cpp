@@ -125,7 +125,6 @@ void ParticleSystem::addRigidbodies(vector<Rigidbody*> rigid)
 
 void ParticleSystem::updateList() {
 	
-	//#pragma omp parallel for
 	for (int i = 0; i < particles.size(); ++i) {
 		particles[i]->position = particles[i]->nextPosition;
 		grid.update(*particles[i]);

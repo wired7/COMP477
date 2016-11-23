@@ -114,20 +114,20 @@ void SPH::calcSPH()
 {	
 	ParticleSystem* sys = ParticleSystem::getInstance();
 	
-	#pragma omp parallel for
+	#pragma omp parallel for schedule(dynamic, 2)
 	for (int i = 0; i < sys->particles.size(); ++i)
 	{
 		sys->calcNeighbors(sys->particles[i]);
 	}	
 
-	#pragma omp parallel for	
+	#pragma omp parallel for schedule(dynamic, 2)	
 	for (int i = 0; i < sys->particles.size(); ++i)
 	{
 		sys->particles[i]->params.density = SPH::calcDensity(*sys->particles[i]);
 		sys->particles[i]->params.pressure = SPH::calcPressure(*sys->particles[i]);
 	}
 
-	#pragma omp parallel for
+	#pragma omp parallel for schedule(dynamic, 2)
 	for (int i = 0; i < sys->particles.size(); ++i)
 	{
 		//calc right side equation
@@ -137,7 +137,7 @@ void SPH::calcSPH()
 		sys->particles[i]->nextPosition += sys->sysParams.tStep * sys->particles[i]->params.velocity;
 	}
 
-	#pragma omp parallel for
+	#pragma omp parallel for schedule(dynamic, 2)
 	for (int i = 0; i < sys->particles.size(); ++i)
 	{
 		collisionsSubFunction(sys, i);
