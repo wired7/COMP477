@@ -3,6 +3,7 @@
 #include "Skybox.h"
 #include "Terrain.h"
 #include "Controller.h"
+#include <mutex>
 
 class StateSpace
 {
@@ -15,7 +16,9 @@ public:
 	bool playModeOn;
 	int frameCount;
 	double time;
-	vector<vector<vec3>> frames;
+	char* fileName;
+	vector<vector<vec3>>* framesFront;
+	vector<vector<vec3>>* framesBack;
 	vector<Camera*> observers;
 	vector<InstancedMeshObject*> instancedModels;
 	vector<MeshObject*> models;
@@ -24,5 +27,12 @@ public:
 	StateSpace(GLFWwindow*, Skybox*);
 	~StateSpace();
 	void draw();
+	void updateFrames();
+	void loadFramesInBack();
+	void swap(vector<vector<vec3>>* p1, vector<vector<vec3>>* p2);
+	void initializeFrameRead();
+	int framesBuffSize;
+	int totalFrames;
+	int currGlobalFrame;
 };
 
