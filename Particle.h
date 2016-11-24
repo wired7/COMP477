@@ -6,6 +6,7 @@ using namespace std;
 
 struct ParticleParameters {
 	glm::vec3 velocity = glm::vec3(0,0,0);
+	glm::vec3 acceleration = glm::vec3(0, 0, 0);
 	float density;
 	float pressure;
 	float kernel;
