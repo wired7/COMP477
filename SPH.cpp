@@ -7,49 +7,6 @@
 #include <thread>
 #include <omp.h>
 
-#define THREADSIZE 200
-
-using namespace std::chrono;
-
-void neighbors(ParticleSystem* pS, int i, int* count)
-{
-	for (int j = i; (j < i + THREADSIZE) && (j < pS->particles.size()); j++, *count++)
-	{
-		pS->calcNeighbors(pS->particles[j]);
-	}
-}
-
-void densitiesPressures(ParticleSystem* pS, int i, int* count)
-{
-	for (int j = i; j < i + THREADSIZE && j < pS->particles.size(); j++, *count++)
-	{
-		pS->particles[j]->params.density = SPH::calcDensity(*pS->particles[j]);
-		pS->particles[j]->params.pressure = SPH::calcPressure(*pS->particles[j]);
-	}
-}
-
-void eulerTimeIntegrations(ParticleSystem* pS, int i, int* count)
-{
-	for (int j = i; j < i + THREADSIZE && j < pS->particles.size(); j++, *count++)
-	{
-		//calc right side equation
-		vec3 acceleration = SPH::calcAcceleration(*pS->particles[j]);
-		pS->particles[j]->params.velocity += pS->sysParams.tStep * acceleration;
-		pS->particles[j]->nextPosition = pS->particles[j]->position;
-		pS->particles[j]->nextPosition += pS->sysParams.tStep * pS->particles[j]->params.velocity;
-	}
-}
-
-void collisionsSubFunction(ParticleSystem*, int);
-
-void collisions(ParticleSystem* pS, int i, int* count)
-{
-	for (int n = i; n < i + THREADSIZE && n < pS->particles.size(); n++, *count++)
-	{
-		collisionsSubFunction(pS, n);
-	}
-}
-
 void collisionsSubFunction(ParticleSystem* pS, int n)
 {
 	Particle* currParticle = pS->particles[n];
@@ -114,6 +71,7 @@ void SPH::calcSPH()
 {	
 	ParticleSystem* sys = ParticleSystem::getInstance();
 	
+	// Get the neighbors of each particle and set up its attributes for pressure and density calculation
 	#pragma omp parallel for schedule(dynamic, 2)
 	for (int i = 0; i < sys->particles.size(); ++i)
 	{
@@ -124,23 +82,37 @@ void SPH::calcSPH()
 		sys->particles[i]->params.laplacianVelocity = vec3(0, 0, 0);
 	}	
 
+	// Calculate the density of each particle
 	#pragma omp parallel for schedule(dynamic, 2)	
 	for (int i = 0; i < sys->particles.size(); ++i)
 	{
 		sys->particles[i]->params.density += SPH::calcDensity(*sys->particles[i]);
+	}
+
+	// Calculate the pressure of each particle
+	#pragma omp parallel for schedule(dynamic, 2)	
+	for (int i = 0; i < sys->particles.size(); ++i)
+	{
 		sys->particles[i]->params.pressure += SPH::calcPressure(*sys->particles[i]);
 	}
 
-	#pragma omp parallel for schedule(dynamic, 2)
+	// Using the pressure and the density, calculate the acceleration of the particle
+	#pragma omp parallel for schedule(dynamic, 2)	
 	for (int i = 0; i < sys->particles.size(); ++i)
 	{
-		//calc right side equation
-		vec3 acceleration = SPH::calcAcceleration(*sys->particles[i]);
-		sys->particles[i]->params.velocity += sys->sysParams.tStep * acceleration;
+		sys->particles[i]->params.acceleration = SPH::calcAcceleration(*sys->particles[i]);
+	}
+
+	// Using the acceleration, use explicit euler integration to find the next position of the particle
+	#pragma omp parallel for schedule(dynamic, 2)	
+	for (int i = 0; i < sys->particles.size(); ++i)
+	{
+		sys->particles[i]->params.velocity += sys->sysParams.tStep * sys->particles[i]->params.acceleration;
 		sys->particles[i]->nextPosition = sys->particles[i]->position;
 		sys->particles[i]->nextPosition += sys->sysParams.tStep * sys->particles[i]->params.velocity;
 	}
 
+	// Find external forces (collisions with rigidbodies) and apply them to the particle
 	#pragma omp parallel for schedule(dynamic, 2)
 	for (int i = 0; i < sys->particles.size(); ++i)
 	{
@@ -149,63 +121,6 @@ void SPH::calcSPH()
 	
 	// update list of particles
 	sys->updateList();
-	
-	
-	/*
-	int threadCount = sys->particles.size() / THREADSIZE + 1;
-	std::thread* threads = new thread[threadCount];
-	
-	for (int i = 0, count = 0, step = 0; step < threadCount; i += THREADSIZE, ++step)
-	{
-		threads[step] = std::thread(neighbors, sys, i, &count);
-		//if debug draw lines
-	}
-
-	for (int i = 0; i < threadCount; ++i)
-	{
-		threads[i].join();
-	}
-
-
-	for (int i = 0, count = 0, step = 0; step < threadCount; i += THREADSIZE, ++step)
-	{
-		threads[step] = std::thread(densitiesPressures, sys, i, &count);
-	}
-
-	for (int i = 0; i < threadCount; ++i)
-	{
-		threads[i].join();
-	}
-
-
-	for (int i = 0, count = 0, step = 0; step < threadCount; i += THREADSIZE, ++step)
-	{
-		threads[step] = std::thread(eulerTimeIntegrations, sys, i, &count);
-	}
-
-	for (int i = 0; i < threadCount; ++i)
-	{
-		threads[i].join();
-	}
-
-	
-	for (int i = 0, count = 0, step = 0; step < threadCount; i += THREADSIZE, ++step)
-	{
-		threads[step] = std::thread(collisions, sys, i, &count);
-	}
-
-	for (int i = 0; i < threadCount; ++i)
-	{
-		threads[i].join();
-	}
-	
-
-	delete[] threads;
-	
-
-	// update list of particles
-	sys->updateList();
-	*/
 }
 
 float SPH::calcDensity(Particle particle)
@@ -282,7 +197,7 @@ float SPH::calcLaplacianViscosityKernel(vec3 distance, float h)
 		return 0.0f;
 	}
 
-	float coefficient = -45.0f / (glm::pi<float>()*pow(h, 6));
+	float coefficient = 45.0f / (glm::pi<float>()*pow(h, 6));
 	float derivedFirstValue = ((h - magnitude));
 
 	return coefficient * derivedFirstValue;
@@ -308,13 +223,13 @@ vec3 SPH::calcGradientPressure(Particle particle)
 
 			vec3 kernel = calcGradientPressureKernel(distance, h);
 
-			ret += (sys->sysParams.mass / sys->particles[index]->params.density) * symmetricPressure * kernel;
+			ret -= (sys->sysParams.mass / sys->particles[index]->params.density) * symmetricPressure * kernel;
 
 			sys->particles[index]->params.gradientPressure -= (sys->sysParams.mass / particle.params.density) * symmetricPressure * kernel;
 		}
 	}
 
-	return (-1.0f)*ret; // return the negated vector
+	return ret; // return the negated vector
 }
 
 vec3 SPH::calcLaplacianVelocity(Particle particle)
@@ -337,7 +252,7 @@ vec3 SPH::calcLaplacianVelocity(Particle particle)
 
 			ret += (sys->sysParams.mass / sys->particles[index]->params.density) * symmetricVelocity * kernel;
 
-			sys->particles[index]->params.laplacianVelocity += (sys->sysParams.mass / particle.params.density) * symmetricVelocity * kernel;
+			sys->particles[index]->params.laplacianVelocity += (sys->sysParams.mass / particle.params.density) * (-1.0f) * symmetricVelocity * kernel;
 		}
 	}
 
