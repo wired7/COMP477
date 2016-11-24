@@ -26,6 +26,7 @@ class ParticleSystem
 public:
 	~ParticleSystem();
 	static ParticleSystem* getInstance();
+	void goNuts(float, float, string);
 	vector<glm::vec3>* getParticlePositions();
 	SystemParameters sysParams;
 	vector<Particle*> particles;

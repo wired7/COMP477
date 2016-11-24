@@ -1,9 +1,12 @@
 #pragma once
 #include "ParticleSystem.h"
+#include "SPH.h"
 #include "glm.hpp"
 #include <thread>
 #include <chrono>
 #include <omp.h>
+#include <fstream>
+#
 
 using namespace std::chrono;
 
@@ -90,6 +93,50 @@ ParticleSystem::ParticleSystem()
 ParticleSystem::~ParticleSystem()
 {
 
+}
+
+void ParticleSystem::goNuts(float playbackTime, float frameRate, string filePath)
+{
+	milliseconds ms;
+
+	float t = 0;
+
+	ofstream myfile;
+	myfile.open(filePath);
+	myfile << sysParams.particleRadius << " " << sysParams.searchRadius << " " << sysParams.viscocity << " " << sysParams.stiffness << " ";
+	myfile << sysParams.restDensity << " " << sysParams.gravity << " " << sysParams.tStep << " " << sysParams.maxTStep << " " << sysParams.mass << " " << endl;
+	myfile.close();
+
+	for (float simTime = 0; simTime < playbackTime; simTime += sysParams.tStep)
+	{
+		ms = duration_cast<milliseconds>(system_clock::now().time_since_epoch());
+
+		if (t >= frameRate)
+		{
+			myfile.open(filePath, std::ios_base::app);
+
+			myfile << sysParams.tStep;
+
+			for (int i = 0; i < particles.size(); i++)
+				myfile << " " << particles[i]->position.x << " " << particles[i]->position.y << " " << particles[i]->position.z;
+
+			myfile << endl;
+
+			myfile.close();
+
+			t = 0;
+
+			system("CLS");
+
+			float deltaTime = duration_cast<milliseconds>(system_clock::now().time_since_epoch()).count() - ms.count();
+			cout << (simTime / playbackTime) * 100 << "%" << endl;
+			cout << "ETA: " << deltaTime * (playbackTime - simTime) / 1000 / 60 << " mins" << endl;
+		}
+
+		SPH::calcSPH();
+
+		t += sysParams.tStep;
+	}
 }
 
 void ParticleSystem::addParticles(vector<Particle*> part)

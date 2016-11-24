@@ -129,7 +129,7 @@ vector<int> Grid3D::getNeighbors(Particle particle)
 		{
 			int particleIndex = currCube->particles.at(j);
 
-			if (particleIndex != particle.getIndex() && inRadius(particle.position, ps->particles[particleIndex]->position))
+			if (particleIndex > particle.getIndex() && inRadius(particle.position, ps->particles[particleIndex]->position))
 			{
 				ret.push_back(particleIndex);
 			}

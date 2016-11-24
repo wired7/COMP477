@@ -2,6 +2,7 @@
 #include "ParticleSystem.h"
 #include "SPH.h"
 #include <chrono>
+#include <fstream>
 
 using namespace std::chrono;
 
@@ -18,12 +19,15 @@ StateSpace::StateSpace(GLFWwindow* window, Skybox* skybox)
 	int width, height;
 	glfwGetWindowSize(window, &width, &height);
 	Camera::activeCamera = new StateSpaceCamera(window, vec2(0, 0), vec2(1, 1), vec3(5, 5, 0), vec3(5, 5, 5), vec3(0, 1, 0), perspective(45.0f, (float)width / height, 0.1f, 1000.0f), terrain);
-	
+	observers.push_back(Camera::activeCamera);
+
 	float viscocity = 0.01f;
 	float stiffness = 0.01f;
 	float timeStep = 0.001f;
 	float density = 1000.0f;
 	float radius = 0.1f;//1.0f / density;
+	float searchRadius = 1.0f;
+	float gravity = -9.81f;
 	float mass = 1.0f;
 
 	int blockSize = 2;
@@ -39,13 +43,13 @@ StateSpace::StateSpace(GLFWwindow* window, Skybox* skybox)
 	rect.model = rect.model * rotate(mat4(1.0f), 1.5f, vec3(1, 1, 1));
 
 	Rigidbody* rB = new Rigidbody(cube.vertices, cube.indices, cube.model, 1000, false);
-//	Rigidbody* rB1 = new Rigidbody(rect.vertices, rect.indices, rect.model, 1000, false);
+	Rigidbody* rB1 = new Rigidbody(rect.vertices, rect.indices, rect.model, 1000, false);
 	vector<Rigidbody*> rigidbodies;
 	rigidbodies.push_back(rB);
-//	rigidbodies.push_back(rB1);
+	rigidbodies.push_back(rB1);
 
-	ParticleSystem::getInstance()->sysParams = SystemParameters(radius, 0.5f, viscocity, stiffness, density, -9.81f, timeStep, timeStep, mass);
-	ParticleSystem::getInstance()->grid = Grid3D(30, 0.5);
+	ParticleSystem::getInstance()->sysParams = SystemParameters(radius, searchRadius, viscocity, stiffness, density, gravity, timeStep, timeStep, mass);
+	ParticleSystem::getInstance()->grid = Grid3D(30, searchRadius);
 	ParticleSystem::getInstance()->addParticles(pos);
 	ParticleSystem::getInstance()->addRigidbodies(rigidbodies);
 
@@ -54,40 +58,10 @@ StateSpace::StateSpace(GLFWwindow* window, Skybox* skybox)
 	frames.push_back(*p);
 	delete p;
 
-	float t = 0;
-	float playbackTime = 5;
-	float currentTimeStep = 0;
-
-	for (float simTime = 0; simTime < playbackTime; simTime += currentTimeStep)
-	{
-		ms = duration_cast<milliseconds>(system_clock::now().time_since_epoch());
-
-		if (t >= 0.016f)
-		{
-			auto partPos = ParticleSystem::getInstance()->getParticlePositions();
-			frames.push_back(*partPos);
-			delete partPos;
-			t = 0;
-
-			system("CLS");
-
-			float deltaTime = duration_cast<milliseconds>(system_clock::now().time_since_epoch()).count() - ms.count();
-			cout << (simTime / playbackTime) * 100 << "%" << endl;
-			cout << "ETA: " << deltaTime * (playbackTime - simTime) / 1000 / 60 << " mins" << endl;
-		}
-
-		SPH::calcSPH();
-
-		currentTimeStep = ParticleSystem::getInstance()->sysParams.tStep;
-
-		t += currentTimeStep;
-	}
+	ParticleSystem::getInstance()->goNuts(5, 0.016f, "Animations\\test.anim");
 	
 	for (int i = 0; i < ParticleSystem::getInstance()->rigidbodies.size(); i++)
 		models.push_back(new Rigidbody(ParticleSystem::getInstance()->rigidbodies[i]->vertices, ParticleSystem::getInstance()->rigidbodies[i]->indices, ParticleSystem::getInstance()->rigidbodies[i]->model, 0, true));
-	
-	
-	observers.push_back(Camera::activeCamera);
 }
 
 

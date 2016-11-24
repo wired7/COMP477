@@ -149,63 +149,6 @@ void SPH::calcSPH()
 	
 	// update list of particles
 	sys->updateList();
-	
-	
-	/*
-	int threadCount = sys->particles.size() / THREADSIZE + 1;
-	std::thread* threads = new thread[threadCount];
-	
-	for (int i = 0, count = 0, step = 0; step < threadCount; i += THREADSIZE, ++step)
-	{
-		threads[step] = std::thread(neighbors, sys, i, &count);
-		//if debug draw lines
-	}
-
-	for (int i = 0; i < threadCount; ++i)
-	{
-		threads[i].join();
-	}
-
-
-	for (int i = 0, count = 0, step = 0; step < threadCount; i += THREADSIZE, ++step)
-	{
-		threads[step] = std::thread(densitiesPressures, sys, i, &count);
-	}
-
-	for (int i = 0; i < threadCount; ++i)
-	{
-		threads[i].join();
-	}
-
-
-	for (int i = 0, count = 0, step = 0; step < threadCount; i += THREADSIZE, ++step)
-	{
-		threads[step] = std::thread(eulerTimeIntegrations, sys, i, &count);
-	}
-
-	for (int i = 0; i < threadCount; ++i)
-	{
-		threads[i].join();
-	}
-
-	
-	for (int i = 0, count = 0, step = 0; step < threadCount; i += THREADSIZE, ++step)
-	{
-		threads[step] = std::thread(collisions, sys, i, &count);
-	}
-
-	for (int i = 0; i < threadCount; ++i)
-	{
-		threads[i].join();
-	}
-	
-
-	delete[] threads;
-	
-
-	// update list of particles
-	sys->updateList();
-	*/
 }
 
 float SPH::calcDensity(Particle particle)
@@ -310,7 +253,7 @@ vec3 SPH::calcGradientPressure(Particle particle)
 
 			ret += (sys->sysParams.mass / sys->particles[index]->params.density) * symmetricPressure * kernel;
 
-			sys->particles[index]->params.gradientPressure -= (sys->sysParams.mass / particle.params.density) * symmetricPressure * kernel;
+			sys->particles[index]->params.gradientPressure += (sys->sysParams.mass / particle.params.density) * symmetricPressure * kernel;
 		}
 	}
 
@@ -337,7 +280,7 @@ vec3 SPH::calcLaplacianVelocity(Particle particle)
 
 			ret += (sys->sysParams.mass / sys->particles[index]->params.density) * symmetricVelocity * kernel;
 
-			sys->particles[index]->params.laplacianVelocity += (sys->sysParams.mass / particle.params.density) * symmetricVelocity * kernel;
+			sys->particles[index]->params.laplacianVelocity -= (sys->sysParams.mass / particle.params.density) * symmetricVelocity * kernel;
 		}
 	}
 
