@@ -211,7 +211,8 @@ void SPH::calcSPH()
 float SPH::calcDensity(Particle particle)
 {
 	ParticleSystem* sys = ParticleSystem::getInstance();
-	float density = particle.params.mass * calcDensityKernel(vec3(0.0f, 0.0f, 0.0f), sys->sysParams.searchRadius);
+
+	float density = sys->sysParams.mass * calcDensityKernel(vec3(0.0f, 0.0f, 0.0f), sys->sysParams.searchRadius);
 
 	for (int i = 0; i < particle.neighbors.size(); ++i)
 	{
@@ -222,8 +223,8 @@ float SPH::calcDensity(Particle particle)
 			Particle* currParticle = sys->particles[particle.neighbors.at(i)];
 			vec3 distance = particle.position - currParticle->position;
 			float kernel = calcDensityKernel(distance, sys->sysParams.searchRadius);
-			density += currParticle->params.mass * kernel;
-			sys->particles[index]->params.density += sys->particles[index]->params.mass * kernel;
+			density += sys->sysParams.mass * kernel;
+			sys->particles[index]->params.density += sys->sysParams.mass * kernel;
 		}
 	}
 
@@ -307,9 +308,9 @@ vec3 SPH::calcGradientPressure(Particle particle)
 
 			vec3 kernel = calcGradientPressureKernel(distance, h);
 
-			ret += (sys->particles[index]->params.mass / sys->particles[index]->params.density) * symmetricPressure * kernel;
+			ret += (sys->sysParams.mass / sys->particles[index]->params.density) * symmetricPressure * kernel;
 
-			sys->particles[index]->params.gradientPressure -= (particle.params.mass / particle.params.density) * symmetricPressure * kernel;
+			sys->particles[index]->params.gradientPressure -= (sys->sysParams.mass / particle.params.density) * symmetricPressure * kernel;
 		}
 	}
 
@@ -334,9 +335,9 @@ vec3 SPH::calcLaplacianVelocity(Particle particle)
 
 			float kernel = calcLaplacianViscosityKernel(distance, h);
 
-			ret += (sys->particles[index]->params.mass / sys->particles[index]->params.density) * symmetricVelocity * kernel;
+			ret += (sys->sysParams.mass / sys->particles[index]->params.density) * symmetricVelocity * kernel;
 
-			sys->particles[index]->params.laplacianVelocity += (particle.params.mass / particle.params.density) * symmetricVelocity * kernel;
+			sys->particles[index]->params.laplacianVelocity += (sys->sysParams.mass / particle.params.density) * symmetricVelocity * kernel;
 		}
 	}
 

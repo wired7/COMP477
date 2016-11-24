@@ -5,7 +5,6 @@
 using namespace std;
 
 struct ParticleParameters {
-	float mass;
 	glm::vec3 velocity = glm::vec3(0,0,0);
 	float density;
 	float pressure;
@@ -13,7 +12,7 @@ struct ParticleParameters {
 	glm::vec3 gradientPressure;
 	glm::vec3 laplacianVelocity;
 
-	ParticleParameters(float m, glm::vec3 v) : mass(m), velocity(v) {}
+	ParticleParameters(glm::vec3 v) : velocity(v) {}
 };
 
 class Particle {
