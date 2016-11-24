@@ -23,7 +23,7 @@ public:
 	vec3 lookAtVector;
 	vec3 camPosVector;
 	vec3 upVector;
-	
+
 	Camera(GLFWwindow*, vec2, vec2, vec3, vec3, vec3, mat4);
 	virtual ~Camera() {};
 	virtual void update() = 0;
@@ -39,6 +39,9 @@ public:
 
 	SphericalCamera(GLFWwindow*, vec2, vec2, vec3, vec3, vec3, mat4);
 	virtual void update();
+
+private:
+	double maxCamPhi;
 };
 
 class StateSpaceCamera : public Camera
@@ -50,6 +53,9 @@ public:
 	StateSpaceCamera(GLFWwindow*, vec2, vec2, vec3, vec3, vec3, mat4, Terrain*);
 	void translate(vec2);
 	void update();
+
+private:
+	double maxCamPhi;
 };
 
 class MenuCamera : public Camera

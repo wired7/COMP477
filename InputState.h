@@ -10,4 +10,12 @@ public:
 	static bool shiftPressed;
 	static bool controlPressed;
 	static bool altPressed;
+	static bool wireframeModeOn;
+	static bool surfaceModeOn;
+	static bool mouseButtonLeftPressed;
+	static bool wPressed;
+	static bool sPressed;
+	static double previousMousePosX;
+	static double previousMousePosY;
+
 };
