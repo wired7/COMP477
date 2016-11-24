@@ -20,45 +20,12 @@ StateSpace::StateSpace(GLFWwindow* window, Skybox* skybox)
 	glfwGetWindowSize(window, &width, &height);
 	Camera::activeCamera = new StateSpaceCamera(window, vec2(0, 0), vec2(1, 1), vec3(5, 5, 0), vec3(5, 5, 5), vec3(0, 1, 0), perspective(45.0f, (float)width / height, 0.1f, 1000.0f), terrain);
 	observers.push_back(Camera::activeCamera);
-
-	float viscocity = 0.01f;
-	float stiffness = 0.01f;
-	float timeStep = 0.001f;
-	float density = 1000.0f;
-	float radius = 0.1f;//1.0f / density;
-	float searchRadius = 1.0f;
-	float gravity = -9.81f;
-	float mass = 1.0f;
-
-	int blockSize = 2;
-	
-	vector<Particle*> pos;
-	for(int k = 0; k < blockSize; k++)
-		for(int j = 0; j < blockSize; j++)
-			for (int i = 0; i < blockSize; i++)
-				pos.push_back(new Particle(vec3(5.0f + (float)i / density, 5.0f + (float)j / density, 5.0f + (float)k / density)));
-
-	Cube cube(vec3(5.0f, 5.0f, 5.0f), vec3(1.0f, 1.0f, 1.0f), vec4(1.0f, 0.0f, 0.0f, 0.5f), false);
-	Rectangle rect(vec3(5, 4, 5), vec3(1, 2, 1), vec4(1, 1, 0, 1), false);
-	rect.model = rect.model * rotate(mat4(1.0f), 1.5f, vec3(1, 1, 1));
-
-	Rigidbody* rB = new Rigidbody(cube.vertices, cube.indices, cube.model, 1000, false);
-	Rigidbody* rB1 = new Rigidbody(rect.vertices, rect.indices, rect.model, 1000, false);
-	vector<Rigidbody*> rigidbodies;
-	rigidbodies.push_back(rB);
-	rigidbodies.push_back(rB1);
-
-	ParticleSystem::getInstance()->sysParams = SystemParameters(radius, searchRadius, viscocity, stiffness, density, gravity, timeStep, timeStep, mass);
-	ParticleSystem::getInstance()->grid = Grid3D(30, searchRadius);
-	ParticleSystem::getInstance()->addParticles(pos);
-	ParticleSystem::getInstance()->addRigidbodies(rigidbodies);
+	Controller::setController(StateSpaceController::getController());
 
 	auto p = ParticleSystem::getInstance()->getParticlePositions();
-	instancedModels.push_back(new InstancedSpheres(radius, 8, vec4(0.5, 0.5, 1, 1.0f), *p));
+	instancedModels.push_back(new InstancedSpheres(ParticleSystem::getInstance()->sysParams.particleRadius, 8, vec4(0.5, 0.5, 1, 1.0f), *p));
 	frames.push_back(*p);
 	delete p;
-
-	ParticleSystem::getInstance()->goNuts(5, 0.016f, "Animations\\test.anim");
 	
 	for (int i = 0; i < ParticleSystem::getInstance()->rigidbodies.size(); i++)
 		models.push_back(new Rigidbody(ParticleSystem::getInstance()->rigidbodies[i]->vertices, ParticleSystem::getInstance()->rigidbodies[i]->indices, ParticleSystem::getInstance()->rigidbodies[i]->model, 0, true));

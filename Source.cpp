@@ -10,8 +10,13 @@
 #include <gtc/matrix_transform.hpp>
 #include <gtx/rotate_vector.hpp>
 #include <thread>
+#include "FileStorage.h"
+#include "OpenFileDialog.h"
+#include "SaveFileDialog.h"
+#include "GraphicsObject.h"
 #include "Shader.h"
 #include "StateSpace.h"
+#include "ParticleSystem.h"
 #include "Menu.h"
 #include <windows.h>
 #include <omp.h>
@@ -23,7 +28,6 @@ GLFWwindow* window;
 StateSpace* stateSpace;
 Skybox* skybox;
 Menu* menu;
-GraphicsObject* selectedObject;
 
 //Nvidia GPU support
 extern "C" {
@@ -48,6 +52,7 @@ int init() {
 
 	// Open a window and create its OpenGL context
 	window = glfwCreateWindow(1200, 800, "COMP477", NULL, NULL);
+	glfwHideWindow(window);
 	if (window == NULL) {
 		fprintf(stderr, "Failed to open GLFW window.\n");
 		getchar();
@@ -84,37 +89,116 @@ int init() {
 	LitShader::shader = new LitShader("shaders\\litShader.VERTEXSHADER", "shaders\\InstancedFragmentShader.FRAGMENTSHADER");
 	InstancedLitShader::shader = new InstancedLitShader("shaders\\InstancedVertexShader.VERTEXSHADER", "shaders\\InstancedFragmentShader.FRAGMENTSHADER");
 	CubeMapShader::shader = new CubeMapShader("shaders\\CubeMap.VERTEXSHADER", "shaders\\CubeMap.FRAGMENTSHADER");
-	
-	skybox = new Skybox("skyboxes\\ame_majesty\\");
-	stateSpace = new StateSpace(window, skybox);
-
-	StateSpace::activeStateSpace = stateSpace;
-
-	Controller::setController(StateSpaceController::getController());
-
-	menu = new Menu(window);
 
 	srand(time(NULL));
 }
 
 int main()
 {
-
 	if (init() < 0)
 		return -1;
 
+menu:
+	system("CLS");
+	cout << "What would you like to do?" << endl;
+	cout << "1. Create new simulation" << endl;
+	cout << "2. Edit existing simulation" << endl;
+	cout << "3. Run Existing simulation" << endl;
+
+	string s;
 	do {
-		// Clear the screen
-		glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
+		s = "";
 
-		stateSpace->draw();
+		getline(cin, s);
 
-//		menu->draw();
+		if (stoi(s) < 1 || stoi(s) > 3)
+			cout << "Invalid Input. Please try again." << endl;
 
-		// Swap buffers
-		glfwSwapBuffers(window);
-		glfwPollEvents();
-	} while (glfwWindowShouldClose(window) == 0);
+	} while (stoi(s) < 0 || stoi(s) > 3);
+
+	if (stoi(s) == 1)
+	{
+		OpenFileDialog dialog;
+
+		string sysParamsFile = dialog.SelectFile();
+
+		if (sysParamsFile == "")
+			goto menu;
+		
+		auto sysParams = FileStorage::loadSysParams(sysParamsFile);
+
+		string simParams;
+		system("CLS");
+		cout << "Enter number of particles: " << endl;
+		getline(cin, simParams);
+		int blockSize = pow(stof(simParams), 1.0f / 3.0f);
+
+		cout << "Enter total grid size per axis:" << endl;
+		getline(cin, simParams);
+		int gridSize = stoi(simParams);
+
+		cout << "Enter animation time" << endl;
+		getline(cin, simParams);
+		float animationTime = stof(simParams);
+
+		cout << "Save animation as..." << endl;
+
+		SaveFileDialog saveDialog;
+
+		string animFile = saveDialog.SaveFile();
+
+		if (animFile == "")
+			goto menu;
+
+		vector<Particle*> pos;
+		for (int k = 0; k < blockSize; k++)
+			for (int j = 0; j < blockSize; j++)
+				for (int i = 0; i < blockSize; i++)
+					pos.push_back(new Particle(vec3(2.0f + 2.0f * (float)i / sysParams.restDensity, 2.0f + 2.0f * (float)j / sysParams.restDensity, 2.0f + 2.0f * (float)k / sysParams.restDensity)));
+
+		Cube cube(vec3(2.0f, 2.0f, 2.0f), vec3(1.0f, 1.0f, 1.0f), vec4(1.0f, 0.0f, 0.0f, 0.5f), false);
+//		Rectangle rect(vec3(5, 4, 5), vec3(1, 2, 1), vec4(1, 1, 0, 1), false);
+//		rect.model = rect.model * rotate(mat4(1.0f), 1.5f, vec3(1, 1, 1));
+
+		Rigidbody* rB = new Rigidbody(cube.vertices, cube.indices, cube.model, 1000, false);
+//		Rigidbody* rB1 = new Rigidbody(rect.vertices, rect.indices, rect.model, 1000, false);
+		vector<Rigidbody*> rigidbodies;
+		rigidbodies.push_back(rB);
+//		rigidbodies.push_back(rB1);
+
+		ParticleSystem::getInstance()->sysParams = sysParams;
+		ParticleSystem::getInstance()->grid = Grid3D(gridSize / sysParams.searchRadius, sysParams.searchRadius);
+		ParticleSystem::getInstance()->addParticles(pos);
+		ParticleSystem::getInstance()->addRigidbodies(rigidbodies);
+
+		ParticleSystem::getInstance()->goNuts(animationTime, 0.016f, animFile);
+
+		goto menu;
+	}
+	else if(stoi(s) == 2)
+	{ }
+	else if (stoi(s) == 3)
+	{
+		skybox = new Skybox("skyboxes\\ame_majesty\\");
+		stateSpace = new StateSpace(window, skybox);
+
+		StateSpace::activeStateSpace = stateSpace;
+
+		glfwShowWindow(window);
+
+		do {
+			// Clear the screen
+			glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
+
+			stateSpace->draw();
+
+			// Swap buffers
+			glfwSwapBuffers(window);
+			glfwPollEvents();
+		} while (glfwWindowShouldClose(window) == 0);
+
+		goto menu;
+	}
 
 	// Close OpenGL window and terminate GLFW
 	glfwTerminate();

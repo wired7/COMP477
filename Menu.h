@@ -7,7 +7,7 @@ class Menu
 public:
 	Camera* observer;
 //	ImportedMesh* bucket;
-	Rectangle* rectangle;
+//	Rectangle* rectangle;
 	Menu(GLFWwindow*);
 	~Menu();
 	void draw();

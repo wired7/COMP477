@@ -28,7 +28,6 @@
     <ClInclude Include="GraphicsObject.h" />
     <ClInclude Include="Grid3D.h" />
     <ClInclude Include="InputState.h" />
-    <ClInclude Include="Menu.h" />
     <ClInclude Include="NoiseTexture.h" />
     <ClInclude Include="OpenFileDialog.h" />
     <ClInclude Include="Particle.h" />
@@ -56,7 +55,6 @@
     </ClCompile>
     <ClCompile Include="Grid3D.cpp" />
     <ClCompile Include="InputState.cpp" />
-    <ClCompile Include="Menu.cpp" />
     <ClCompile Include="Particle.cpp" />
     <ClCompile Include="ParticleSystem.cpp" />
     <ClCompile Include="Rigidbody.cpp" />

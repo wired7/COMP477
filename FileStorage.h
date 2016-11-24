@@ -1,9 +1,14 @@
 #pragma once
-class FileStorage
+#include "ParticleSystem.h"
+
+using namespace std;
+
+static class FileStorage
 {
 public:
-	FileStorage();
-	~FileStorage();
 	static void write(char* file);
+	static SystemParameters loadSysParams(string);
+private:
+	static SystemParameters matchSysParams(vector<pair<string, float>>);
 };
 
