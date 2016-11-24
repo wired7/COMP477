@@ -207,13 +207,13 @@ void SPH::calcSPH()
 float SPH::calcDensity(Particle particle)
 {
 	ParticleSystem* sys = ParticleSystem::getInstance();
-	float density = particle.params.mass * calcDensityKernel(vec3(0.0f, 0.0f, 0.0f), sys->sysParams.searchRadius);
+	float density = sys->sysParams.mass * calcDensityKernel(vec3(0.0f, 0.0f, 0.0f), sys->sysParams.searchRadius);
 
 	for (int i = 0; i < particle.neighbors.size(); ++i)
 	{
 		Particle* currParticle = sys->particles[particle.neighbors.at(i)];
 		vec3 distance = particle.position - currParticle->position;
-		density += currParticle->params.mass * calcDensityKernel(distance, sys->sysParams.searchRadius);
+		density += sys->sysParams.mass * calcDensityKernel(distance, sys->sysParams.searchRadius);
 	}
 
 	return density;
@@ -291,7 +291,7 @@ vec3 SPH::calcGradientPressure(Particle particle)
 		// pressure has to be symmetric, to guarantee symmetry we take the average of the two pressures
 		float symmetricPressure = (sys->particles[index]->params.pressure + particle.params.pressure) / 2.0f;
 
-		ret += (sys->particles[index]->params.mass / sys->particles[index]->params.density) * symmetricPressure * (calcGradientPressureKernel(distance, h));
+		ret += (sys->sysParams.mass / sys->particles[index]->params.density) * symmetricPressure * (calcGradientPressureKernel(distance, h));
 	}
 
 	return (-1.0f)*ret; // return the negated vector
@@ -310,7 +310,7 @@ vec3 SPH::calcLaplacianVelocity(Particle particle)
 		// forces between two particles should be equal & opposite, symmetrize the velocity fields
 		vec3 symmetricVelocity = sys->particles[index]->params.velocity - particle.params.velocity;
 		
-		ret += (sys->particles[index]->params.mass / sys->particles[index]->params.density) * symmetricVelocity * (calcLaplacianViscosityKernel(distance, h));
+		ret += (sys->sysParams.mass / sys->particles[index]->params.density) * symmetricVelocity * (calcLaplacianViscosityKernel(distance, h));
 	}
 
 	return ret;

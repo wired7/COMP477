@@ -24,6 +24,7 @@ StateSpace::StateSpace(GLFWwindow* window, Skybox* skybox)
 	float timeStep = 0.001f;
 	float density = 1000.0f;
 	float radius = 0.1f;//1.0f / density;
+	float mass = 1.0f;
 
 	int blockSize = 2;
 	
@@ -43,7 +44,7 @@ StateSpace::StateSpace(GLFWwindow* window, Skybox* skybox)
 	rigidbodies.push_back(rB);
 //	rigidbodies.push_back(rB1);
 
-	ParticleSystem::getInstance()->sysParams = SystemParameters(radius, 0.5f, viscocity, stiffness, density, -9.81f, timeStep, timeStep);
+	ParticleSystem::getInstance()->sysParams = SystemParameters(radius, 0.5f, viscocity, stiffness, density, -9.81f, timeStep, timeStep, mass);
 	ParticleSystem::getInstance()->grid = Grid3D(30, 0.5);
 	ParticleSystem::getInstance()->addParticles(pos);
 	ParticleSystem::getInstance()->addRigidbodies(rigidbodies);
