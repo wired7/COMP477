@@ -36,15 +36,22 @@ void Camera::setCamera(Camera* cam)
 
 
 SphericalCamera::SphericalCamera(GLFWwindow* window, vec2 relativePosition, vec2 relativeDimensions, vec3 pos, vec3 lookAt, vec3 up, mat4 Projection) :
-Camera(window, relativePosition, relativeDimensions, pos, lookAt, up, Projection)
+	Camera(window, relativePosition, relativeDimensions, pos, lookAt, up, Projection)
 {
 	distance = length(camPosVector - lookAtVector);
-	camTheta = atan2(pos.z - lookAt.z, pos.x - lookAt.x);
+	maxCamPhi = 0.7;
+
+	//camTheta = atan2(pos.z - lookAt.z, pos.x - lookAt.x);
 	update();
 }
 
 void SphericalCamera::update()
 {
+	if (camPhi > maxCamPhi)
+		camPhi = maxCamPhi;
+	else if (camPhi < maxCamPhi * -1)
+		camPhi = maxCamPhi * -1;
+
 	camPosVector = distance * vec3(cos(camTheta) * cos(camPhi), sin(camPhi), sin(camTheta) * cos(camPhi)) + lookAtVector;
 	upVector = vec3(-cos(camTheta) * sin(camPhi), cos(camPhi), -sin(camTheta) * sin(camPhi));
 	View = lookAt(camPosVector, lookAtVector, upVector);
@@ -54,7 +61,9 @@ StateSpaceCamera::StateSpaceCamera(GLFWwindow* window, vec2 relativePosition, ve
 	Camera(window, relativePosition, relativeDimensions, pos, lookAt, up, Projection)
 {
 	this->terrain = terrain;
-	camTheta = atan2(lookAt.z - pos.z, lookAt.x - pos.x);
+	maxCamPhi = 0.7;
+
+	//camTheta = atan2(lookAt.z - pos.z, lookAt.x - pos.x);
 
 	update();
 }
@@ -63,14 +72,19 @@ void StateSpaceCamera::translate(vec2 offset)
 {
 	vec3 diff(cos(camTheta), 0, sin(camTheta));
 
-	if(length(camPosVector + diff * vec3(offset.x, 0, offset.y)) < 15)
+	if (length(camPosVector + diff * vec3(offset.x, 0, offset.y)) < 15)
 		camPosVector += diff * vec3(offset.x, 0, offset.y);
 }
 
 void StateSpaceCamera::update()
 {
-	vector<double> minDiff = {INFINITY, INFINITY, INFINITY};
-	vector<int> minIndex = {-1, -1, -1};
+	if (camPhi > maxCamPhi)
+		camPhi = maxCamPhi;
+	else if (camPhi < maxCamPhi * -1)
+		camPhi = maxCamPhi * -1;
+
+	vector<double> minDiff = { INFINITY, INFINITY, INFINITY };
+	vector<int> minIndex = { -1, -1, -1 };
 
 	if (terrain != nullptr)
 	{

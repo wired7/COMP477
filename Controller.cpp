@@ -30,6 +30,23 @@ StateSpaceController::~StateSpaceController()
 
 void StateSpaceController::kC(GLFWwindow* window, int key, int scancode, int action, int mods)
 {
+	if ((key == GLFW_KEY_W))
+	{
+		InputState::wPressed = true;
+		StateSpaceCamera* activeCam = (StateSpaceCamera*)Camera::activeCamera;
+		activeCam->translate(0.1f * vec2(1.0f));
+		activeCam->update();
+	}
+
+	if ((key == GLFW_KEY_S))
+	{
+		InputState::sPressed = true;
+		StateSpaceCamera* activeCam = (StateSpaceCamera*)Camera::activeCamera;
+		activeCam->translate(-0.1f * vec2(1.0f));
+		activeCam->update();
+	}
+
+
 	if ((key == GLFW_KEY_LEFT_SHIFT || key == GLFW_KEY_RIGHT_SHIFT) && action == GLFW_PRESS)
 	{
 		InputState::shiftPressed = true;
@@ -64,11 +81,6 @@ void StateSpaceController::kC(GLFWwindow* window, int key, int scancode, int act
 	{
 		InputState::altPressed = false;
 	}
-
-	if (key == GLFW_KEY_P && action == GLFW_PRESS)
-	{
-		StateSpace::activeStateSpace->playModeOn ^= true;
-	}
 }
 
 void StateSpaceController::sC(GLFWwindow* window, double xOffset, double yOffset)
@@ -92,7 +104,8 @@ void StateSpaceController::mC(GLFWwindow* window, int button, int action, int mo
 {
 	if (button == GLFW_MOUSE_BUTTON_LEFT && action == GLFW_PRESS)
 	{
-
+		InputState::mouseButtonLeftPressed = true;
+		glfwSetInputMode(window, GLFW_CURSOR, GLFW_CURSOR_DISABLED);
 	}
 	if (button == GLFW_MOUSE_BUTTON_RIGHT && action == GLFW_PRESS)
 	{
@@ -100,13 +113,27 @@ void StateSpaceController::mC(GLFWwindow* window, int button, int action, int mo
 	}
 	if ((button == GLFW_MOUSE_BUTTON_LEFT || button == GLFW_MOUSE_BUTTON_RIGHT) && action == GLFW_RELEASE)
 	{
-
+		InputState::mouseButtonLeftPressed = false;
+		glfwSetInputMode(window, GLFW_CURSOR, GLFW_CURSOR_NORMAL);
 	}
 }
 
 void StateSpaceController::mPC(GLFWwindow* window, double xpos, double ypos)
 {
+	double deltaX = xpos - InputState::previousMousePosX;
+	double deltaY = ypos - InputState::previousMousePosY;
 
+	if (InputState::mouseButtonLeftPressed)
+	{
+		StateSpaceCamera* activeCam = (StateSpaceCamera*)Camera::activeCamera;
+		activeCam->camTheta += 0.005 * (GLfloat)deltaX;
+		activeCam->camPhi -= 0.005 * (GLfloat)deltaY;
+
+		activeCam->update();
+	}
+
+	InputState::previousMousePosX = xpos;
+	InputState::previousMousePosY = ypos;
 }
 
 void StateSpaceController::wRC(GLFWwindow*, int, int)
