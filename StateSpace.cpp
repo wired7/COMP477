@@ -19,11 +19,11 @@ StateSpace::StateSpace(GLFWwindow* window, Skybox* skybox)
 	glfwGetWindowSize(window, &width, &height);
 	Camera::activeCamera = new StateSpaceCamera(window, vec2(0, 0), vec2(1, 1), vec3(5, 5, 0), vec3(5, 5, 5), vec3(0, 1, 0), perspective(45.0f, (float)width / height, 0.1f, 1000.0f), terrain);
 	
-	float viscocity = 0.01f;
+	float viscocity = 2;
 	float stiffness = 0.01f;
 	float timeStep = 0.001f;
 	float density = 1000.0f;
-	float radius = 0.1f;//1.0f / density;
+	float radius = 0.02f;//1.0f / density;
 
 	int blockSize = 2;
 	
@@ -43,13 +43,13 @@ StateSpace::StateSpace(GLFWwindow* window, Skybox* skybox)
 	rigidbodies.push_back(rB);
 //	rigidbodies.push_back(rB1);
 
-	ParticleSystem::getInstance()->sysParams = SystemParameters(radius, 0.5f, viscocity, stiffness, density, -9.81f, timeStep, timeStep);
-	ParticleSystem::getInstance()->grid = Grid3D(30, 0.5);
+	ParticleSystem::getInstance()->sysParams = SystemParameters(radius, 1, viscocity, stiffness, density, -9.81f, timeStep, timeStep);
+	ParticleSystem::getInstance()->grid = Grid3D(15, 1);
 	ParticleSystem::getInstance()->addParticles(pos);
 	ParticleSystem::getInstance()->addRigidbodies(rigidbodies);
 
 	auto p = ParticleSystem::getInstance()->getParticlePositions();
-	instancedModels.push_back(new InstancedSpheres(radius, 8, vec4(0.5, 0.5, 1, 1.0f), *p));
+	instancedModels.push_back(new InstancedSpheres(radius, 10, vec4(0.5, 0.5, 1, 1.0f), *p));
 	frames.push_back(*p);
 	delete p;
 
@@ -61,7 +61,7 @@ StateSpace::StateSpace(GLFWwindow* window, Skybox* skybox)
 	{
 		ms = duration_cast<milliseconds>(system_clock::now().time_since_epoch());
 
-		if (t >= 0.016f)
+		if (t >= 0.032f)
 		{
 			auto partPos = ParticleSystem::getInstance()->getParticlePositions();
 			frames.push_back(*partPos);
@@ -127,7 +127,7 @@ void StateSpace::draw()
 
 		milliseconds ms = duration_cast<milliseconds>(system_clock::now().time_since_epoch());
 
-		if (ms.count() - time >= 16 && playModeOn)
+		if (ms.count() - time >= 32 && playModeOn)
 		{
 			frameCount = (frameCount + 1) % frames.size();
 			((InstancedSpheres*)instancedModels[0])->updateInstances(&(frames[frameCount]));

@@ -13,5 +13,5 @@ public:
 	static float calcLaplacianViscosityKernel(glm::vec3 distance, float h);
 	static glm::vec3 calcGradientPressure(Particle particle);
 	static glm::vec3 calcLaplacianVelocity(Particle particle);
-	static glm::vec3 calcAcceleration(const Particle& particle);
+	static glm::vec3 calcAcceleration(Particle particle);
 };

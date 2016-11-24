@@ -118,13 +118,17 @@ void SPH::calcSPH()
 	for (int i = 0; i < sys->particles.size(); ++i)
 	{
 		sys->calcNeighbors(sys->particles[i]);
+		sys->particles[i]->params.density = 0;
+		sys->particles[i]->params.pressure = 0;
+		sys->particles[i]->params.gradientPressure = vec3(0, 0, 0);
+		sys->particles[i]->params.laplacianVelocity = vec3(0, 0, 0);
 	}	
 
 	#pragma omp parallel for schedule(dynamic, 2)	
 	for (int i = 0; i < sys->particles.size(); ++i)
 	{
-		sys->particles[i]->params.density = SPH::calcDensity(*sys->particles[i]);
-		sys->particles[i]->params.pressure = SPH::calcPressure(*sys->particles[i]);
+		sys->particles[i]->params.density += SPH::calcDensity(*sys->particles[i]);
+		sys->particles[i]->params.pressure += SPH::calcPressure(*sys->particles[i]);
 	}
 
 	#pragma omp parallel for schedule(dynamic, 2)
@@ -211,9 +215,16 @@ float SPH::calcDensity(Particle particle)
 
 	for (int i = 0; i < particle.neighbors.size(); ++i)
 	{
-		Particle* currParticle = sys->particles[particle.neighbors.at(i)];
-		vec3 distance = particle.position - currParticle->position;
-		density += currParticle->params.mass * calcDensityKernel(distance, sys->sysParams.searchRadius);
+		int index = particle.neighbors[i];
+
+		if (index > particle.getIndex())
+		{
+			Particle* currParticle = sys->particles[particle.neighbors.at(i)];
+			vec3 distance = particle.position - currParticle->position;
+			float kernel = calcDensityKernel(distance, sys->sysParams.searchRadius);
+			density += currParticle->params.mass * kernel;
+			sys->particles[index]->params.density += sys->particles[index]->params.mass * kernel;
+		}
 	}
 
 	return density;
@@ -283,15 +294,23 @@ vec3 SPH::calcGradientPressure(Particle particle)
 	for (int i = 0; i < particle.neighbors.size(); ++i)
 	{
 		int index = particle.neighbors[i];
-		vec3 distance = particle.position - sys->particles[index]->position;
 
-		float h = sys->sysParams.searchRadius;
+		if (index > particle.getIndex())
+		{
+			vec3 distance = particle.position - sys->particles[index]->position;
 
-		// forces between two particles should be equal & opposite
-		// pressure has to be symmetric, to guarantee symmetry we take the average of the two pressures
-		float symmetricPressure = (sys->particles[index]->params.pressure + particle.params.pressure) / 2.0f;
+			float h = sys->sysParams.searchRadius;
 
-		ret += (sys->particles[index]->params.mass / sys->particles[index]->params.density) * symmetricPressure * (calcGradientPressureKernel(distance, h));
+			// forces between two particles should be equal & opposite
+			// pressure has to be symmetric, to guarantee symmetry we take the average of the two pressures
+			float symmetricPressure = (sys->particles[index]->params.pressure + particle.params.pressure) / 2.0f;
+
+			vec3 kernel = calcGradientPressureKernel(distance, h);
+
+			ret += (sys->particles[index]->params.mass / sys->particles[index]->params.density) * symmetricPressure * kernel;
+
+			sys->particles[index]->params.gradientPressure -= (particle.params.mass / particle.params.density) * symmetricPressure * kernel;
+		}
 	}
 
 	return (-1.0f)*ret; // return the negated vector
@@ -304,26 +323,35 @@ vec3 SPH::calcLaplacianVelocity(Particle particle)
 	for (int i = 0; i < particle.neighbors.size(); ++i)
 	{
 		int index = particle.neighbors[i];
-		vec3 distance = particle.position - sys->particles[index]->position;
-		float h = sys->sysParams.searchRadius;
 
-		// forces between two particles should be equal & opposite, symmetrize the velocity fields
-		vec3 symmetricVelocity = sys->particles[index]->params.velocity - particle.params.velocity;
-		
-		ret += (sys->particles[index]->params.mass / sys->particles[index]->params.density) * symmetricVelocity * (calcLaplacianViscosityKernel(distance, h));
+		if (index > particle.getIndex())
+		{
+			vec3 distance = particle.position - sys->particles[index]->position;
+			float h = sys->sysParams.searchRadius;
+
+			// forces between two particles should be equal & opposite, symmetrize the velocity fields
+			vec3 symmetricVelocity = sys->particles[index]->params.velocity - particle.params.velocity;
+
+			float kernel = calcLaplacianViscosityKernel(distance, h);
+
+			ret += (sys->particles[index]->params.mass / sys->particles[index]->params.density) * symmetricVelocity * kernel;
+
+			sys->particles[index]->params.laplacianVelocity += (particle.params.mass / particle.params.density) * symmetricVelocity * kernel;
+		}
 	}
 
 	return ret;
 }
 
-vec3 SPH::calcAcceleration(const Particle& particle)
+vec3 SPH::calcAcceleration(Particle particle)
 {
 	ParticleSystem* sys = ParticleSystem::getInstance();
-	auto gP = calcGradientPressure(particle);
-	auto lV = sys->sysParams.viscocity*calcLaplacianVelocity(particle);
+	particle.params.gradientPressure += calcGradientPressure(particle);
+	particle.params.laplacianVelocity += calcLaplacianVelocity(particle);
+
 	auto g = particle.params.density * vec3(0.0f, sys->sysParams.gravity, 0.0f);
 
-	return (gP + lV + g) / particle.params.density;
+	return (particle.params.gradientPressure + sys->sysParams.viscocity * particle.params.laplacianVelocity + g) / particle.params.density;
 }
 
 
