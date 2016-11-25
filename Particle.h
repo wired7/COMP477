@@ -26,7 +26,7 @@ public:
 	glm::vec3 nextPosition = glm::vec3(0, 0, 0);
 	int getIndex();
 	glm::vec3 getGridCellCoord();
-	void setGridCellCoord(glm::vec3 gridCellCoord);
+	void setGridCellCoord(const glm::vec3& gridCellCoord);
 	vector<int> neighbors;
 	ParticleParameters params;
 	glm::vec3 collisionNormal;

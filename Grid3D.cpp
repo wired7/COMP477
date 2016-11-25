@@ -33,7 +33,7 @@ float Grid3D::getCellSize()
 }
 
 //updates a particle to the correct
-void Grid3D::update(Particle particle)
+void Grid3D::update(Particle& particle)
 {
 	//TODO: particle remove itself from previous cell it was in?
 
@@ -49,12 +49,14 @@ void Grid3D::update(Particle particle)
 	if (remove)
 	{
 		GridCube* cubeptr = &data[(int)currCell.x][(int)currCell.y][(int)currCell.z];
+
 		// This can probably be optimized using the object's name
 		for (int i = 0; i < cubeptr->particles.size(); ++i)
 		{
 			if (cubeptr->particles.at(i) == particle.getIndex())
 			{
 				cubeptr->particles.erase(cubeptr->particles.begin() + i);
+				--i;
 			}
 		}
 	}
@@ -68,7 +70,6 @@ void Grid3D::update(Particle particle)
 	{
 		//TODO
 	}
-
 }
 
 vector<GridCube> Grid3D::getNeighborCubes(Particle particle)
@@ -120,6 +121,7 @@ vector<int> Grid3D::getNeighbors(Particle particle)
 	vector<int> ret;
 	
 	ParticleSystem* ps = ParticleSystem::getInstance();
+	
 	for (int i = 0; i < neighborCubes.size(); ++i)
 	{
 		int particlesSize = neighborCubes[i].particles.size();

@@ -22,7 +22,7 @@ glm::vec3 Particle::getGridCellCoord()
 	return gridCellCoord;
 }
 
-void Particle::setGridCellCoord(glm::vec3 gridCellCoord)
+void Particle::setGridCellCoord(const glm::vec3& gridCellCoord)
 {
 	this->gridCellCoord = gridCellCoord;
 }
