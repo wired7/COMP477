@@ -150,7 +150,7 @@ menu:
 		if (animFile == "")
 			goto menu;
 
-		float separation = 1.0f / blockSize;
+		float separation = 0.5f / blockSize;
 		vector<Particle*> pos;
 		for (int k = 0; k < blockSize; k++)
 			for (int j = 0; j < blockSize; j++)
