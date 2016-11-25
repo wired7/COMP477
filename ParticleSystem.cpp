@@ -166,8 +166,6 @@ void ParticleSystem::addRigidbodies(vector<Rigidbody*> rigid)
 	#pragma omp parallel for
 	for(int i = 0; i < grid.data.size(); ++i)
 		rigidbodyIntersections(i);
-
-//	cout << duration_cast<milliseconds>(system_clock::now().time_since_epoch()).count() - ms.count() << endl;
 }
 
 void ParticleSystem::updateList() {

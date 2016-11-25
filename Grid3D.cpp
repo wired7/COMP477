@@ -50,21 +50,21 @@ void Grid3D::update(Particle& particle)
 	{
 		GridCube* cubeptr = &data[(int)currCell.x][(int)currCell.y][(int)currCell.z];
 
-		// This can probably be optimized using the object's name
 		for (int i = 0; i < cubeptr->particles.size(); ++i)
 		{
 			if (cubeptr->particles.at(i) == particle.getIndex())
 			{
 				cubeptr->particles.erase(cubeptr->particles.begin() + i);
-				--i;
+				break;
 			}
 		}
-	}
 
-	if (!offGrid && remove)
-	{
-		data[gridX][gridY][gridZ].particles.push_back(particle.getIndex());
-		particle.setGridCellCoord(glm::vec3(gridX, gridY, gridZ));
+		if (!offGrid)
+		{
+			data[gridX][gridY][gridZ].particles.push_back(particle.getIndex());
+			particle.setGridCellCoord(glm::vec3(gridX, gridY, gridZ));
+		}
+
 	}
 	else
 	{
@@ -127,7 +127,7 @@ vector<int> Grid3D::getNeighbors(Particle particle)
 		int particlesSize = neighborCubes[i].particles.size();
 
 		GridCube* currCube = &neighborCubes[i];
-		for (int j = 0; j < particlesSize; j++)
+		for (int j = 0; j < particlesSize; ++j)
 		{
 			int particleIndex = currCube->particles.at(j);
 

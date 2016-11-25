@@ -4,6 +4,7 @@
 #include <chrono>
 #include <fstream>
 #include "FileStorage.h"
+#include "OpenFileDialog.h"
 #include <thread>
 
 using namespace std::chrono;
@@ -19,60 +20,28 @@ StateSpace::StateSpace(GLFWwindow* window, Skybox* skybox)
 	framesBuffSize = 60;
 	currGlobalFrame = 0;
 
-milliseconds ms = duration_cast<milliseconds>(system_clock::now().time_since_epoch());
-time = ms.count();
-frameCount = 0;
-playModeOn = false;
-this->skybox = skybox;
+	milliseconds ms = duration_cast<milliseconds>(system_clock::now().time_since_epoch());
+	time = ms.count();
+	frameCount = 0;
+	playModeOn = false;
+	this->skybox = skybox;
 //	terrain = new Terrain(1, 40, 40, 32, STATIC);
-int width, height;
-glfwGetWindowSize(window, &width, &height);
-Camera::activeCamera = new StateSpaceCamera(window, vec2(0, 0), vec2(1, 1), vec3(5, 5, 0), vec3(5, 5, 5), vec3(0, 1, 0), perspective(45.0f, (float)width / height, 0.1f, 1000.0f), terrain);
-observers.push_back(Camera::activeCamera);
+	int width, height;
+	glfwGetWindowSize(window, &width, &height);
+	Camera::activeCamera = new StateSpaceCamera(window, vec2(0, 0), vec2(1, 1), vec3(3, 3, 0), vec3(2, 2, 2), vec3(0, 1, 0), perspective(45.0f, (float)width / height, 0.1f, 1000.0f), terrain);
+	observers.push_back(Camera::activeCamera);
 
-float viscocity = 0.01f;
-float stiffness = 0.01f;
-float timeStep = 0.01f;
-float density = 1000.0f;
-float radius = 0.1f;//1.0f / density;
-float searchRadius = 1.0f;
-float gravity = -9.81f;
-float mass = 1.0f;
+	Controller::setController(StateSpaceController::getController());
 
-int blockSize = 10;
+	fileName = _strdup(OpenFileDialog().SelectFile().c_str());
+	initializeFrameRead();
 
-vector<Particle*> pos;
-for (int k = 0; k < blockSize; k++)
-	for (int j = 0; j < blockSize; j++)
-		for (int i = 0; i < blockSize; i++)
-			pos.push_back(new Particle(vec3(5.0f + (float)i / density, 5.0f + (float)j / density, 5.0f + (float)k / density)));
+	cout << ParticleSystem::getInstance()->sysParams.particleRadius << endl;
 
-Cube cube(vec3(5.0f, 5.0f, 5.0f), vec3(1.0f, 1.0f, 1.0f), vec4(1.0f, 0.0f, 0.0f, 0.5f), false);
-Rectangle rect(vec3(5, 4, 5), vec3(1, 2, 1), vec4(1, 1, 0, 1), false);
-rect.model = rect.model * rotate(mat4(1.0f), 1.5f, vec3(1, 1, 1));
+	instancedModels.push_back(new InstancedSpheres(ParticleSystem::getInstance()->sysParams.particleRadius, 32, vec4(0.5, 0.5, 1, 1.0f), framesFront->at(0)));
 
-Rigidbody* rB = new Rigidbody(cube.vertices, cube.indices, cube.model, 1000, false);
-Rigidbody* rB1 = new Rigidbody(rect.vertices, rect.indices, rect.model, 1000, false);
-vector<Rigidbody*> rigidbodies;
-rigidbodies.push_back(rB);
-rigidbodies.push_back(rB1);
-
-ParticleSystem::getInstance()->sysParams = SystemParameters(radius, searchRadius, viscocity, stiffness, density, gravity, timeStep, timeStep, mass);
-ParticleSystem::getInstance()->grid = Grid3D(30, searchRadius);
-ParticleSystem::getInstance()->addParticles(pos);
-ParticleSystem::getInstance()->addRigidbodies(rigidbodies);
-
-auto p = ParticleSystem::getInstance()->getParticlePositions();
-instancedModels.push_back(new InstancedSpheres(radius, 32, vec4(0.5, 0.5, 1, 1.0f), *p));
-framesFront->push_back(*p);
-delete p;
-fileName = "Animations\\test.anim";
-ParticleSystem::getInstance()->goNuts(3, 0.016f, fileName);
-
-for (int i = 0; i < ParticleSystem::getInstance()->rigidbodies.size(); i++)
-	models.push_back(new Rigidbody(ParticleSystem::getInstance()->rigidbodies[i]->vertices, ParticleSystem::getInstance()->rigidbodies[i]->indices, ParticleSystem::getInstance()->rigidbodies[i]->model, 0, true));
-
-initializeFrameRead();
+	for (int i = 0; i < ParticleSystem::getInstance()->rigidbodies.size(); i++)
+		models.push_back(new Rigidbody(ParticleSystem::getInstance()->rigidbodies[i]->vertices, ParticleSystem::getInstance()->rigidbodies[i]->indices, ParticleSystem::getInstance()->rigidbodies[i]->model, 0, true));
 }
 
 
@@ -128,7 +97,7 @@ void StateSpace::draw()
 			{
 				((InstancedSpheres*)instancedModels[0])->updateInstances(&((*framesFront)[frameCount]));
 			}
-			time = ms.count();
+			time = duration_cast<milliseconds>(system_clock::now().time_since_epoch()).count();
 			currGlobalFrame++;
 		}
 

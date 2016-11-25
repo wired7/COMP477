@@ -2,19 +2,21 @@
 #include "glm.hpp"
 #include <vector>
 #include <fstream>
+#include "ParticleSystem.h"
 
 using namespace std;
 
-class FileStorage
+static class FileStorage
 {
 public:
-	FileStorage();
-	~FileStorage();
 	static void write(char* file);
 	static void readFrames(char* file, int count, vector<vector<glm::vec3>>* frames);
 	static int getFramesTotal(char* file);
 	static fstream filePos;
 	static bool hasOpen;
 	static void resetReadFrames();
+	static SystemParameters loadSysParams(string);
+private:
+	static SystemParameters matchSysParams(vector<pair<string, float>> values);
 };
 

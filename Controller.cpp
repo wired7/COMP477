@@ -155,3 +155,5 @@ Controller* StateSpaceController::getController()
 
 	return controller;
 }
+
+EditorController* EditorController::controller = NULL;
