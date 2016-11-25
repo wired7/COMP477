@@ -34,17 +34,18 @@ void collisionsSubFunction(ParticleSystem* pS, int n)
 
 			if (distance <= pS->sysParams.particleRadius)
 			{
-				if (currParticle->collisionNormal != normal && currParticle->collisionNormal != -normal)
-				{
-					vec3 origin = currParticle->nextPosition;
-					vec3 direction = normal;
-					Triangle triangle(point1, point2, point3);
+				vec3 origin = currParticle->nextPosition;
+				vec3 direction = normal;
+				Triangle triangle(point1, point2, point3);
 
+				float distanceToPlaneAtCollision = plane.intersection(origin, direction);
+
+				direction = -sign(distanceToPlaneAtCollision) * direction;
+				
+				if (currParticle->collisionNormal != direction)
+				{
 					if (triangle.intersects(origin, direction))
 					{
-						float distanceToPlaneAtCollision = plane.intersection(origin, direction);
-
-						direction = -sign(distanceToPlaneAtCollision) * direction;
 						currParticle->collisionNormal = direction;
 						//theres a collision. Update velocity based on conservation of momentum.
 						//						float t = distanceToPlaneAtCollision / length(currParticle->params.velocity);
@@ -53,9 +54,19 @@ void collisionsSubFunction(ParticleSystem* pS, int n)
 						sys->sysParams.tStep = t;
 						}*/
 
-						// Update particle velocity with reflected, assuming no loss in energy in terms of heat
-						currParticle->params.velocity = glm::reflect(currParticle->params.velocity, direction);
-						currParticle->nextPosition += pS->sysParams.tStep * currParticle->params.velocity;
+						// Update particle velocity with reflected, assuming some loss in energy in terms of heat
+						// take particle back to position where it would have first collided with the plane given the current velocity
+						vec3 velDir = normalize(currParticle->params.velocity);
+						float d1 = plane.intersection(origin, velDir);
+						float backwardsDisplacement = (pS->sysParams.particleRadius * d1 / distanceToPlaneAtCollision) - d1; // using law of sines
+						currParticle->params.velocity = 0.8f * glm::reflect(currParticle->params.velocity, direction);
+						currParticle->nextPosition -= velDir * backwardsDisplacement;
+
+//						currParticle->nextPosition += (pS->sysParams.particleRadius - abs(distanceToPlaneAtCollision)) * direction;
+
+						// time retrocession = backwardsDisplacement / currParticle->params.velocity. So tStep -= tRetrocession.
+						// But this shouldn't be done here since we must obtain the minimum time step produced by these calculations beforehand
+						// we may never have to do this. collisions look pretty good by now
 						return;
 					}
 				}
@@ -207,6 +218,7 @@ vec3 SPH::calcGradientPressure(Particle particle)
 {
 	ParticleSystem* sys = ParticleSystem::getInstance();
 	vec3 ret;
+
 	for (int i = 0; i < particle.neighbors.size(); ++i)
 	{
 		int index = particle.neighbors[i];

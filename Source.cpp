@@ -154,9 +154,9 @@ menu:
 		for (int k = 0; k < blockSize; k++)
 			for (int j = 0; j < blockSize; j++)
 				for (int i = 0; i < blockSize; i++)
-					pos.push_back(new Particle(vec3(2.0f + 2.0f * (float)i / sysParams.restDensity, 2.0f + 2.0f * (float)j / sysParams.restDensity, 2.0f + 2.0f * (float)k / sysParams.restDensity)));
+					pos.push_back(new Particle(vec3(3.0f + 50.0f * (float)i / sysParams.restDensity, 3.0f + 50.0f * (float)j / sysParams.restDensity, 3.0f + 50.0f * (float)k / sysParams.restDensity)));
 
-		Cube cube(vec3(2.0f, 2.0f, 2.0f), vec3(1.0f, 1.0f, 1.0f), vec4(1.0f, 0.0f, 0.0f, 0.5f), false);
+		Cube cube(vec3(3.0f, 3.0f, 3.0f), vec3(3.0f, 3.0f, 3.0f), vec4(1.0f, 0.0f, 0.0f, 0.5f), false);
 //		Rectangle rect(vec3(5, 4, 5), vec3(1, 2, 1), vec4(1, 1, 0, 1), false);
 //		rect.model = rect.model * rotate(mat4(1.0f), 1.5f, vec3(1, 1, 1));
 

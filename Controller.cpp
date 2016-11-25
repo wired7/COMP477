@@ -30,6 +30,11 @@ StateSpaceController::~StateSpaceController()
 
 void StateSpaceController::kC(GLFWwindow* window, int key, int scancode, int action, int mods)
 {
+	if (key == GLFW_KEY_P && action == GLFW_PRESS)
+	{
+		StateSpace::activeStateSpace->playModeOn ^= true;
+	}
+
 	if ((key == GLFW_KEY_W))
 	{
 		InputState::wPressed = true;

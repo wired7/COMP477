@@ -1,7 +1,7 @@
-particle radius: 0.05
-search radius: 1
+particle radius: 0.1
+search radius: 0.2
 viscocity: 0.01
-stiffness: 0.01
+stiffness: 2
 rest density: 1000
 gravity: -9.81
 time step: 0.001

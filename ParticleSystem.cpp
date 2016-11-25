@@ -166,8 +166,6 @@ void ParticleSystem::addRigidbodies(vector<Rigidbody*> rigid)
 	#pragma omp parallel for
 	for(int i = 0; i < grid.data.size(); ++i)
 		rigidbodyIntersections(i);
-
-//	cout << duration_cast<milliseconds>(system_clock::now().time_since_epoch()).count() - ms.count() << endl;
 }
 
 void ParticleSystem::updateList() {
@@ -182,7 +180,6 @@ void ParticleSystem::calcNeighbors(Particle* particle)
 {
 	particle->neighbors.clear();
 	particle->neighbors = grid.getNeighbors(*particle);
-
 }
 
 // Instantiate vector to heap, the class which receives this function must take care of the deletion of the pointer
