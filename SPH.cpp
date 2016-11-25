@@ -149,8 +149,11 @@ float SPH::calcDensity(Particle particle)
 			Particle* currParticle = sys->particles[particle.neighbors.at(i)];
 			vec3 distance = particle.position - currParticle->position;
 			float kernel = calcDensityKernel(distance, sys->sysParams.searchRadius);
-			density += sys->sysParams.mass * kernel;
-			sys->particles[index]->params.density += sys->sysParams.mass * kernel;
+			#pragma omp critical
+			{
+				density += sys->sysParams.mass * kernel;
+				sys->particles[index]->params.density += sys->sysParams.mass * kernel;
+			}
 		}
 	}
 
@@ -234,10 +237,12 @@ vec3 SPH::calcGradientPressure(Particle particle)
 			float symmetricPressure = (sys->particles[index]->params.pressure + particle.params.pressure) / 2.0f;
 
 			vec3 kernel = calcGradientPressureKernel(distance, h);
+			#pragma omp critical
+			{
+				ret -= (sys->sysParams.mass / sys->particles[index]->params.density) * symmetricPressure * kernel;
 
-			ret -= (sys->sysParams.mass / sys->particles[index]->params.density) * symmetricPressure * kernel;
-
-			sys->particles[index]->params.gradientPressure += (sys->sysParams.mass / particle.params.density) * symmetricPressure * kernel;
+				sys->particles[index]->params.gradientPressure += (sys->sysParams.mass / particle.params.density) * symmetricPressure * kernel;
+			}
 		}
 	}
 
@@ -261,10 +266,12 @@ vec3 SPH::calcLaplacianVelocity(Particle particle)
 			vec3 symmetricVelocity = sys->particles[index]->params.velocity - particle.params.velocity;
 
 			float kernel = calcLaplacianViscosityKernel(distance, h);
+			#pragma omp critical
+			{
+				ret += (sys->sysParams.mass / sys->particles[index]->params.density) * symmetricVelocity * kernel;
 
-			ret += (sys->sysParams.mass / sys->particles[index]->params.density) * symmetricVelocity * kernel;
-
-			sys->particles[index]->params.laplacianVelocity -= (sys->sysParams.mass / particle.params.density) * symmetricVelocity * kernel;
+				sys->particles[index]->params.laplacianVelocity -= (sys->sysParams.mass / particle.params.density) * symmetricVelocity * kernel;
+			}
 		}
 	}
 
