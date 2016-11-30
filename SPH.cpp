@@ -118,6 +118,7 @@ void SPH::calcSPH()
 		sys->particles[i]->params.pressure = 0;
 		sys->particles[i]->params.gradientPressure = vec3(0, 0, 0);
 		sys->particles[i]->params.laplacianVelocity = vec3(0, 0, 0);
+		sys->particles[i]->params.tensionAcceleration = vec3(0, 0, 0);
 	}	
 
 	// Calculate the density of each particle
@@ -323,10 +324,40 @@ vec3 SPH::calcAcceleration(Particle particle)
 	ParticleSystem* sys = ParticleSystem::getInstance();
 	particle.params.gradientPressure += calcGradientPressure(particle);
 	particle.params.laplacianVelocity += calcLaplacianVelocity(particle);
+	particle.params.tensionAcceleration += calcSurfaceTension(particle);
 
 	auto g = particle.params.density * vec3(0.0f, sys->sysParams.gravity, 0.0f);
 
-	return (particle.params.gradientPressure + sys->sysParams.viscocity * particle.params.laplacianVelocity + g) / particle.params.density;
+	return ((particle.params.gradientPressure + sys->sysParams.viscocity * particle.params.laplacianVelocity + g) / particle.params.density) + particle.params.tensionAcceleration;
+}
+
+vec3 SPH::calcSurfaceTension(Particle particle)
+{
+	ParticleSystem* sys = ParticleSystem::getInstance();
+	float k = sys->sysParams.surfaceTension;
+	float m = sys->sysParams.mass;
+	vec3 ret;
+	for (int i = 0; i < particle.neighbors.size(); ++i)
+	{
+		int index = particle.neighbors[i];
+
+		if (index > particle.getIndex())
+		{
+			vec3 distance = particle.position - sys->particles[index]->position;
+			float h = sys->sysParams.searchRadius;
+
+			vec3 kernel = calcGradientPressureKernel(distance, h);
+
+			ret += kernel;
+
+			#pragma omp critical
+			{
+				sys->particles[index]->params.tensionAcceleration -= k * kernel;
+			}
+		}
+	}
+
+	return -k * ret;
 }
 
 
