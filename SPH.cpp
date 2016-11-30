@@ -31,12 +31,12 @@ void collisionsSubFunction(ParticleSystem* pS, int n)
 			Plane plane(point1, point2, point3);
 			vec3 normal = normalize(plane.normal);
 			float distance = abs(dot(normal, currParticle->nextPosition) - dot(normal, plane.point));
+			Triangle triangle(point1, point2, point3);
+			vec3 origin = currParticle->nextPosition;
 
 			if (distance <= pS->sysParams.particleRadius)
 			{
-				vec3 origin = currParticle->nextPosition;
 				vec3 direction = normal;
-				Triangle triangle(point1, point2, point3);
 
 				float distanceToPlaneAtCollision = plane.intersection(origin, direction);
 
@@ -58,11 +58,27 @@ void collisionsSubFunction(ParticleSystem* pS, int n)
 						// take particle back to position where it would have first collided with the plane given the current velocity
 						vec3 velDir = normalize(currParticle->params.velocity);
 						float d1 = plane.intersection(origin, velDir);
-						float backwardsDisplacement = (pS->sysParams.particleRadius * d1 / distanceToPlaneAtCollision) - d1; // using law of sines
-						currParticle->params.velocity = 0.8f * glm::reflect(currParticle->params.velocity, direction);
-						currParticle->nextPosition -= velDir * backwardsDisplacement;
+						float backwardsDisplacement;
 
-//						currParticle->nextPosition += (pS->sysParams.particleRadius - abs(distanceToPlaneAtCollision)) * direction;
+						if (distanceToPlaneAtCollision == 0.0f)
+						{
+							//sin(theta) = radius / backwardsDisplacement -> bD = radius / sin(theta)
+							// theta = angle between velocity vector and plane -> dot(v, normal) = cos(phi) -> phi = arccos(dot(v, normal))
+							// theta = 90 - phi -> bD = radius / sin(90 - arccos(dot(v, normal)))
+							backwardsDisplacement = pS->sysParams.particleRadius / dot(-velDir, direction);
+						}
+						else if (d1 >= 0)
+						{
+							backwardsDisplacement = d1 * pS->sysParams.particleRadius / distanceToPlaneAtCollision - d1; // using law of sines
+						}
+						else
+						{
+							d1 *= -1;
+							backwardsDisplacement = d1 * (distanceToPlaneAtCollision + pS->sysParams.particleRadius) / distanceToPlaneAtCollision; // using law of sines
+						}
+
+						currParticle->params.velocity = glm::reflect(currParticle->params.velocity, direction);
+						currParticle->nextPosition -= velDir * backwardsDisplacement;
 
 						// time retrocession = backwardsDisplacement / currParticle->params.velocity. So tStep -= tRetrocession.
 						// But this shouldn't be done here since we must obtain the minimum time step produced by these calculations beforehand
@@ -72,7 +88,18 @@ void collisionsSubFunction(ParticleSystem* pS, int n)
 				}
 			}
 			else {
-				currParticle->collisionNormal = glm::vec3(0, 0, 0);
+				vec3 difference = currParticle->nextPosition - currParticle->position;
+				float d1 = triangle.intersection(origin, normalize(difference));
+				if(d1 > 0)
+				{
+					float distanceToPlaneAtCollision = plane.intersection(origin, normal);
+					vec3 velDir = normalize(currParticle->params.velocity);
+					float backwardsDisplacement;
+
+					backwardsDisplacement = d1 * (distanceToPlaneAtCollision + pS->sysParams.particleRadius) / distanceToPlaneAtCollision; // using law of sines
+				}
+				else
+					currParticle->collisionNormal = glm::vec3(0, 0, 0);
 			}
 		}
 	}
@@ -149,9 +176,11 @@ float SPH::calcDensity(Particle particle)
 			Particle* currParticle = sys->particles[particle.neighbors.at(i)];
 			vec3 distance = particle.position - currParticle->position;
 			float kernel = calcDensityKernel(distance, sys->sysParams.searchRadius);
+
+			density += sys->sysParams.mass * kernel;
+
 			#pragma omp critical
 			{
-				density += sys->sysParams.mass * kernel;
 				sys->particles[index]->params.density += sys->sysParams.mass * kernel;
 			}
 		}
@@ -205,7 +234,7 @@ vec3 SPH::calcGradientPressureKernel(vec3 distance, float h)
 	}
 
 	float coefficient = -45.0f / (glm::pi<float>()*pow(h, 6));
-	vec3 derivedFirstValue = distance / magnitude;
+	vec3 derivedFirstValue = magnitude > 0.0f ? distance / magnitude : vec3(0.0f, 0.0f, 0.0f);
 	float derivedSecondValue = pow((h - magnitude), 2);	
 
 	return coefficient * derivedFirstValue * derivedSecondValue;
@@ -221,7 +250,7 @@ float SPH::calcLaplacianViscosityKernel(vec3 distance, float h)
 	}
 
 	float coefficient = 45.0f / (glm::pi<float>()*pow(h, 6));
-	float derivedFirstValue = ((h - magnitude));
+	float derivedFirstValue = h - magnitude;
 
 	return coefficient * derivedFirstValue;
 }
@@ -246,10 +275,11 @@ vec3 SPH::calcGradientPressure(Particle particle)
 			float symmetricPressure = (sys->particles[index]->params.pressure + particle.params.pressure) / 2.0f;
 
 			vec3 kernel = calcGradientPressureKernel(distance, h);
+
+			ret -= (sys->sysParams.mass / sys->particles[index]->params.density) * symmetricPressure * kernel;
+
 			#pragma omp critical
 			{
-				ret -= (sys->sysParams.mass / sys->particles[index]->params.density) * symmetricPressure * kernel;
-
 				sys->particles[index]->params.gradientPressure += (sys->sysParams.mass / particle.params.density) * symmetricPressure * kernel;
 			}
 		}
@@ -275,10 +305,11 @@ vec3 SPH::calcLaplacianVelocity(Particle particle)
 			vec3 symmetricVelocity = sys->particles[index]->params.velocity - particle.params.velocity;
 
 			float kernel = calcLaplacianViscosityKernel(distance, h);
+
+			ret += (sys->sysParams.mass / sys->particles[index]->params.density) * symmetricVelocity * kernel;
+
 			#pragma omp critical
 			{
-				ret += (sys->sysParams.mass / sys->particles[index]->params.density) * symmetricVelocity * kernel;
-
 				sys->particles[index]->params.laplacianVelocity -= (sys->sysParams.mass / particle.params.density) * symmetricVelocity * kernel;
 			}
 		}
