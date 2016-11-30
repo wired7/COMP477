@@ -50,7 +50,6 @@ SystemParameters FileStorage::matchSysParams(vector<pair<string, float>> values)
 	float gravity = 0;
 	float timeStep = 0;
 	float maxTimeStep = 0;
-	float mass = 0;
 
 	for (int i = 0; i < values.size(); i++)
 	{
@@ -70,11 +69,9 @@ SystemParameters FileStorage::matchSysParams(vector<pair<string, float>> values)
 			timeStep = values[i].second;
 		else if (values[i].first == "max time step")
 			maxTimeStep = values[i].second;
-		else if (values[i].first == "mass")
-			mass = values[i].second;
 	}
 
-	return SystemParameters(radius, searchRadius, viscocity, stiffness, density, gravity, timeStep, maxTimeStep, mass);
+	return SystemParameters(radius, searchRadius, viscocity, stiffness, density, gravity, timeStep, maxTimeStep);
 }
 
 void FileStorage::readFrames(char* file, int count, vector<vector<glm::vec3>>* frames)
@@ -89,7 +86,6 @@ void FileStorage::readFrames(char* file, int count, vector<vector<glm::vec3>>* f
 	float gravity = 0;
 	float timeStep = 0;
 	float maxTimeStep = 0;
-	float mass = 0;
 
 	string line;
 	string delimiter = " ";
@@ -99,7 +95,7 @@ void FileStorage::readFrames(char* file, int count, vector<vector<glm::vec3>>* f
 	{
 		filePos.open(file, ios_base::in);
 		hasOpen = true;
-		getline(filePos, line); //skip first line
+		getline(filePos, line);
 		
 		stringstream ss(line);
 
@@ -111,9 +107,8 @@ void FileStorage::readFrames(char* file, int count, vector<vector<glm::vec3>>* f
 		ss >> gravity;
 		ss >> timeStep;
 		ss >> maxTimeStep;
-		ss >> mass;
 
-		ParticleSystem::getInstance()->sysParams = SystemParameters(radius, searchRadius, viscocity, stiffness, density, gravity, timeStep, maxTimeStep, mass);
+		ParticleSystem::getInstance()->sysParams = SystemParameters(radius, searchRadius, viscocity, stiffness, density, gravity, timeStep, maxTimeStep);
 	}
 
 	if (filePos.is_open())

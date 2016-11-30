@@ -18,7 +18,10 @@ struct SystemParameters {
 	float mass;
 
 	SystemParameters() {};
-	SystemParameters(float pR, float sR, float v, float k, float rD, float g, float tS, float mS, float mass) : particleRadius(pR), searchRadius(sR), viscocity(v), stiffness(k), restDensity(rD), gravity(g), tStep(tS), maxTStep(mS), mass(mass) {}
+	SystemParameters(float pR, float sR, float v, float k, float rD, float g, float tS, float mS) : particleRadius(pR), searchRadius(sR), viscocity(v), stiffness(k), restDensity(rD), gravity(g), tStep(tS), maxTStep(mS)
+	{
+		mass = 3.0f * 3.1415f * pow(particleRadius, 3) * restDensity / 4.0f;
+	}
 };
 
 class ParticleSystem 

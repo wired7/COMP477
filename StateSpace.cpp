@@ -17,7 +17,7 @@ StateSpace::StateSpace(GLFWwindow* window, Skybox* skybox)
 {
 	framesFront = new vector<vector<vec3>>();
 	framesBack = new vector<vector<vec3>>();
-	framesBuffSize = 60;
+	framesBuffSize = 200;
 	currGlobalFrame = 0;
 
 	milliseconds ms = duration_cast<milliseconds>(system_clock::now().time_since_epoch());
@@ -36,7 +36,7 @@ StateSpace::StateSpace(GLFWwindow* window, Skybox* skybox)
 	fileName = _strdup(OpenFileDialog().SelectFile().c_str());
 	initializeFrameRead();
 
-	cout << ParticleSystem::getInstance()->sysParams.particleRadius << endl;
+	cout << framesFront->at(0)[0].x << " " << framesFront->at(0)[0].y << " " << framesFront->at(0)[0].z << endl;
 
 	instancedModels.push_back(new InstancedSpheres(ParticleSystem::getInstance()->sysParams.particleRadius, 32, vec4(0.5, 0.5, 1, 1.0f), framesFront->at(0)));
 
@@ -127,7 +127,7 @@ void StateSpace::updateFrames()
 		frameCount = 0;
 
 		std::thread t1(&StateSpace::loadFramesInBack, this);
-		t1.detach();
+		t1.join();
 	}
 	if (currGlobalFrame > totalFrames - 1)
 	{

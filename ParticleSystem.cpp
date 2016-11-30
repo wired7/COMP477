@@ -104,7 +104,7 @@ void ParticleSystem::goNuts(float playbackTime, float frameRate, string filePath
 	ofstream myfile;
 	myfile.open(filePath);
 	myfile << sysParams.particleRadius << " " << sysParams.searchRadius << " " << sysParams.viscocity << " " << sysParams.stiffness << " ";
-	myfile << sysParams.restDensity << " " << sysParams.gravity << " " << sysParams.tStep << " " << sysParams.maxTStep << " " << sysParams.mass << " " << endl;
+	myfile << sysParams.restDensity << " " << sysParams.gravity << " " << sysParams.tStep << " " << sysParams.maxTStep << endl;
 	myfile.close();
 
 	for (float simTime = 0; simTime < playbackTime; simTime += sysParams.tStep)

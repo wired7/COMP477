@@ -99,7 +99,7 @@ int main()
 		return -1;
 
 menu:
-	system("CLS");
+//	system("CLS");
 	cout << "What would you like to do?" << endl;
 	cout << "1. Create new simulation" << endl;
 	cout << "2. Edit existing simulation" << endl;
@@ -150,14 +150,19 @@ menu:
 		if (animFile == "")
 			goto menu;
 
-		float separation = 0.5f / blockSize;
+		float separation = sysParams.particleRadius;
+		vec3 cubeDimensions(3.0f, 3.0f, 3.0f);
+		vec3 cubeCenter(3.0f, 3.0f, 3.0f);
+
+		float particleSpan = separation * blockSize / 2.0f;
+
 		vector<Particle*> pos;
 		for (int k = 0; k < blockSize; k++)
 			for (int j = 0; j < blockSize; j++)
 				for (int i = 0; i < blockSize; i++)
-					pos.push_back(new Particle(vec3(3.0f + separation * (float)i, 3.0f + separation * (float)j, 3.0f + separation * (float)k)));
+					pos.push_back(new Particle(vec3(3.0f + separation * (float)i - particleSpan, 3.0f + separation * (float)j - particleSpan, 3.0f + separation * (float)k - particleSpan)));
 
-		Cube cube(vec3(3.0f, 3.0f, 3.0f), vec3(3.0f, 3.0f, 3.0f), vec4(1.0f, 0.0f, 0.0f, 0.5f), false);
+		Cube cube(cubeCenter, cubeDimensions, vec4(1.0f, 0.0f, 0.0f, 0.5f), false);
 //		Rectangle rect(vec3(5, 4, 5), vec3(1, 2, 1), vec4(1, 1, 0, 1), false);
 //		rect.model = rect.model * rotate(mat4(1.0f), 1.5f, vec3(1, 1, 1));
 
