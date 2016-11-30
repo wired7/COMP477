@@ -160,11 +160,20 @@ float SPH::calcDensity(Particle particle)
 	return density;
 }
 
+/* Ideal Gas Equation
 float SPH::calcPressure(const Particle& particle)
 {
 	ParticleSystem* sys = ParticleSystem::getInstance();
 	return sys->sysParams.stiffness * (particle.params.density - sys->sysParams.restDensity);
 }
+*/
+
+float SPH::calcPressure(const Particle& particle)
+{
+	ParticleSystem* sys = ParticleSystem::getInstance();
+	return sys->sysParams.stiffness * (pow(particle.params.density / sys->sysParams.restDensity, sys->sysParams.pressureGamma) - 1);
+}
+
 
 // Derived Kernel functions were found in this paper
 // http://image.diku.dk/projects/media/kelager.06.pdf
