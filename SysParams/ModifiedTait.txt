@@ -1,4 +1,4 @@
-particle radius: 0.1
+particle radius: 0.01
 search radius: 0.4
 viscocity: 0.1
 stiffness: 1119

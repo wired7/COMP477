@@ -17,7 +17,7 @@ StateSpace::StateSpace(GLFWwindow* window, Skybox* skybox)
 {
 	framesFront = new vector<vector<vec3>>();
 	framesBack = new vector<vector<vec3>>();
-	framesBuffSize = 200;
+	framesBuffSize = 600;
 	currGlobalFrame = 0;
 
 	milliseconds ms = duration_cast<milliseconds>(system_clock::now().time_since_epoch());
@@ -91,7 +91,7 @@ void StateSpace::draw()
 			if ((*framesFront)[frameCount].size() == 0)
 			{
 				thisIsAHackImLazy = true;
-				currGlobalFrame = totalFrames;
+				currGlobalFrame = totalFrames+5;
 			}
 			if (!thisIsAHackImLazy)
 			{

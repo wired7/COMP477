@@ -90,13 +90,16 @@ void collisionsSubFunction(ParticleSystem* pS, int n)
 			else {
 				vec3 difference = currParticle->nextPosition - currParticle->position;
 				float d1 = triangle.intersection(origin, normalize(difference));
-				if(d1 > 0)
+				if(d1 < 0)
 				{
 					float distanceToPlaneAtCollision = plane.intersection(origin, normal);
 					vec3 velDir = normalize(currParticle->params.velocity);
 					float backwardsDisplacement;
 
-					backwardsDisplacement = d1 * (distanceToPlaneAtCollision + pS->sysParams.particleRadius) / distanceToPlaneAtCollision; // using law of sines
+					backwardsDisplacement = d1 * pS->sysParams.particleRadius / distanceToPlaneAtCollision; // using law of sines
+
+					currParticle->params.velocity = glm::reflect(currParticle->params.velocity, velDir);
+					currParticle->nextPosition -= velDir * backwardsDisplacement;
 				}
 				else
 					currParticle->collisionNormal = glm::vec3(0, 0, 0);
