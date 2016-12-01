@@ -32,7 +32,8 @@ public:
 	void swap(vector<vector<vec3>>* p1, vector<vector<vec3>>* p2);
 	void initializeFrameRead();
 	int framesBuffSize;
-	int totalFrames;
+	int totalFrames = 0;
+	int totalFramesLoaded;
 	int currGlobalFrame;
 };
 
