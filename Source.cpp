@@ -151,8 +151,8 @@ menu:
 			goto menu;
 
 		float separation = sysParams.particleRadius;
-		vec3 cubeDimensions(3.0f, 3.0f, 3.0f);
-		vec3 cubeCenter(3.0f, 3.0f, 3.0f);
+		vec3 cubeDimensions(1.0f, 3.0f, 1.0f);
+		vec3 cubeCenter(4.0f, 4.0f, 4.0f);
 
 		float particleSpan = separation * blockSize / 2.0f;
 
@@ -160,7 +160,7 @@ menu:
 		for (int k = 0; k < blockSize; k++)
 			for (int j = 0; j < blockSize; j++)
 				for (int i = 0; i < blockSize; i++)
-					pos.push_back(new Particle(vec3(3.0f + separation * (float)i - particleSpan, 3.0f + separation * (float)j - particleSpan, 3.0f + separation * (float)k - particleSpan)));
+					pos.push_back(new Particle(cubeCenter + vec3(separation * (float)i - particleSpan, separation * (float)j - particleSpan, separation * (float)k - particleSpan)));
 
 		Cube cube(cubeCenter, cubeDimensions, vec4(1.0f, 0.0f, 0.0f, 0.5f), false);
 //		Rectangle rect(vec3(5, 4, 5), vec3(1, 2, 1), vec4(1, 1, 0, 1), false);

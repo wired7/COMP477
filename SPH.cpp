@@ -77,7 +77,7 @@ void collisionsSubFunction(ParticleSystem* pS, int n)
 							backwardsDisplacement = d1 * (distanceToPlaneAtCollision + pS->sysParams.particleRadius) / distanceToPlaneAtCollision; // using law of sines
 						}
 
-						currParticle->params.velocity = glm::reflect(currParticle->params.velocity, direction);
+						currParticle->params.velocity = 0.8f * glm::reflect(currParticle->params.velocity, direction);
 						currParticle->nextPosition -= velDir * backwardsDisplacement;
 
 						// time retrocession = backwardsDisplacement / currParticle->params.velocity. So tStep -= tRetrocession.
@@ -88,20 +88,20 @@ void collisionsSubFunction(ParticleSystem* pS, int n)
 				}
 			}
 			else {
-/*				vec3 difference = currParticle->nextPosition - currParticle->position;
-				float d1 = triangle.intersection(origin, normalize(difference));
-				if(abs(d1) < length(difference) && d1 < 0)
+				vec3 difference = currParticle->nextPosition - currParticle->position;
+				float d1 = triangle.intersection(currParticle->position, normalize(difference));
+				if(abs(d1) < length(difference) && d1 >= 0)
 				{
-					float distanceToPlaneAtCollision = plane.intersection(origin, normal);
+					float distanceToPlaneAtCollision = abs(plane.intersection(origin, normal));
 					vec3 velDir = normalize(currParticle->params.velocity);
-					float backwardsDisplacement;
+					float backwardsDisplacement = d1 * pS->sysParams.particleRadius / distanceToPlaneAtCollision; // using law of sines
 
-					backwardsDisplacement = d1 * pS->sysParams.particleRadius / distanceToPlaneAtCollision; // using law of sines
-
-					currParticle->params.velocity = glm::reflect(currParticle->params.velocity, velDir);
+					currParticle->params.velocity = 0.8f * glm::reflect(currParticle->params.velocity, velDir);
 					currParticle->nextPosition -= velDir * backwardsDisplacement;
+
+					return;
 				}
-				else*/
+				else
 					currParticle->collisionNormal = glm::vec3(0, 0, 0);
 			}
 		}
