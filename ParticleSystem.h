@@ -16,7 +16,7 @@ struct SystemParameters {
 	float tStep;
 	float maxTStep;
 	float mass;
-	float surfaceTension = 0.01f;
+	float tensionCoefficient = 0.01f;
 	float pressureGamma = 7.0f;
 
 	SystemParameters() {};

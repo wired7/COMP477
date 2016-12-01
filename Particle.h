@@ -10,9 +10,12 @@ struct ParticleParameters {
 	float density;
 	float pressure;
 	float kernel;
+	float smoothColor;
 	glm::vec3 gradientPressure;
 	glm::vec3 laplacianVelocity;
-	glm::vec3 tensionAcceleration;
+	glm::vec3 tensionForce;
+	glm::vec3 gradientSmoothColor;
+	glm::vec3 laplacianSmoothColor;
 
 	ParticleParameters(glm::vec3 v) : velocity(v) {}
 };
