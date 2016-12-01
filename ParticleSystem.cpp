@@ -102,7 +102,7 @@ void ParticleSystem::goNuts(float playbackTime, float frameRate, string filePath
 
 	ofstream myfile;
 	myfile.open(filePath);
-	myfile << sysParams.particleRadius << " " << sysParams.searchRadius << " " << sysParams.viscocity << " " << sysParams.stiffness << " ";
+	myfile << sysParams.volume << " " << sysParams.particleRadius << " " << sysParams.searchRadius << " " << sysParams.viscocity << " " << sysParams.stiffness << " ";
 	myfile << sysParams.restDensity << " " << sysParams.gravity << " " << sysParams.tStep << " " << sysParams.maxTStep << endl;
 	myfile.close();
 
@@ -193,10 +193,10 @@ vector<glm::vec3>* ParticleSystem::getParticlePositions() {
 	return particlePositions;
 }
 
-void ParticleSystem::setStiffnessOfParticleSystem(int blockSize) {
+void ParticleSystem::setStiffnessOfParticleSystem() {
 
 	// Getting the height of water by multiplying the block size 
-	float heightOfWater = blockSize * particleSystem->sysParams.particleRadius;
+	float heightOfWater = pow(particleSystem->sysParams.volume, 1.0f/3.0f);
 
 	// Determining the max velocity by doing the square root of 2 * g * H
 	float maxVelocitySquared = 2.0f * -particleSystem->sysParams.gravity * heightOfWater;
@@ -208,11 +208,9 @@ void ParticleSystem::setStiffnessOfParticleSystem(int blockSize) {
 	// Stiffness can be calculated by multiplying the velocity with the restDensity then dividing it with Tait's constant, gamma
 	particleSystem->sysParams.stiffness = (speedOfSoundSquared * particleSystem->sysParams.restDensity / particleSystem->sysParams.pressureGamma) / 1000;
 
-	// stiffness output giving me less than expected
 	cout << particleSystem->sysParams.stiffness << endl;
 }
-
-
+/*
 vector<MeshObject*> ParticleSystem::rayTrace(vector<vec3>* points, float radius, int resolution) {
 	vec3 max = {-INFINITY, -INFINITY, -INFINITY};
 	vec3 min = {INFINITY, INFINITY, INFINITY};
@@ -232,7 +230,7 @@ vector<MeshObject*> ParticleSystem::rayTrace(vector<vec3>* points, float radius,
 	vec3 pt2 = min + vec3(max.x, 0, 0);
 	vec3 pt3 = min + vec3(max.x, max.y, 0);
 	vec3 pt4 = min + vec3(0, max.y, 0);
-/*
+
 	Vertex2*** vertices = new Vertex2**[resolution];
 	float stepX = range.x / resolution;
 	float stepY = range.y / resolution;
@@ -250,6 +248,14 @@ vector<MeshObject*> ParticleSystem::rayTrace(vector<vec3>* points, float radius,
 
 //			buffer[i][j] = clamp(rayTrace(origin, c.direction, 1), 0.0f, 1.0f);
 		}
-	}*/
+	}
+}
+*/
 
+void ParticleSystem::calculateMassOfParticles(){
+	// m = pV / n
+	// where m is the mass, p is the rest density, V is the volume and n is the number of particles
+	particleSystem->sysParams.mass = (particleSystem->sysParams.restDensity * particleSystem->sysParams.volume) / particleSystem->particles.size();
+
+	cout << particleSystem->sysParams.mass << endl;
 }
