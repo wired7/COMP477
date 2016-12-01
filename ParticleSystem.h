@@ -15,7 +15,9 @@ struct SystemParameters {
 	float gravity;
 	float tStep;
 	float maxTStep;
-	float mass;	
+	float mass;
+	float surfaceTension = 0.01f;
+	float pressureGamma = 7.0f;
 
 	SystemParameters() {};
 	SystemParameters(float pR, float sR, float v, float k, float rD, float g, float tS, float mS) : particleRadius(pR), searchRadius(sR), viscocity(v), stiffness(k), restDensity(rD), gravity(g), tStep(tS), maxTStep(mS)
@@ -24,6 +26,7 @@ struct SystemParameters {
 		// 88.5 is the max velocity		
 		//stiffness = (rD * pow(88.5, 2)) / pressureGamma;
 		//stiffness = 1119.0f;
+
 		mass = 3.0f * 3.1415f * pow(particleRadius, 3) * restDensity / 4.0f;
 	}
 };

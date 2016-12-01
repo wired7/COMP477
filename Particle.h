@@ -12,6 +12,7 @@ struct ParticleParameters {
 	float kernel;
 	glm::vec3 gradientPressure;
 	glm::vec3 laplacianVelocity;
+	glm::vec3 tensionAcceleration;
 
 	ParticleParameters(glm::vec3 v) : velocity(v) {}
 };
