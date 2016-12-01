@@ -36,7 +36,7 @@ StateSpace::StateSpace(GLFWwindow* window, Skybox* skybox)
 	fileName = _strdup(OpenFileDialog().SelectFile().c_str());
 	initializeFrameRead();
 
-	cout << framesFront->at(0)[0].x << " " << framesFront->at(0)[0].y << " " << framesFront->at(0)[0].z << endl;
+//	cout << framesFront->at(0)[0].x << " " << framesFront->at(0)[0].y << " " << framesFront->at(0)[0].z << endl;
 
 	instancedModels.push_back(new InstancedSpheres(ParticleSystem::getInstance()->sysParams.particleRadius, 32, vec4(0.5, 0.5, 1, 1.0f), framesFront->at(0)));
 

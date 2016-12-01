@@ -165,12 +165,12 @@ void SPH::calcSPH()
 	}
 
 	// Find external forces (collisions with rigidbodies) and apply them to the particle
-	#pragma omp parallel for schedule(dynamic, 2)
+/*	#pragma omp parallel for schedule(dynamic, 2)
 	for (int i = 0; i < sys->particles.size(); ++i)
 	{
 		collisionsSubFunction(sys, i);
 	}
-	
+*/	
 	// update list of particles
 	sys->updateList();
 }
@@ -241,7 +241,9 @@ float SPH::calcSmoothedColor(Particle particle){
 			}
 		}
 	}
-
+	if (smoothColor == 0) {
+		cout << smoothColor << endl;
+	}
 	return smoothColor;
 }
 
@@ -425,9 +427,13 @@ vec3 SPH::calcAcceleration(Particle particle)
 	// http://citeseerx.ist.psu.edu/viewdoc/download?doi=10.1.1.2.7720&rep=rep1&type=pdf
 	particle.params.gradientSmoothColor += calcGradientColor(particle);
 	particle.params.laplacianSmoothColor += calcLaplacianColor(particle);
+	
+	glm::vec3 surfaceForce = glm::vec3(0, 0, 0);
 
-	auto surfaceForce = (-1.0f) * particle.params.laplacianSmoothColor * sys->sysParams.tensionCoefficient * (particle.params.gradientSmoothColor / glm::length(particle.params.gradientSmoothColor));
-
+	if (glm::length(particle.params.gradientSmoothColor) != 0) {
+		surfaceForce = (-1.0f) * particle.params.laplacianSmoothColor * sys->sysParams.tensionCoefficient * (particle.params.gradientSmoothColor / glm::length(particle.params.gradientSmoothColor));
+	}
+	
 	auto g = particle.params.density * vec3(0.0f, sys->sysParams.gravity, 0.0f);
 
 	return ((particle.params.gradientPressure + sys->sysParams.viscocity * particle.params.laplacianVelocity + g + surfaceForce) / particle.params.density);

@@ -1,5 +1,5 @@
 particle radius: 0.01
-search radius: 0.4
+search radius: 0.2
 viscocity: 0.1
 stiffness: 1119
 rest density: 1000
