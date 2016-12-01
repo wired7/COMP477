@@ -28,7 +28,7 @@ StateSpace::StateSpace(GLFWwindow* window, Skybox* skybox)
 //	terrain = new Terrain(1, 40, 40, 32, STATIC);
 	int width, height;
 	glfwGetWindowSize(window, &width, &height);
-	Camera::activeCamera = new StateSpaceCamera(window, vec2(0, 0), vec2(1, 1), vec3(3, 3, 0), vec3(2, 2, 2), vec3(0, 1, 0), perspective(45.0f, (float)width / height, 0.1f, 1000.0f), terrain);
+	Camera::activeCamera = new StateSpaceCamera(window, vec2(0, 0), vec2(1, 1), vec3(5, 5, 0), vec3(4, 4, 4), vec3(0, 1, 0), perspective(45.0f, (float)width / height, 0.1f, 1000.0f), terrain);
 	observers.push_back(Camera::activeCamera);
 
 	Controller::setController(StateSpaceController::getController());

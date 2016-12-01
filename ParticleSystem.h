@@ -43,6 +43,7 @@ public:
 	void calcNeighbors(Particle* particle);
 	void setStiffnessOfParticleSystem(int blockSize);
 	Grid3D grid;
+	vector<MeshObject*> rayTrace(vector<glm::vec3>*, float, int);
 private:
 	static ParticleSystem* particleSystem;
 	ParticleSystem();

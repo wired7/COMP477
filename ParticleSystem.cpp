@@ -6,7 +6,6 @@
 #include <chrono>
 #include <omp.h>
 #include <fstream>
-#
 
 using namespace std::chrono;
 
@@ -211,4 +210,46 @@ void ParticleSystem::setStiffnessOfParticleSystem(int blockSize) {
 
 	// stiffness output giving me less than expected
 	cout << particleSystem->sysParams.stiffness << endl;
+}
+
+
+vector<MeshObject*> ParticleSystem::rayTrace(vector<vec3>* points, float radius, int resolution) {
+	vec3 max = {-INFINITY, -INFINITY, -INFINITY};
+	vec3 min = {INFINITY, INFINITY, INFINITY};
+	// Get bounding cube
+	for (int i = 0; i < points->size(); i++)
+	{
+		for (int j = 0; j < 3; j++)
+		{
+			if (points->at(i)[j] > max[j])
+				max[j] = points->at(i)[j];
+			if (points->at(i)[j] < min[j])
+				min[j] = points->at(i)[j];
+		}
+	}
+
+	vec3 pt1 = min;
+	vec3 pt2 = min + vec3(max.x, 0, 0);
+	vec3 pt3 = min + vec3(max.x, max.y, 0);
+	vec3 pt4 = min + vec3(0, max.y, 0);
+/*
+	Vertex2*** vertices = new Vertex2**[resolution];
+	float stepX = range.x / resolution;
+	float stepY = range.y / resolution;
+	
+	mat4 rotation = rotate(mat4(1.0f), 1.0f, cross(vec3(0, 0, 1), normalize(camDir)));
+
+	for (int i = 0; i < resolution; i++)
+	{
+		vertices[i] = new Vertex2*[resolution];
+		for (int j = 0; j < resolution; j++)
+		{
+			vec3 o = camPos + vec3(rotation * vec4(vec3(range, 0) / 2.0f + vec3(i, j, 0) * vec3(stepX, stepY, 0), 1.0f));
+//			c.direction = normalize(vec3(origin.x, origin.y, -1));
+	//		origin += c.origin;
+
+//			buffer[i][j] = clamp(rayTrace(origin, c.direction, 1), 0.0f, 1.0f);
+		}
+	}*/
+
 }
