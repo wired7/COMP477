@@ -6,7 +6,6 @@
 #include <chrono>
 #include <omp.h>
 #include <fstream>
-#include "RayTracingCamera.h"
 
 using namespace std::chrono;
 
@@ -192,6 +191,26 @@ vector<glm::vec3>* ParticleSystem::getParticlePositions() {
 	}
 
 	return particlePositions;
+}
+
+void ParticleSystem::setStiffnessOfParticleSystem(int blockSize) {
+
+	// Getting the height of water by multiplying the block size 
+	float heightOfWater = blockSize * particleSystem->sysParams.particleRadius;
+
+	// Determining the max velocity by doing the square root of 2 * g * H
+	float maxVelocitySquared = 2.0f * -particleSystem->sysParams.gravity * heightOfWater;
+
+	// The ratio between the square of the velocity and the square of the speed of sound is proportional to the ratio between the variation of density between particles over the rest density
+	// In the paper, they have concluded that n reaches ~0.01 which means that the ratio between the squared velocity is equal to 0.01
+	float speedOfSoundSquared = maxVelocitySquared / 0.01f;
+
+	// Stiffness can be calculated by multiplying the velocity with the restDensity then dividing it with Tait's constant, gamma
+	particleSystem->sysParams.stiffness = (speedOfSoundSquared * particleSystem->sysParams.restDensity / particleSystem->sysParams.pressureGamma) / 1000;
+
+	// stiffness output giving me less than expected
+	cout << particleSystem->sysParams.stiffness << endl;
+}
 }
 
 vector<MeshObject*> ParticleSystem::rayTrace(vector<vec3>* points, float radius) {

@@ -172,8 +172,9 @@ menu:
 		rigidbodies.push_back(rB);
 //		rigidbodies.push_back(rB1);
 
-		ParticleSystem::getInstance()->sysParams = sysParams;
+		ParticleSystem::getInstance()->sysParams = sysParams;		
 		ParticleSystem::getInstance()->grid = Grid3D(gridSize / sysParams.searchRadius, sysParams.searchRadius);
+		ParticleSystem::getInstance()->setStiffnessOfParticleSystem(blockSize); // calculating the stiffness of the system by using the blockSize * particleRadius to get the height of the water
 		ParticleSystem::getInstance()->addParticles(pos);
 		ParticleSystem::getInstance()->addRigidbodies(rigidbodies);
 

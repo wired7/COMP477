@@ -17,7 +17,7 @@ StateSpace::StateSpace(GLFWwindow* window, Skybox* skybox)
 {
 	framesFront = new vector<vector<vec3>>();
 	framesBack = new vector<vector<vec3>>();
-	framesBuffSize = 600;
+	framesBuffSize = 60;
 	currGlobalFrame = 0;
 
 	milliseconds ms = duration_cast<milliseconds>(system_clock::now().time_since_epoch());
@@ -85,20 +85,16 @@ void StateSpace::draw()
 
 		if (ms.count() - time >= 16 && playModeOn)
 		{
-			bool thisIsAHackImLazy = false;
 			frameCount = (frameCount + 1) % framesFront->size();
-
-			if ((*framesFront)[frameCount].size() == 0)
-			{
-				thisIsAHackImLazy = true;
-				currGlobalFrame = totalFrames+5;
+			if ((*framesFront)[frameCount].size() == 0) {
+				FileStorage::resetReadFrames();
+				initializeFrameRead();
 			}
-			if (!thisIsAHackImLazy)
-			{
+			else {
 				((InstancedSpheres*)instancedModels[0])->updateInstances(&((*framesFront)[frameCount]));
+				time = duration_cast<milliseconds>(system_clock::now().time_since_epoch()).count();
+				currGlobalFrame++;
 			}
-			time = duration_cast<milliseconds>(system_clock::now().time_since_epoch()).count();
-			currGlobalFrame++;
 		}
 
 	}
@@ -108,9 +104,16 @@ void StateSpace::loadFramesInBack()
 {	
 	_mutex.lock();
 	framesBack->clear();
-	FileStorage::readFrames(fileName, framesBuffSize, framesBack);
+
+	int framesLeft = totalFrames - totalFramesLoaded;
+
+	if (framesLeft > 0) {
+		int loadSize = (framesLeft > framesBuffSize)? framesBuffSize : framesLeft;
+		totalFramesLoaded += loadSize;
+		FileStorage::readFrames(fileName, framesBuffSize, framesBack);
+	}
+
 	_mutex.unlock();
-	return;
 }
 
 void StateSpace::updateFrames() 
@@ -118,23 +121,17 @@ void StateSpace::updateFrames()
 	if (frameCount == framesFront->size() - 1)
 	{
 		currGlobalFrame++;
-	
+
 		//wait for buffer to be ready for swap
 		_mutex.lock();
 		_mutex.unlock();
-		
+
 		swap(framesFront, framesBack);
 		frameCount = 0;
 
 		std::thread t1(&StateSpace::loadFramesInBack, this);
-		t1.join();
+		t1.detach();
 	}
-	if (currGlobalFrame > totalFrames - 1)
-	{
-		FileStorage::resetReadFrames();
-		initializeFrameRead();
-	}
-	return;
 }
 
 void StateSpace::swap(vector<vector<vec3>>* p1, vector<vector<vec3>>* p2)
@@ -147,11 +144,16 @@ void StateSpace::swap(vector<vector<vec3>>* p1, vector<vector<vec3>>* p2)
 
 void StateSpace::initializeFrameRead()
 {
+	frameCount = 0;
 	currGlobalFrame = 0;
 	framesFront->clear();
 	framesBack->clear();
-	totalFrames = FileStorage::getFramesTotal(fileName);
-	FileStorage::readFrames(fileName, framesBuffSize, framesFront);
+	if (totalFrames == 0) 
+	{
+		totalFrames = FileStorage::getFramesTotal(fileName);
+	}
+	totalFramesLoaded = framesBuffSize % totalFrames;
+	FileStorage::readFrames(fileName, totalFramesLoaded, framesFront);
 	std::thread t1(&StateSpace::loadFramesInBack, this);
-	t1.join();
+	t1.detach();
 }

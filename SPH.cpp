@@ -379,7 +379,7 @@ vec3 SPH::calcLaplacianColor(Particle particle){
 
 			#pragma omp critical
 			{
-				sys->particles[index]->params.laplacianVelocity -= (sys->sysParams.mass / particle.params.density) * particle.params.smoothColor * kernel;
+				sys->particles[index]->params.laplacianSmoothColor += (sys->sysParams.mass / particle.params.density) * particle.params.smoothColor * kernel;
 			}
 		}
 	}
