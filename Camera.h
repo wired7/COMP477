@@ -28,6 +28,13 @@ public:
 	virtual ~Camera() {};
 	virtual void update() = 0;
 	void setViewport();
+
+	int getScreenWidth();
+	int getScreenHeight();
+
+private:
+	int screenWidth;
+	int screenHeight;
 };
 
 class SphericalCamera : public Camera

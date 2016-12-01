@@ -2,9 +2,9 @@
 
 Shader::Shader(const char* vertexPath, const char* fragmentPath)
 {
-	Program = LoadShaders(vertexPath, fragmentPath);
-	viewID = glGetUniformLocation(Program, "View");
-	projectionID = glGetUniformLocation(Program, "Projection");
+	program = LoadShaders(vertexPath, fragmentPath);
+	viewID = glGetUniformLocation(program, "View");
+	projectionID = glGetUniformLocation(program, "Projection");
 };
 
 GLuint Shader::LoadShaders(const char * vertex_file_path, const char * fragment_file_path) {
@@ -100,14 +100,14 @@ GLuint Shader::LoadShaders(const char * vertex_file_path, const char * fragment_
 
 void Shader::Use()
 {
-	glUseProgram(Program);
+	glUseProgram(program);
 };
 
 LitShader* LitShader::shader;
 
 LitShader::LitShader(const char* vertexPath, const char* fragmentPath) : Shader(vertexPath, fragmentPath)
 {
-	modelID = glGetUniformLocation(Program, "Model");
+	modelID = glGetUniformLocation(program, "Model");
 
 /*	lightSourceID = glGetUniformLocation(Program, "lightSource");
 	lightSourceNID = glGetUniformLocation(Program, "nLightSource");
@@ -124,12 +124,26 @@ InstancedLitShader* InstancedLitShader::shader;
 
 InstancedLitShader::InstancedLitShader(const char* vertexPath, const char* fragmentPath) : Shader(vertexPath, fragmentPath)
 {
-	scaleID = glGetUniformLocation(Program, "Scale");
+	scaleID = glGetUniformLocation(program, "Scale");
 }
 
 CubeMapShader* CubeMapShader::shader;
 
 CubeMapShader::CubeMapShader(const char* vertexPath, const char* fragmentPath) : Shader(vertexPath, fragmentPath)
 {
-	cubeMap = glGetUniformLocation(Program, "cubemap");
+	cubeMap = glGetUniformLocation(program, "cubemap");
+}
+
+GUIShader* GUIShader::shader;
+
+GUIShader::GUIShader(const char* vertexPath, const char* fragmentPath) : Shader(vertexPath, fragmentPath)
+{
+	modelID = glGetUniformLocation(program, "Model");
+}
+
+TextShader* TextShader::shader;
+
+TextShader::TextShader(const char* vertexPath, const char* fragmentPath) : Shader(vertexPath, fragmentPath)
+{
+	colorID = glGetUniformLocation(program, "textColor");
 }
