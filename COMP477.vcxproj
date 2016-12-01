@@ -32,6 +32,7 @@
     <ClInclude Include="OpenFileDialog.h" />
     <ClInclude Include="Particle.h" />
     <ClInclude Include="ParticleSystem.h" />
+    <ClInclude Include="RayTracingCamera.h" />
     <ClInclude Include="Rigidbody.h" />
     <ClInclude Include="SaveFileDialog.h" />
     <ClInclude Include="Shader.h" />
@@ -57,6 +58,7 @@
     <ClCompile Include="InputState.cpp" />
     <ClCompile Include="Particle.cpp" />
     <ClCompile Include="ParticleSystem.cpp" />
+    <ClCompile Include="RayTracingCamera.cpp" />
     <ClCompile Include="Rigidbody.cpp" />
     <ClCompile Include="Shader.cpp" />
     <ClCompile Include="Shape.cpp" />

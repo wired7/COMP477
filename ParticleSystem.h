@@ -46,6 +46,7 @@ public:
 	void updateList();
 	void calcNeighbors(Particle* particle);
 	Grid3D grid;
+	vector<MeshObject*> rayTrace(vector<glm::vec3>*, float);
 private:
 	static ParticleSystem* particleSystem;
 	ParticleSystem();

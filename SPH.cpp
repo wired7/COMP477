@@ -88,9 +88,9 @@ void collisionsSubFunction(ParticleSystem* pS, int n)
 				}
 			}
 			else {
-				vec3 difference = currParticle->nextPosition - currParticle->position;
+/*				vec3 difference = currParticle->nextPosition - currParticle->position;
 				float d1 = triangle.intersection(origin, normalize(difference));
-				if(d1 < 0)
+				if(abs(d1) < length(difference) && d1 < 0)
 				{
 					float distanceToPlaneAtCollision = plane.intersection(origin, normal);
 					vec3 velDir = normalize(currParticle->params.velocity);
@@ -101,7 +101,7 @@ void collisionsSubFunction(ParticleSystem* pS, int n)
 					currParticle->params.velocity = glm::reflect(currParticle->params.velocity, velDir);
 					currParticle->nextPosition -= velDir * backwardsDisplacement;
 				}
-				else
+				else*/
 					currParticle->collisionNormal = glm::vec3(0, 0, 0);
 			}
 		}
@@ -165,12 +165,12 @@ void SPH::calcSPH()
 	}
 
 	// Find external forces (collisions with rigidbodies) and apply them to the particle
-/*	#pragma omp parallel for schedule(dynamic, 2)
+	#pragma omp parallel for schedule(dynamic, 2)
 	for (int i = 0; i < sys->particles.size(); ++i)
 	{
 		collisionsSubFunction(sys, i);
 	}
-*/	
+	
 	// update list of particles
 	sys->updateList();
 }

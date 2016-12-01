@@ -6,7 +6,7 @@
 #include <chrono>
 #include <omp.h>
 #include <fstream>
-#
+#include "RayTracingCamera.h"
 
 using namespace std::chrono;
 
@@ -192,4 +192,31 @@ vector<glm::vec3>* ParticleSystem::getParticlePositions() {
 	}
 
 	return particlePositions;
+}
+
+vector<MeshObject*> ParticleSystem::rayTrace(vector<vec3>* points, float radius) {
+	int x, y;
+	vector<Shape*> shapes;
+
+	float w = 4;
+	float h = 4;
+	x = 400;
+	y = 400;
+	float stepX = w / x;
+	float stepY = h / y;
+
+	vec3** buffer = new vec3*[x];
+	for (int i = 0; i < x; i++)
+	{
+		buffer[i] = new vec3[y];
+		for (int j = 0; j < y; j++)
+		{
+//			vec3 origin = vec3(i * stepX - w / 2, h / 2 - j * stepY, f);
+//			c.direction = normalize(vec3(origin.x, origin.y, -1));
+	//		origin += c.origin;
+
+//			buffer[i][j] = clamp(rayTrace(origin, c.direction, 1), 0.0f, 1.0f);
+		}
+	}
+
 }

@@ -84,6 +84,9 @@
     <ClInclude Include="OpenFileDialog.h">
       <Filter>Header Files</Filter>
     </ClInclude>
+    <ClInclude Include="RayTracingCamera.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="TextureManager.cpp">
@@ -144,6 +147,9 @@
       <Filter>Source Files</Filter>
     </ClCompile>
     <ClCompile Include="FileStorage.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="RayTracingCamera.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
   </ItemGroup>
