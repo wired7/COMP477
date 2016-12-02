@@ -10,6 +10,7 @@
 
 using namespace std;
 
+long FileStorage::startPos;
 fstream FileStorage::filePos;
 bool FileStorage::hasOpen = false;
 
@@ -142,6 +143,7 @@ vector<MeshObject*> FileStorage::matchRigidbodies(vector<pair<string, vector<flo
 			vec3 dimensions(values[i].second[3], values[i].second[4], values[i].second[5]);
 			vec4 color(values[i].second[6], values[i].second[7], values[i].second[8], values[i].second[9]);
 			float res = values[i].second[10];
+
 			rigidbodies.push_back(new Polyhedron(res, center, dimensions, color, false));
 		}
 /*		else if (values[i].first == "triangle")
@@ -254,6 +256,8 @@ void FileStorage::readFrames(char* file, int count, vector<vector<glm::vec3>>* f
 		ss >> maxTimeStep;
 
 		ParticleSystem::getInstance()->sysParams = SystemParameters(volume, radius, searchRadius, viscocity, stiffness, density, gravity, timeStep, maxTimeStep);
+
+		startPos = filePos.tellg();
 	}
 
 	if (filePos.is_open())
@@ -277,8 +281,7 @@ void FileStorage::readFrames(char* file, int count, vector<vector<glm::vec3>>* f
 
 void FileStorage::resetReadFrames()
 {
-	filePos.close();
-	hasOpen = false;
+	filePos.seekg(startPos);
 }
 
 int FileStorage::getFramesTotal(char* file)

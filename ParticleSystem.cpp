@@ -235,7 +235,7 @@ void ParticleSystem::setStiffnessOfParticleSystem() {
 	// Stiffness can be calculated by multiplying the velocity with the restDensity then dividing it with Tait's constant, gamma
 	particleSystem->sysParams.stiffness = (speedOfSoundSquared * particleSystem->sysParams.restDensity / particleSystem->sysParams.pressureGamma) / 1000;
 }
-/*
+
 vector<MeshObject*> ParticleSystem::rayTrace(vector<vec3>* points, float radius, int resolution) {
 	vec3 max = {-INFINITY, -INFINITY, -INFINITY};
 	vec3 min = {INFINITY, INFINITY, INFINITY};
@@ -251,13 +251,15 @@ vector<MeshObject*> ParticleSystem::rayTrace(vector<vec3>* points, float radius,
 		}
 	}
 
+
+
 	vec3 pt1 = min;
 	vec3 pt2 = min + vec3(max.x, 0, 0);
 	vec3 pt3 = min + vec3(max.x, max.y, 0);
 	vec3 pt4 = min + vec3(0, max.y, 0);
 
 	Vertex2*** vertices = new Vertex2**[resolution];
-	float stepX = range.x / resolution;
+/*	float stepX = range.x / resolution;
 	float stepY = range.y / resolution;
 	
 	mat4 rotation = rotate(mat4(1.0f), 1.0f, cross(vec3(0, 0, 1), normalize(camDir)));
@@ -274,11 +276,10 @@ vector<MeshObject*> ParticleSystem::rayTrace(vector<vec3>* points, float radius,
 //			buffer[i][j] = clamp(rayTrace(origin, c.direction, 1), 0.0f, 1.0f);
 		}
 	}
-	
+	*/
 	return vector<MeshObject*>();
-	}
 }
-*/
+
 
 void ParticleSystem::calculateMassOfParticles(){
 	// m = pV / n
