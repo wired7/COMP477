@@ -91,7 +91,7 @@ int init() {
 	GUIShader::shader = new GUIShader("shaders\\GUIShader.VERTEXSHADER", "shaders\\GUIShader.FRAGMENTSHADER");
 	TextShader::shader = new TextShader("shaders\\TextShader.VERTEXSHADER", "shaders\\TextShader.FRAGMENTSHADER");
 
-	Skybox* skybox = new Skybox("skyboxes\\ame_majesty\\");
+	Skybox* skybox = new Skybox("skyboxes\\ame_nebula\\");
 	Scenes::stateSpace = new StateSpace(window, skybox);
 	Scenes::menu = new Menu(window);
 	StateSpace::activeStateSpace = Scenes::stateSpace;

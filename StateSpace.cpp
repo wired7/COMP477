@@ -36,8 +36,11 @@ StateSpace::StateSpace(GLFWwindow* window, Skybox* skybox)
 	this->window = window;
 //	terrain = new Terrain(1, 40, 40, 32, STATIC);
 
-	playButton = new GUIButton(vec3(1000, 100, 0.0f), vec3(64, 64, 0), vec4(1.0f, 1.0f, 1.0f, 1.0f), "", "textures\\playButton.png", true, play);
-	pauseButton = new GUIButton(vec3(1100, 100, 0.0f), vec3(64, 64, 0), vec4(1.0f, 1.0f, 1.0f, 1.0f), "", "textures\\pauseButton.png", true, pause);
+	/*
+	buttons.push_back(new GUIButton(vec3(1000, 100, 0.0f), vec3(64, 64, 0), vec4(1.0f, 1.0f, 1.0f, 1.0f), "", vec4(1.0f), "textures\\playButton.png", true, play));
+	buttons.push_back(new GUIButton(vec3(1100, 100, 0.0f), vec3(64, 64, 0), vec4(1.0f, 1.0f, 1.0f, 1.0f), "", vec4(1.0f), "textures\\pauseButton.png", true, pause));
+	buttons.push_back(new GUIButton(vec3(750, 100, 0.0f), vec3(180, 64, 0), vec4(1.0f, 1.0f, 1.0f, 1.0f), "Back To Menu", vec4(1.0f, 1.0f, 1.0f, 1.0f), "textures\\menuButton.png", true, pause));
+	*/
 }
 
 void StateSpace::loadAnimation()
@@ -122,9 +125,11 @@ void StateSpace::draw()
 	}
 
 	glDisable(GL_DEPTH_TEST);
-
-	playButton->draw();
-	pauseButton->draw();
+/*
+	for (int i = 0; i < buttons.size(); i++)
+	{
+		buttons[i]->draw();
+	*/
 }
 
 void StateSpace::loadFramesInBack()
@@ -198,9 +203,12 @@ void StateSpace::execute()
 
 void StateSpace::checkInput()
 {
+	/*
 	//hover
-	playButton->checkHover();
-	pauseButton->checkHover();
+	for (int i = 0; i < buttons.size(); i++)
+	{
+		buttons[i]->checkHover();
+	}
 
 	static int oldLeftClickState = GLFW_RELEASE;
 
@@ -208,9 +216,12 @@ void StateSpace::checkInput()
 	if (leftClick == GLFW_PRESS && oldLeftClickState == GLFW_RELEASE)
 	{
 		oldLeftClickState = GLFW_PRESS;
-		playButton->checkMouseClick();
-		pauseButton->checkMouseClick();
+		for (int i = 0; i < buttons.size(); i++)
+		{
+			buttons[i]->checkMouseClick();
+		}
 	}
 
 	oldLeftClickState = leftClick;
+	*/
 }
