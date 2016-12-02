@@ -18,6 +18,11 @@ void play()
 	StateSpace::activeStateSpace->playModeOn = true;
 }
 
+void pause()
+{
+	StateSpace::activeStateSpace->playModeOn = false;
+}
+
 StateSpace::StateSpace(GLFWwindow* window, Skybox* skybox)
 {
 	framesFront = new vector<vector<vec3>>();
@@ -32,6 +37,7 @@ StateSpace::StateSpace(GLFWwindow* window, Skybox* skybox)
 //	terrain = new Terrain(1, 40, 40, 32, STATIC);
 
 	playButton = new GUIButton(vec3(1000, 100, 0.0f), vec3(64, 64, 0), vec4(1.0f, 1.0f, 1.0f, 1.0f), "", "textures\\playButton.png", true, play);
+	pauseButton = new GUIButton(vec3(1100, 100, 0.0f), vec3(64, 64, 0), vec4(1.0f, 1.0f, 1.0f, 1.0f), "", "textures\\pauseButton.png", true, pause);
 }
 
 void StateSpace::loadAnimation()
@@ -40,7 +46,7 @@ void StateSpace::loadAnimation()
 	time = ms.count();
 	int width, height;
 	glfwGetWindowSize(window, &width, &height);
-	Camera::activeCamera = new StateSpaceCamera(window, vec2(0, 0), vec2(1, 1), vec3(5, 5, 0), vec3(4, 4, 4), vec3(0, 1, 0), perspective(45.0f, (float)width / height, 0.1f, 1000.0f), terrain);
+	Camera::activeCamera = new StateSpaceCamera(window, vec2(0, 0), vec2(1, 1), vec3(3, 3, 0), vec3(3, 3, 3), vec3(0, 1, 0), perspective(45.0f, (float)width / height, 0.1f, 1000.0f), terrain);
 	observers.push_back(Camera::activeCamera);
 
 	Controller::setController(StateSpaceController::getController());
@@ -52,13 +58,18 @@ void StateSpace::loadAnimation()
 
 	instancedModels.push_back(new InstancedSpheres(ParticleSystem::getInstance()->sysParams.particleRadius, 32, vec4(0.5, 0.5, 1, 1.0f), framesFront->at(0)));
 
-	for (int i = 0; i < ParticleSystem::getInstance()->rigidbodies.size(); i++)
-		models.push_back(new Rigidbody(ParticleSystem::getInstance()->rigidbodies[i]->vertices, ParticleSystem::getInstance()->rigidbodies[i]->indices, ParticleSystem::getInstance()->rigidbodies[i]->model, 0, true));
+	for (int i = 0; i < models.size(); i++)
+		models[i]->bindBuffers();
 }
 
 
 StateSpace::~StateSpace()
 {
+	for (int i = 0; i < instancedModels.size(); i++)
+		delete instancedModels[i];
+
+	for (int i = 0; i < models.size(); i++)
+		delete models[i];
 }
 
 void StateSpace::draw()
@@ -113,6 +124,7 @@ void StateSpace::draw()
 	glDisable(GL_DEPTH_TEST);
 
 	playButton->draw();
+	pauseButton->draw();
 }
 
 void StateSpace::loadFramesInBack()
@@ -125,7 +137,7 @@ void StateSpace::loadFramesInBack()
 	if (framesLeft > 0) {
 		int loadSize = (framesLeft > framesBuffSize)? framesBuffSize : framesLeft;
 		totalFramesLoaded += loadSize;
-		FileStorage::readFrames(fileName, framesBuffSize, framesBack);
+		FileStorage::readFrames(fileName, framesBuffSize, framesBack, nullptr);
 	}
 
 	_mutex.unlock();
@@ -168,7 +180,7 @@ void StateSpace::initializeFrameRead()
 		totalFrames = FileStorage::getFramesTotal(fileName);
 	}
 	totalFramesLoaded = framesBuffSize % totalFrames;
-	FileStorage::readFrames(fileName, totalFramesLoaded, framesFront);
+	FileStorage::readFrames(fileName, totalFramesLoaded, framesFront, &models);
 	std::thread t1(&StateSpace::loadFramesInBack, this);
 	t1.detach();
 }
@@ -183,6 +195,7 @@ void StateSpace::checkInput()
 {
 	//hover
 	playButton->checkHover();
+	pauseButton->checkHover();
 
 	static int oldLeftClickState = GLFW_RELEASE;
 
@@ -191,7 +204,7 @@ void StateSpace::checkInput()
 	{
 		oldLeftClickState = GLFW_PRESS;
 		playButton->checkMouseClick();
-
+		pauseButton->checkMouseClick();
 	}
 
 	oldLeftClickState = leftClick;

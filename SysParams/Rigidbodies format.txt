@@ -1,0 +1,8 @@
+cube: center.x center.y center.z dimensions.x dimensions.y dimensions.z red green blue alpha
+
+sphere: center.x center.y center.z dimensions.x dimensions.y dimensions.z red green blue alpha resolution
+
+triangle(not available yet): point1.x point1.y point1.z point2.x point2.y point2.z point3.x point3.y point3.z
+
+
+***all points are relative to the predefined center of liquid volume

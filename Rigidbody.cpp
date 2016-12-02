@@ -36,20 +36,3 @@ void Rigidbody::calculateInertiaTensor()
 {
 
 }
-
-void Rigidbody::applyTransform()
-{
-	//convert each vertex of the rigidbody to world coordinates based on latest model matrix
-	if (model != mat4(1.0f))
-	{
-		mat4 transposeInverse = transpose(inverse(model));
-
-		for (int j = 0; j < vertices.size(); ++j)
-		{
-			vertices[j].position = vec3(model * vec4(vertices[j].position, 1));
-			vertices[j].normal = vec3(transposeInverse * vec4(vertices[j].position, 1));
-		}
-
-		model = mat4(1.0f);
-	}
-}

@@ -7,6 +7,7 @@
 using namespace std;
 
 struct SystemParameters {
+	float volume;
 	float particleRadius;
 	float searchRadius;
 	float viscocity;
@@ -21,10 +22,7 @@ struct SystemParameters {
 	float pressureGamma = 7.0f;
 
 	SystemParameters() {};
-	SystemParameters(float pR, float sR, float v, float k, float rD, float g, float tS, float mS) : particleRadius(pR), searchRadius(sR), viscocity(v), stiffness(k), restDensity(rD), gravity(g), tStep(tS), maxTStep(mS)
-	{
-		mass = 3.0f * 3.1415f * pow(particleRadius, 3) * restDensity / 4.0f;
-	}
+	SystemParameters(float vl, float pR, float sR, float v, float k, float rD, float g, float tS, float mS) : volume(vl), particleRadius(pR), searchRadius(sR), viscocity(v), stiffness(k), restDensity(rD), gravity(g), tStep(tS), maxTStep(mS){}
 };
 
 class ParticleSystem 
@@ -41,7 +39,8 @@ public:
 	void addRigidbodies(vector<Rigidbody*>);
 	void updateList();
 	void calcNeighbors(Particle* particle);
-	void setStiffnessOfParticleSystem(int blockSize);
+	void setStiffnessOfParticleSystem();
+	void calculateMassOfParticles();
 	Grid3D grid;
 	vector<MeshObject*> rayTrace(vector<glm::vec3>*, float, int);
 private:

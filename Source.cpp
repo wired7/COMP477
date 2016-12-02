@@ -105,116 +105,19 @@ int main()
 	if (init() < 0)
 		return -1;
 
-	/*
-menu:
-//	system("CLS");
-	cout << "What would you like to do?" << endl;
-	cout << "1. Create new simulation" << endl;
-	cout << "2. Edit existing simulation" << endl;
-	cout << "3. Run Existing simulation" << endl;
-
-	string s;
 	do {
-		s = "";
+		// Clear the screen
+		glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
 
-		getline(cin, s);
+		SceneManager::getInstance()->getActiveState()->execute();
 
-		if (stoi(s) < 1 || stoi(s) > 3)
-			cout << "Invalid Input. Please try again." << endl;
+		// Swap buffers
+		glfwSwapBuffers(window);
+		glfwPollEvents();
+	} while (glfwWindowShouldClose(window) == 0);
 
-	} while (stoi(s) < 0 || stoi(s) > 3);
+	// Close OpenGL window and terminate GLFW
+	glfwTerminate();
 
-	if (stoi(s) == 1)
-	{
-		OpenFileDialog dialog;
-
-		string sysParamsFile = dialog.SelectFile();
-
-		if (sysParamsFile == "")
-			goto menu;
-
-		auto sysParams = FileStorage::loadSysParams(sysParamsFile);
-
-		string simParams;
-		system("CLS");
-		cout << "Enter number of particles: " << endl;
-		getline(cin, simParams);
-		int blockSize = pow(stof(simParams), 1.0f / 3.0f);
-
-		cout << "Enter total grid size per axis:" << endl;
-		getline(cin, simParams);
-		int gridSize = stoi(simParams);
-
-		cout << "Enter animation time" << endl;
-		getline(cin, simParams);
-		float animationTime = stof(simParams);
-
-		cout << "Save animation as..." << endl;
-
-		SaveFileDialog saveDialog;
-
-		string animFile = saveDialog.SaveFile();
-
-		if (animFile == "")
-			goto menu;
-
-		float separation = sysParams.particleRadius;
-		vec3 cubeDimensions(1.0f, 3.0f, 1.0f);
-		vec3 cubeCenter(4.0f, 4.0f, 4.0f);
-
-		float particleSpan = separation * blockSize / 2.0f;
-
-		vector<Particle*> pos;
-		for (int k = 0; k < blockSize; k++)
-			for (int j = 0; j < blockSize; j++)
-				for (int i = 0; i < blockSize; i++)
-					pos.push_back(new Particle(cubeCenter + vec3(separation * (float)i - particleSpan, separation * (float)j - particleSpan, separation * (float)k - particleSpan)));
-
-		Cube cube(cubeCenter, cubeDimensions, vec4(1.0f, 0.0f, 0.0f, 0.5f), false);
-//		Rectangle rect(vec3(5, 4, 5), vec3(1, 2, 1), vec4(1, 1, 0, 1), false);
-//		rect.model = rect.model * rotate(mat4(1.0f), 1.5f, vec3(1, 1, 1));
-
-		Rigidbody* rB = new Rigidbody(cube.vertices, cube.indices, cube.model, 1000, false);
-//		Rigidbody* rB1 = new Rigidbody(rect.vertices, rect.indices, rect.model, 1000, false);
-		vector<Rigidbody*> rigidbodies;
-		rigidbodies.push_back(rB);
-//		rigidbodies.push_back(rB1);
-
-		ParticleSystem::getInstance()->sysParams = sysParams;
-		ParticleSystem::getInstance()->grid = Grid3D(gridSize / sysParams.searchRadius, sysParams.searchRadius);
-		ParticleSystem::getInstance()->setStiffnessOfParticleSystem(blockSize); // calculating the stiffness of the system by using the blockSize * particleRadius to get the height of the water
-		ParticleSystem::getInstance()->addParticles(pos);
-		ParticleSystem::getInstance()->addRigidbodies(rigidbodies);
-
-		ParticleSystem::getInstance()->goNuts(animationTime, 0.016f, animFile);
-
-		goto menu;
-	}
-	else if(stoi(s) == 2)
-	{ }
-	else if (stoi(s) == 3)
-	{
-		skybox = new Skybox("skyboxes\\ame_majesty\\");
-		StateSpace* stateSpace = new StateSpace(window, skybox);
-
-		StateSpace::activeStateSpace = stateSpace;
-		SceneManager::getInstance()->changeActiveState(stateSpace);
-
-		glfwShowWindow(window);
-		*/
-		do {
-			// Clear the screen
-			glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
-
-			SceneManager::getInstance()->getActiveState()->execute();
-
-			// Swap buffers
-			glfwSwapBuffers(window);
-			glfwPollEvents();
-		} while (glfwWindowShouldClose(window) == 0);
-
-		// Close OpenGL window and terminate GLFW
-		glfwTerminate();
-
-		return 0;
+	return 0;
 }

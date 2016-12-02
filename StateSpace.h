@@ -45,5 +45,6 @@ public:
 
 private:
 	GUIButton* playButton;
+	GUIButton* pauseButton;
 };
 

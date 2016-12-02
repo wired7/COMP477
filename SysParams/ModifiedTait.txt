@@ -1,3 +1,4 @@
+volume: 1
 particle radius: 0.02
 search radius: 0.2
 viscocity: 0.01
