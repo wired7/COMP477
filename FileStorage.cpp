@@ -278,7 +278,6 @@ void FileStorage::readFrames(char* file, int count, vector<vector<glm::vec3>>* f
 void FileStorage::resetReadFrames()
 {
 	filePos.close();
-	hasOpen = false;
 }
 
 int FileStorage::getFramesTotal(char* file)
