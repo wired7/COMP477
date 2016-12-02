@@ -129,7 +129,7 @@ void ParticleSystem::goNuts(float playbackTime, float frameRate, string filePath
 
 	myfile << "Particles:" << endl;
 
-	myfile << sysParams.particleRadius << " " << sysParams.searchRadius << " " << sysParams.viscocity << " " << sysParams.stiffness << " ";
+	myfile << sysParams.volume << " " << sysParams.particleRadius << " " << sysParams.searchRadius << " " << sysParams.viscocity << " " << sysParams.stiffness << " ";
 	myfile << sysParams.restDensity << " " << sysParams.gravity << " " << sysParams.tStep << " " << sysParams.maxTStep << endl;
 	myfile.close();
 
@@ -273,7 +273,7 @@ vector<MeshObject*> ParticleSystem::rayTrace(vector<vec3>* points, float radius,
 
 //			buffer[i][j] = clamp(rayTrace(origin, c.direction, 1), 0.0f, 1.0f);
 		}
-	}*/
+	}
 	
 	return vector<MeshObject*>();
 	}

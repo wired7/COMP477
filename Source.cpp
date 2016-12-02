@@ -138,7 +138,30 @@ menu:
 		system("CLS");
 		cout << "Enter number of particles: " << endl;
 		getline(cin, simParams);
-		int blockSize = pow(stof(simParams), 1.0f / 3.0f);
+
+		/*
+		int blockSize = pow(stof(simParams), 1.0f/3.0f);
+		*/
+
+		/// Dexter's way of placing particles
+		// New Way of initializing position of water
+		int numOfParticles = stoi(simParams);
+
+		// setting up the particles in the scene
+		int numOfParticlesPerMeterCube = ceil(numOfParticles / sysParams.volume);
+		int particlesPerMeter = ceil(pow(numOfParticlesPerMeterCube, 1.0f / 3.0f));
+		float distanceOwnedByParticle = 1.0f / particlesPerMeter;
+		float offsetFromBoundary = distanceOwnedByParticle / 2.0f;
+
+		// get height, length, width of the body of water
+		// Assuming it's a cube for now
+		float heightWater;
+		float lengthWater;
+		float widthWater;
+
+		heightWater = lengthWater = widthWater = pow(sysParams.volume, 1.0f / 3.0f);
+
+		cout << "Dimension h x l x w " << heightWater << " " << lengthWater << " " << widthWater << endl;
 
 		cout << "Enter animation time" << endl;
 		getline(cin, simParams);
@@ -165,15 +188,26 @@ menu:
 		vec3 center = vec3(1, 1, 1) - b.min;
 		vec3 maximum = center + b.max + vec3(1, 1, 1);
 
-		int gridSize = max(maximum.x, max(maximum.y, maximum.z));
+		int gridSize = 10;//max(maximum.x, max(maximum.y, maximum.z));
+		
+		cout << gridSize << endl;
 
-		float particleSpan = separation * blockSize / 2.0f;
+		system("PAUSE");
 
+		int floorHeight = floor(heightWater * particlesPerMeter);
+		int floorWidth = floor(widthWater * particlesPerMeter);
+		int floorLength = floor(lengthWater * particlesPerMeter);
+
+		cout << "NumberOfParticles/meter: h x l x w " << floorHeight << " " << floorWidth << " " << floorLength << endl;
+		
 		vector<Particle*> pos;
-		for (int k = 0; k < blockSize; k++)
-			for (int j = 0; j < blockSize; j++)
-				for (int i = 0; i < blockSize; i++)
-					pos.push_back(new Particle(center + vec3(separation * (float)i - particleSpan, separation * (float)j - particleSpan, separation * (float)k - particleSpan)));
+		for (int h = 0; h < floorHeight; ++h) {
+			for (int w = 0; w < floorWidth; ++w) {
+				for (int l = 0; l < floorLength; ++l) {
+					pos.push_back(new Particle(center + vec3(h * distanceOwnedByParticle - offsetFromBoundary, w * distanceOwnedByParticle - offsetFromBoundary, l * distanceOwnedByParticle - offsetFromBoundary)));
+				}
+			}
+		}
 
 		vector<Rigidbody*> rigidbodies;
 
@@ -186,7 +220,7 @@ menu:
 
 		ParticleSystem::getInstance()->sysParams = sysParams;		
 		ParticleSystem::getInstance()->grid = Grid3D(gridSize / sysParams.searchRadius, sysParams.searchRadius);
-		ParticleSystem::getInstance()->setStiffnessOfParticleSystem(blockSize); // calculating the stiffness of the system by using the blockSize * particleRadius to get the height of the water
+		ParticleSystem::getInstance()->setStiffnessOfParticleSystem(); // calculating the stiffness of the system by using the blockSize * particleRadius to get the height of the water
 		ParticleSystem::getInstance()->addParticles(pos);
 		ParticleSystem::getInstance()->addRigidbodies(rigidbodies);
 
