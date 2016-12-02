@@ -87,8 +87,10 @@ void collisionsSubFunction(ParticleSystem* pS, int n)
 					}
 				}
 			}
+			
 			else {
-/*				vec3 difference = currParticle->nextPosition - currParticle->position;
+				/*
+				vec3 difference = currParticle->nextPosition - currParticle->position;
 				float d1 = triangle.intersection(origin, normalize(difference));
 				if (d1 < 0)
 				{
@@ -101,9 +103,11 @@ void collisionsSubFunction(ParticleSystem* pS, int n)
 					currParticle->params.velocity = glm::reflect(currParticle->params.velocity, velDir);
 					currParticle->nextPosition -= velDir * backwardsDisplacement;
 				}
-				else*/
+				else
+				*/
 					currParticle->collisionNormal = glm::vec3(0, 0, 0);
 			}
+			
 		}
 	}
 }

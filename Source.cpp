@@ -153,6 +153,8 @@ menu:
 		float distanceOwnedByParticle = 1.0f / particlesPerMeter;
 		float offsetFromBoundary = distanceOwnedByParticle / 2.0f;
 
+		cout << numOfParticlesPerMeterCube << " " << particlesPerMeter << " " << distanceOwnedByParticle << " " << offsetFromBoundary << endl;
+
 		// get height, length, width of the body of water
 		// Assuming it's a cube for now
 		float heightWater;
@@ -175,8 +177,6 @@ menu:
 
 		if (animFile == "")
 			goto menu;
-
-		float separation = sysParams.particleRadius;
 
 		Bounds b;
 
@@ -204,7 +204,7 @@ menu:
 				}
 			}
 		}
-
+		
 		vector<Rigidbody*> rigidbodies;
 
 		for (int i = 0; i < rigidBodies.size(); i++)
@@ -213,12 +213,16 @@ menu:
 			rigidBodies[i]->model = translate(rigidBodies[i]->model, center);
 			rigidbodies.push_back(new Rigidbody(rigidBodies[i]->vertices, rigidBodies[i]->indices, rigidBodies[i]->model, 1000, false));
 		}
+		
 
 		ParticleSystem::getInstance()->sysParams = sysParams;		
 		ParticleSystem::getInstance()->grid = Grid3D(gridSize / sysParams.searchRadius, sysParams.searchRadius);
-		ParticleSystem::getInstance()->setStiffnessOfParticleSystem(); // calculating the stiffness of the system by using the blockSize * particleRadius to get the height of the water
 		ParticleSystem::getInstance()->addParticles(pos);
 		ParticleSystem::getInstance()->addRigidbodies(rigidbodies);
+
+		// set up mass and stiffness of system
+		ParticleSystem::getInstance()->setStiffnessOfParticleSystem(); // calculating the stiffness of the system by using the height of water * particleRadius to get the height of the water
+		ParticleSystem::getInstance()->calculateMassOfParticles();
 
 		ParticleSystem::getInstance()->goNuts(animationTime, 0.016f, animFile);
 
