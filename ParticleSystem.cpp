@@ -207,8 +207,6 @@ void ParticleSystem::setStiffnessOfParticleSystem() {
 
 	// Stiffness can be calculated by multiplying the velocity with the restDensity then dividing it with Tait's constant, gamma
 	particleSystem->sysParams.stiffness = (speedOfSoundSquared * particleSystem->sysParams.restDensity / particleSystem->sysParams.pressureGamma) / 1000;
-
-	cout << particleSystem->sysParams.stiffness << endl;
 }
 /*
 vector<MeshObject*> ParticleSystem::rayTrace(vector<vec3>* points, float radius, int resolution) {

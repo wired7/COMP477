@@ -136,11 +136,11 @@ menu:
 		system("CLS");
 		cout << "Enter number of particles: " << endl;
 		getline(cin, simParams);
-
+		
 		/*
-		int blockSize = pow(stof(simParams), 1.0f/3.0f);
+		int blockSize = pow(stof(simParams), 1.0f/3.0f);	
 		*/
-
+		
 		/// Dexter's way of placing particles
 		// New Way of initializing position of water
 		int numOfParticles = stoi(simParams);
@@ -160,6 +160,7 @@ menu:
 		heightWater = lengthWater = widthWater = pow(sysParams.volume, 1.0f / 3.0f);
 
 		cout << "Dimension h x l x w " << heightWater << " " << lengthWater << " " << widthWater << endl;
+		
 
 		cout << "Enter total grid size per axis:" << endl;
 		getline(cin, simParams);
@@ -178,11 +179,12 @@ menu:
 		if (animFile == "")
 			goto menu;
 
-		vec3 cubeDimensions(3.0f, 3.0f, 3.0f);
+		
+		vec3 cubeDimensions(2.0f, 5.0f, 2.0f);
 		vec3 cubeCenter(4.0f, 4.0f, 4.0f);
 
-		vector<Particle*> pos;
-		
+		vector<Particle*> pos;		
+
 		int floorHeight = floor(heightWater * particlesPerMeter);
 		int floorWidth = floor(widthWater * particlesPerMeter);
 		int floorLength = floor(lengthWater * particlesPerMeter);
@@ -196,15 +198,17 @@ menu:
 				}				
 			}
 		}
-
-		/* Previous method using separation and particle span to determine placement of particles
+		
+		/*
+		// Previous method using separation and particle span to determine placement of particles
 		float separation = sysParams.particleRadius;
 		vec3 cubeDimensions(1.0f, 3.0f, 1.0f);
 		vec3 cubeCenter(4.0f, 4.0f, 4.0f);
 
+		vector<Particle*> pos;
+
 		float particleSpan = separation * blockSize / 2.0f;
 
-		vector<Particle*> pos;
 		for (int k = 0; k < blockSize; k++)
 			for (int j = 0; j < blockSize; j++)
 				for (int i = 0; i < blockSize; i++)

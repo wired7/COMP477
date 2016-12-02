@@ -17,8 +17,6 @@ public:
 	static glm::vec3 calcLaplacianVelocity(Particle particle);
 	static glm::vec3 calcAcceleration(Particle particle);
 
-	// TEST
-	static float calcSmoothedColor(Particle particle);
 	static glm::vec3 calcGradientColor(Particle particle);
 	static glm::vec3 calcLaplacianColor(Particle particle);
 

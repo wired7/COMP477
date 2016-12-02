@@ -77,7 +77,7 @@ void collisionsSubFunction(ParticleSystem* pS, int n)
 							backwardsDisplacement = d1 * (distanceToPlaneAtCollision + pS->sysParams.particleRadius) / distanceToPlaneAtCollision; // using law of sines
 						}
 
-						currParticle->params.velocity = 0.8f * glm::reflect(currParticle->params.velocity, direction);
+						currParticle->params.velocity = glm::reflect(currParticle->params.velocity, direction);
 						currParticle->nextPosition -= velDir * backwardsDisplacement;
 
 						// time retrocession = backwardsDisplacement / currParticle->params.velocity. So tStep -= tRetrocession.
@@ -89,17 +89,17 @@ void collisionsSubFunction(ParticleSystem* pS, int n)
 			}
 			else {
 				vec3 difference = currParticle->nextPosition - currParticle->position;
-				float d1 = triangle.intersection(currParticle->position, normalize(difference));
-				if(abs(d1) < length(difference) && d1 >= 0)
+				float d1 = triangle.intersection(origin, normalize(difference));
+				if(d1 < 0)
 				{
-					float distanceToPlaneAtCollision = abs(plane.intersection(origin, normal));
+					float distanceToPlaneAtCollision = plane.intersection(origin, normal);
 					vec3 velDir = normalize(currParticle->params.velocity);
-					float backwardsDisplacement = d1 * pS->sysParams.particleRadius / distanceToPlaneAtCollision; // using law of sines
+					float backwardsDisplacement;
 
-					currParticle->params.velocity = 0.8f * glm::reflect(currParticle->params.velocity, velDir);
+					backwardsDisplacement = d1 * pS->sysParams.particleRadius / distanceToPlaneAtCollision; // using law of sines
+
+					currParticle->params.velocity = glm::reflect(currParticle->params.velocity, velDir);
 					currParticle->nextPosition -= velDir * backwardsDisplacement;
-
-					return;
 				}
 				else
 					currParticle->collisionNormal = glm::vec3(0, 0, 0);
@@ -121,7 +121,6 @@ void SPH::calcSPH()
 		sys->particles[i]->params.pressure = 0;
 		sys->particles[i]->params.gradientPressure = vec3(0, 0, 0);
 		sys->particles[i]->params.laplacianVelocity = vec3(0, 0, 0);
-		sys->particles[i]->params.smoothColor = 0.0f;
 		sys->particles[i]->params.gradientSmoothColor = vec3(0, 0, 0);
 		sys->particles[i]->params.laplacianSmoothColor = vec3(0, 0, 0);
 		sys->particles[i]->params.tensionForce = vec3(0, 0, 0);
@@ -141,13 +140,6 @@ void SPH::calcSPH()
 		sys->particles[i]->params.pressure += SPH::calcPressure(*sys->particles[i]);
 	}
 
-	// Calculate the pressure of each particle
-	#pragma omp parallel for schedule(dynamic, 2)	
-	for (int i = 0; i < sys->particles.size(); ++i)
-	{
-		sys->particles[i]->params.smoothColor += SPH::calcSmoothedColor(*sys->particles[i]);
-	}
-
 	// Using the pressure and the density, calculate the acceleration of the particle
 	#pragma omp parallel for schedule(dynamic, 2)	
 	for (int i = 0; i < sys->particles.size(); ++i)
@@ -165,12 +157,12 @@ void SPH::calcSPH()
 	}
 
 	// Find external forces (collisions with rigidbodies) and apply them to the particle
-	#pragma omp parallel for schedule(dynamic, 2)
+/*	#pragma omp parallel for schedule(dynamic, 2)
 	for (int i = 0; i < sys->particles.size(); ++i)
 	{
 		collisionsSubFunction(sys, i);
 	}
-	
+*/	
 	// update list of particles
 	sys->updateList();
 }
@@ -215,36 +207,6 @@ float SPH::calcPressure(const Particle& particle)
 {
 	ParticleSystem* sys = ParticleSystem::getInstance();
 	return sys->sysParams.stiffness * (pow(particle.params.density / sys->sysParams.restDensity, sys->sysParams.pressureGamma) - 1);
-}
-
-float SPH::calcSmoothedColor(Particle particle){
-
-	ParticleSystem* sys = ParticleSystem::getInstance();
-	float smoothColor = (sys->sysParams.mass/particle.params.density) * calcKernel(vec3(0.0f, 0.0f, 0.0f), sys->sysParams.searchRadius);
-
-	for (int i = 0; i < particle.neighbors.size(); ++i)
-	{
-		int index = particle.neighbors[i];
-
-		if (index > particle.getIndex())
-		{
-			vec3 distance = particle.position - sys->particles[index]->position;
-			float h = sys->sysParams.searchRadius;
-
-			float kernel = calcKernel(distance, h);
-
-			smoothColor += (sys->sysParams.mass / sys->particles[index]->params.density) * kernel;
-		
-			#pragma omp critical
-			{
-				sys->particles[index]->params.smoothColor += (sys->sysParams.mass/particle.params.density) * kernel;
-			}
-		}
-	}
-	if (smoothColor == 0) {
-		cout << smoothColor << endl;
-	}
-	return smoothColor;
 }
 
 // Derived Kernel functions were found in this paper
@@ -348,11 +310,11 @@ vec3 SPH::calcGradientColor(Particle particle)
 
 			vec3 kernel = calcGradientKernel(distance, h);
 
-			ret += (sys->sysParams.mass / sys->particles[index]->params.density) * sys->particles[index]->params.smoothColor * kernel;
+			ret += (sys->sysParams.mass / sys->particles[index]->params.density) * kernel;
 
 			#pragma omp critical
 			{
-				sys->particles[index]->params.gradientSmoothColor += (sys->sysParams.mass / particle.params.density) * particle.params.smoothColor * kernel;
+				sys->particles[index]->params.gradientSmoothColor += (sys->sysParams.mass / particle.params.density) * kernel;
 			}
 		}
 	}
@@ -375,11 +337,11 @@ vec3 SPH::calcLaplacianColor(Particle particle){
 			// forces between two particles should be equal & opposite, symmetrize the velocity fields
 			float kernel = calcLaplacianKernel(distance, h);
 
-			ret += (sys->sysParams.mass / sys->particles[index]->params.density) * sys->particles[index]->params.smoothColor * kernel;
+			ret += (sys->sysParams.mass / sys->particles[index]->params.density) * kernel;
 
 			#pragma omp critical
 			{
-				sys->particles[index]->params.laplacianSmoothColor += (sys->sysParams.mass / particle.params.density) * particle.params.smoothColor * kernel;
+				sys->particles[index]->params.laplacianSmoothColor += (sys->sysParams.mass / particle.params.density) * kernel;
 			}
 		}
 	}
@@ -436,6 +398,6 @@ vec3 SPH::calcAcceleration(Particle particle)
 	
 	auto g = particle.params.density * vec3(0.0f, sys->sysParams.gravity, 0.0f);
 
-	return ((particle.params.gradientPressure + sys->sysParams.viscocity * particle.params.laplacianVelocity + g + surfaceForce) / particle.params.density);
+	return ((particle.params.gradientPressure + sys->sysParams.viscocity * particle.params.laplacianVelocity) / particle.params.density);
 }
 
