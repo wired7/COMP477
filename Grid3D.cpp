@@ -17,6 +17,25 @@ Grid3D::Grid3D(int numCells, float cellSize): numCells(numCells), cellSize(cellS
 				data[i][j].push_back(GridCube());
 		}
 	}
+
+	this->dim = glm::vec3(numCells, numCells, numCells);
+}
+
+Grid3D::Grid3D(glm::vec3 dim, float cellSize) : dim(dim), cellSize(cellSize)
+{
+	//initializes our 3D vector to be (dim.x X dim.y X dim.z)
+	data = vector<vector<vector<GridCube>>>();
+
+	for (int i = 0; i < dim.x; i++)
+	{
+		data.push_back(vector<vector<GridCube>>());
+		for (int j = 0; j < dim.y; j++)
+		{
+			data[i].push_back(vector<GridCube>());
+			for (int k = 0; k < dim.z; k++)
+				data[i][j].push_back(GridCube());
+		}
+	}
 }
 
 Grid3D::Grid3D() {
@@ -41,8 +60,9 @@ void Grid3D::update(Particle& particle)
 	int gridY = particle.position.y / cellSize;
 	int gridZ = particle.position.z / cellSize;
 
-	bool offGrid = (gridX >= numCells || gridY >= numCells || gridZ >= numCells || gridX < 0 || gridY < 0 || gridZ < 0);
-	
+	//bool offGrid = (gridX >= numCells || gridY >= numCells || gridZ >= numCells || gridX < 0 || gridY < 0 || gridZ < 0);
+	bool offGrid = (gridX >= dim.x || gridY >= dim.y || gridZ >= dim.z || gridX < 0 || gridY < 0 || gridZ < 0);
+
 	glm::vec3 currCell = particle.getGridCellCoord();
 	bool remove = (gridX != (int)currCell.x || gridY != (int)currCell.y || gridZ != (int)currCell.z);
 

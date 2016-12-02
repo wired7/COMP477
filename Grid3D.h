@@ -17,6 +17,7 @@ class Grid3D {
 public:
 	vector<vector<vector<GridCube>>> data;
 	Grid3D::Grid3D(int numCells, float cellSize);
+	Grid3D::Grid3D(glm::vec3 dim, float cellSize);
 	Grid3D();
 	~Grid3D();
 	float getCellSize();
@@ -24,6 +25,7 @@ public:
 	vector<int> getNeighbors(Particle particle);
 	vector<GridCube> getNeighborCubes(Particle particle);
 private:
+	glm::vec3 dim;
 	float cellSize;
 	int numCells;
 	bool inRadius(glm::vec3 pos1, glm::vec3 pos2);

@@ -9,7 +9,6 @@ using namespace std;
 static class FileStorage
 {
 public:
-	static void write(char* file);
 	static void readFrames(char* file, int count, vector<vector<glm::vec3>>* frames, vector<MeshObject*>*);
 	static int getFramesTotal(char* file);
 	static fstream filePos;
