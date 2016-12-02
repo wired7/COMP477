@@ -1,6 +1,7 @@
 #pragma once
 #include <vector>
 #include <glm.hpp>
+#include "Shape.h"
 
 using namespace std;
 
@@ -32,5 +33,6 @@ public:
 	void setGridCellCoord(const glm::vec3& gridCellCoord);
 	vector<int> neighbors;
 	ParticleParameters params;
-	glm::vec3 collisionNormal;
+	vec3 collisionNormal;
+	float deltaTime;
 };

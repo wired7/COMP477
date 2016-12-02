@@ -162,126 +162,132 @@ void FileStorage::readFrames(char* file, int count, vector<vector<glm::vec3>>* f
 {
 	float x, y, z;
 
-	float volume = 0;
-	float radius = 0;
-	float searchRadius = 0;
-	float viscocity = 0;
-	float stiffness = 0;
-	float density = 0;
-	float gravity = 0;
-	float timeStep = 0;
-	float maxTimeStep = 0;
-
-	string line;
-	string delimiter = " ";
 	frames->clear();
 
-	if (!hasOpen)
-	{
-		filePos.open(file, ios_base::in);
-		hasOpen = true;
+	string line;
 
-		while(true)
+		if (!hasOpen)
 		{
-			getline(filePos, line);
-			stringstream ss(line);
+			filePos.open(file, ios_base::in);
 
-			string name = line.substr(0, line.find(":"));
-			transform(name.begin(), name.end(), name.begin(), ::tolower);
-
-			if (name == "rigidbody")
+			if (filePos.is_open())
 			{
-				getline(filePos, line);
+				hasOpen = true;
 
-				ss = stringstream(line);
+				float volume = 0;
+				float radius = 0;
+				float searchRadius = 0;
+				float viscocity = 0;
+				float stiffness = 0;
+				float density = 0;
+				float gravity = 0;
+				float timeStep = 0;
+				float maxTimeStep = 0;
 
-				int stringLen = line.length();
+				string delimiter = " ";
 
-				vector<Vertex2> vertices;
-
-				while (stringLen > 0) {
-					vec3 pos;
-
-					for (int i = 0; i < 3; i++)
-						ss >> pos[i];
-
-					vec3 normal;
-
-					for (int i = 0; i < 3; i++)
-						ss >> normal[i];
-					
-					vec4 color;
-
-					for (int i = 0; i < 4; i++)
-						ss >> color[i];
-
-					vertices.push_back(Vertex2(pos, normal, color, vec2(0, 0)));
-
-					stringLen -= 10;
-				}
-
-				getline(filePos, line);
-
-				ss = stringstream(line);
-
-				stringLen = line.length();
-
-				vector<GLuint> indices;
-
-				int val;
-				while (ss >> val)
+				while (true)
 				{
-					indices.push_back(val);
+					getline(filePos, line);
+					stringstream ss(line);
+
+					string name = line.substr(0, line.find(":"));
+					transform(name.begin(), name.end(), name.begin(), ::tolower);
+
+					if (name == "rigidbody")
+					{
+						getline(filePos, line);
+
+						ss = stringstream(line);
+
+						int stringLen = line.length();
+
+						vector<Vertex2> vertices;
+
+						while (stringLen > 0) {
+							vec3 pos;
+
+							for (int i = 0; i < 3; i++)
+								ss >> pos[i];
+
+							vec3 normal;
+
+							for (int i = 0; i < 3; i++)
+								ss >> normal[i];
+
+							vec4 color;
+
+							for (int i = 0; i < 4; i++)
+								ss >> color[i];
+
+							vertices.push_back(Vertex2(pos, normal, color, vec2(0, 0)));
+
+							stringLen -= 10;
+						}
+
+						getline(filePos, line);
+
+						ss = stringstream(line);
+
+						stringLen = line.length();
+
+						vector<GLuint> indices;
+
+						int val;
+						while (ss >> val)
+						{
+							indices.push_back(val);
+						}
+
+						rigidbodies->push_back(new Rigidbody(vertices, indices, mat4(1.0f), 1000, false));
+					}
+					else
+						break;
+
 				}
 
-				rigidbodies->push_back(new Rigidbody(vertices, indices, mat4(1.0f), 1000, false));
-			}
-			else
-				break;
+				getline(filePos, line);
 
+				stringstream ss(line);
+
+				ss >> volume;
+				ss >> radius;
+				ss >> searchRadius;
+				ss >> viscocity;
+				ss >> stiffness;
+				ss >> density;
+				ss >> gravity;
+				ss >> timeStep;
+				ss >> maxTimeStep;
+
+				ParticleSystem::getInstance()->sysParams = SystemParameters(volume, radius, searchRadius, viscocity, stiffness, density, gravity, timeStep, maxTimeStep);
+
+				startPos = filePos.tellg();
+			}
 		}
 
-		getline(filePos, line);
-		
-		stringstream ss(line);
-
-		ss >> volume;
-		ss >> radius;
-		ss >> searchRadius;
-		ss >> viscocity;
-		ss >> stiffness;
-		ss >> density;
-		ss >> gravity;
-		ss >> timeStep;
-		ss >> maxTimeStep;
-
-		ParticleSystem::getInstance()->sysParams = SystemParameters(volume, radius, searchRadius, viscocity, stiffness, density, gravity, timeStep, maxTimeStep);
-
-		startPos = filePos.tellg();
-	}
-
-	if (filePos.is_open())
-	{
-		for (int i = 0; i < count; ++i) {
-			frames->push_back(vector<vec3>());
-			getline(filePos, line);
-			stringstream ss(line);
-			float tStep;
-			ss >> tStep;
-
-			while (ss >> x)
+			if (filePos.is_open())
 			{
-				ss >> y;
-				ss >> z;
-				(*frames)[i].push_back(vec3(x, y, z));
+				for (int i = 0; i < count; ++i) {
+					frames->push_back(vector<vec3>());
+					getline(filePos, line);
+					stringstream ss(line);
+					float tStep;
+					ss >> tStep;
+
+					while (ss >> x)
+					{
+						ss >> y;
+						ss >> z;
+						(*frames)[i].push_back(vec3(x, y, z));
+					}
+				}
 			}
-		}
-	}
 }
 
 void FileStorage::resetReadFrames()
 {
-	filePos.seekg(startPos);
+	filePos.close();
 }
 
 int FileStorage::getFramesTotal(char* file)
@@ -290,10 +296,11 @@ int FileStorage::getFramesTotal(char* file)
 	int count = 0;
 	if (f.is_open())
 	{
+		f.seekg(startPos);
 		std::string line;
 		for (count = 0; std::getline(f, line); ++count);
 	}
-	return count - 1; //we dont count the first line
+	return count; //we dont count the first line
 }
 
 

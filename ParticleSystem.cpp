@@ -195,9 +195,24 @@ void ParticleSystem::addRigidbodies(vector<Rigidbody*> rigid)
 }
 
 void ParticleSystem::updateList() {
-	
+	float ratio = sysParams.tStep / sysParams.maxTStep;
 	for (int i = 0; i < particles.size(); ++i) {
 		particles[i]->position = particles[i]->nextPosition;
+/*		particles[i]->position = particles[i]->position + (particles[i]->nextPosition - particles[i]->position) * ratio;
+		particles[i]->nextPosition = particles[i]->position;
+
+		// Collision Handling
+		if (particles[i]->deltaTime > 0 && sysParams.maxTStep - particles[i]->deltaTime == sysParams.tStep)
+		{
+			vec3 normal = normalize(particles[i]->collisionNormal);
+			vec3 direction = -sign(dot(particles[i]->params.velocity, normal)) * normal;
+//			cout << particles[i]->params.velocity.x << " " << particles[i]->params.velocity.y << " " << particles[i]->params.velocity.z << endl;
+			particles[i]->params.velocity = 0.8f * glm::reflect(particles[i]->params.velocity, direction);
+			particles[i]->collisionNormal = vec3(0, 0, 0);
+//			cout << particles[i]->params.velocity.x << " " << particles[i]->params.velocity.y << " " << particles[i]->params.velocity.z << endl;
+//			system("PAUSE");
+		}*/
+
 		grid.update(*particles[i]);
 	}	
 }

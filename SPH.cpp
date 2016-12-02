@@ -34,51 +34,52 @@ void collisionsSubFunction(ParticleSystem* pS, int n)
 			Triangle triangle(point1, point2, point3);
 			vec3 origin = currParticle->nextPosition;
 
-			if (distance <= pS->sysParams.particleRadius)
+			vec3 direction = -sign(dot(currParticle->params.velocity, normal)) * normal;
+			
+			if (currParticle->collisionNormal != direction)
 			{
-				vec3 direction = normal;
-
-				float distanceToPlaneAtCollision = plane.intersection(origin, direction);
-
-				direction = -sign(distanceToPlaneAtCollision) * direction;
-
-				if (currParticle->collisionNormal != direction)
+				if (distance < pS->sysParams.particleRadius)
 				{
 					if (triangle.intersects(origin, direction))
 					{
-						currParticle->collisionNormal = direction;
-						//theres a collision. Update velocity based on conservation of momentum.
-						//						float t = distanceToPlaneAtCollision / length(currParticle->params.velocity);
-						/*						if (t < sys->sysParams.tStep)
-						{
-						sys->sysParams.tStep = t;
-						}*/
-
 						// Update particle velocity with reflected, assuming some loss in energy in terms of heat
 						// take particle back to position where it would have first collided with the plane given the current velocity
 						vec3 velDir = normalize(currParticle->params.velocity);
 						float d1 = plane.intersection(origin, velDir);
 						float backwardsDisplacement;
 
-						if (distanceToPlaneAtCollision == 0.0f)
+						if (distance == 0.0f)
 						{
 							//sin(theta) = radius / backwardsDisplacement -> bD = radius / sin(theta)
 							// theta = angle between velocity vector and plane -> dot(v, normal) = cos(phi) -> phi = arccos(dot(v, normal))
 							// theta = 90 - phi -> bD = radius / sin(90 - arccos(dot(v, normal)))
 							backwardsDisplacement = pS->sysParams.particleRadius / dot(-velDir, direction);
 						}
-						else if (d1 >= 0)
+						else if (d1 > 0)
 						{
-							backwardsDisplacement = d1 * pS->sysParams.particleRadius / distanceToPlaneAtCollision - d1; // using law of sines
+							backwardsDisplacement = d1 * pS->sysParams.particleRadius / distance - d1; // using law of sines
 						}
 						else
 						{
 							d1 *= -1;
-							backwardsDisplacement = d1 * (distanceToPlaneAtCollision + pS->sysParams.particleRadius) / distanceToPlaneAtCollision; // using law of sines
+							backwardsDisplacement = d1 * pS->sysParams.particleRadius / distance; // using law of sines
 						}
 
 						currParticle->params.velocity = 0.8f * glm::reflect(currParticle->params.velocity, direction);
 						currParticle->nextPosition -= velDir * backwardsDisplacement;
+
+/*						float dT = backwardsDisplacement / length(currParticle->params.velocity);
+
+						if (pS->sysParams.maxTStep - dT < pS->sysParams.tStep)
+						{
+							pS->sysParams.tStep = pS->sysParams.maxTStep - dT;
+						}
+
+						if (dT > currParticle->deltaTime)
+						{
+							currParticle->deltaTime = dT;
+							currParticle->collisionNormal = direction;
+						}*/
 
 						// time retrocession = backwardsDisplacement / currParticle->params.velocity. So tStep -= tRetrocession.
 						// But this shouldn't be done here since we must obtain the minimum time step produced by these calculations beforehand
@@ -86,30 +87,39 @@ void collisionsSubFunction(ParticleSystem* pS, int n)
 						return;
 					}
 				}
-			}
-			
-			else {
-				/*
-				vec3 difference = currParticle->nextPosition - currParticle->position;
-				float d1 = triangle.intersection(origin, normalize(difference));
-				if (d1 < 0)
-				{
-					float distanceToPlaneAtCollision = plane.intersection(origin, normal);
-					vec3 velDir = normalize(currParticle->params.velocity);
-					float backwardsDisplacement;
-
-					backwardsDisplacement = d1 * pS->sysParams.particleRadius / distanceToPlaneAtCollision; // using law of sines
-
-					currParticle->params.velocity = glm::reflect(currParticle->params.velocity, velDir);
-					currParticle->nextPosition -= velDir * backwardsDisplacement;
-				}
 				else
-				*/
-					currParticle->collisionNormal = glm::vec3(0, 0, 0);
-			}
-			
+				{
+					vec3 difference = currParticle->nextPosition - currParticle->position;
+					float d1 = triangle.intersection(origin, normalize(difference));
+					if (d1 < length(difference) && d1 >= 0)
+					{
+						vec3 velDir = normalize(currParticle->params.velocity);
+						float backwardsDisplacement = d1 * pS->sysParams.particleRadius / distance; // using law of sines
+
+						currParticle->params.velocity = 0.8f * glm::reflect(currParticle->params.velocity, direction);
+						currParticle->nextPosition -= velDir * backwardsDisplacement;
+
+/*						float dT = backwardsDisplacement / length(currParticle->params.velocity);
+
+						if (pS->sysParams.maxTStep - dT < pS->sysParams.tStep)
+						{
+							pS->sysParams.tStep = pS->sysParams.maxTStep - dT;
+						}
+
+						if (dT > currParticle->deltaTime)
+						{
+							currParticle->deltaTime = dT;
+							currParticle->collisionNormal = direction;
+						}*/
+
+						return;
+					}
+				}
+			}		
 		}
 	}
+
+	currParticle->collisionNormal = glm::vec3(0, 0, 0);
 }
 
 void SPH::calcSPH()
@@ -128,6 +138,7 @@ void SPH::calcSPH()
 		sys->particles[i]->params.gradientSmoothColor = vec3(0, 0, 0);
 		sys->particles[i]->params.laplacianSmoothColor = vec3(0, 0, 0);
 		sys->particles[i]->params.tensionForce = vec3(0, 0, 0);
+		sys->particles[i]->deltaTime = 0;
 	}
 
 	// Calculate the density of each particle
@@ -166,6 +177,7 @@ void SPH::calcSPH()
 		sys->particles[i]->params.acceleration = SPH::calcAcceleration(*sys->particles[i]);
 	}
 
+	sys->sysParams.tStep = sys->sysParams.maxTStep;
 	// Using the acceleration, use explicit euler integration to find the next position of the particle
 	#pragma omp parallel for schedule(dynamic, 2)	
 	for (int i = 0; i < sys->particles.size(); ++i)
