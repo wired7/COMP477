@@ -44,6 +44,6 @@ public:
 	void checkInput();
 
 private:
-	//std::vector<GUIButton*> buttons;
+	std::vector<GUIButton*> buttons;
 };
 
