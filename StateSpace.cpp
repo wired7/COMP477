@@ -90,7 +90,7 @@ void StateSpace::draw()
 		{
 			frameCount = (frameCount + 1) % framesFront->size();
 			if ((*framesFront)[frameCount].size() == 0) {
-				FileStorage::hasOpen = false;
+				FileStorage::resetReadFrames(fileName);
 				initializeFrameRead();
 			}
 			else {
@@ -157,9 +157,11 @@ void StateSpace::initializeFrameRead()
 	{
 		totalFrames = FileStorage::getFramesTotal(fileName);
 	}
-	totalFramesLoaded = framesBuffSize % totalFrames;
+	int framesLeft = totalFrames;
+	int loadSize = (framesLeft > framesBuffSize) ? framesBuffSize : framesLeft;
+	totalFramesLoaded = loadSize;
 
-	FileStorage::readFrames(fileName, totalFramesLoaded, framesFront, &models);
+	FileStorage::readFrames(fileName, loadSize, framesFront, &models);
 	std::thread t1(&StateSpace::loadFramesInBack, this);
 	t1.detach();
 }

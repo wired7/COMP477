@@ -142,6 +142,20 @@ public:
 	void draw();
 };
 
+class Cylinder : public MeshObject
+{
+public:
+	Cylinder(vec3 topRadius, vec3 bottomRadius, vector<vec3> samplePoints, vec4 color, bool)
+	{
+		shader = LitShader::shader;
+
+		loadTexture("textures\\blank.jpg");
+
+
+	}
+	void draw();
+};
+
 class GUIButton : public MeshObject
 {
 public:

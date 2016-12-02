@@ -10,7 +10,7 @@
 
 using namespace std;
 
-long FileStorage::startPos;
+int FileStorage::startPos;
 fstream FileStorage::filePos;
 bool FileStorage::hasOpen = false;
 
@@ -261,8 +261,6 @@ void FileStorage::readFrames(char* file, int count, vector<vector<glm::vec3>>* f
 				ss >> maxTimeStep;
 
 				ParticleSystem::getInstance()->sysParams = SystemParameters(volume, radius, searchRadius, viscocity, stiffness, density, gravity, timeStep, maxTimeStep);
-
-				startPos = filePos.tellg();
 			}
 		}
 
@@ -285,9 +283,17 @@ void FileStorage::readFrames(char* file, int count, vector<vector<glm::vec3>>* f
 			}
 }
 
-void FileStorage::resetReadFrames()
+void FileStorage::resetReadFrames(char* file)
 {
 	filePos.close();
+
+	filePos.open(file, ios_base::in);
+	string line;
+	for (int i = 0; i < startPos; ++i) 
+	{
+		std::getline(filePos, line);
+	}
+
 }
 
 int FileStorage::getFramesTotal(char* file)
@@ -296,10 +302,22 @@ int FileStorage::getFramesTotal(char* file)
 	int count = 0;
 	if (f.is_open())
 	{
-		f.seekg(startPos);
 		std::string line;
+		std::string s = "Particles:";
+
+		startPos = 0;
+		std::getline(f, line);
+
+		while (line != s) {    
+			startPos++;
+			std::getline(f, line);
+		}
+		std::getline(f, line);
+		startPos+=3;
+
 		for (count = 0; std::getline(f, line); ++count);
 	}
+	f.close();
 	return count; //we dont count the first line
 }
 

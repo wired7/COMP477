@@ -203,8 +203,7 @@ float SPH::calcDensity(Particle particle)
 	ParticleSystem* sys = ParticleSystem::getInstance();
 
 	float density = sys->sysParams.mass * calcKernel(vec3(0.0f, 0.0f, 0.0f), sys->sysParams.searchRadius);
-
-	#pragma omp parallel for schedule(dynamic, 2)	
+	
 	for (int i = 0; i < particle.neighbors.size(); ++i)
 	{
 		int index = particle.neighbors[i];
@@ -214,7 +213,6 @@ float SPH::calcDensity(Particle particle)
 			Particle* currParticle = sys->particles[particle.neighbors.at(i)];
 			vec3 distance = particle.position - currParticle->position;
 			float kernel = calcKernel(distance, sys->sysParams.searchRadius);
-
 
 			density += sys->sysParams.mass * kernel;
 

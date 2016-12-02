@@ -9,12 +9,12 @@ using namespace std;
 static class FileStorage
 {
 public:
-	static long startPos;
+	static int startPos;
 	static void readFrames(char* file, int count, vector<vector<glm::vec3>>* frames, vector<MeshObject*>*);
 	static int getFramesTotal(char* file);
 	static fstream filePos;
 	static bool hasOpen;
-	static void resetReadFrames();
+	static void resetReadFrames(char* file);
 	static SystemParameters loadSysParams(string);
 	static vector<MeshObject*> loadRigidbodies(string);
 private:
