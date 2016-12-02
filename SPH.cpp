@@ -132,8 +132,12 @@ void SPH::calcSPH()
 	{
 		// This is done because it possible to reach a critical state in the following condition:
 
-		// 1st Thread - The first particle is in the calcDensity function and reached the fourth particle and is ready to modify its contents
-		// 2nd Thread - The fourth particle has finished the calcDensity and it is about to add the density
+		// 1st Thread - The first particle is in the calcDensity function and has reached the fourth particle as its neighbor
+		//            - It is about to modify the fourth particle's contents
+		// 2nd Thread - The fourth particle has finished the calcDensity and it is about to add the density from the resulting calcDensity function
+
+		// 1st Thread reaches the critical section in the calcDensity function and modifies the contents
+		// 2nd Thread gets his turn and modifies the old density value and the 1st thread's modification is lost
 
 		// Result: One of the threads modification will be overridden
 
