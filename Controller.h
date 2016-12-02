@@ -31,6 +31,7 @@ private:
 	static void mPC(GLFWwindow*, double, double);
 	static void wRC(GLFWwindow*, int, int);
 public:
+	static glm::vec2 mouseScreenToGUICoords(double x, double y);
 	static Controller* getController();
 };
 
@@ -45,6 +46,23 @@ private:
 	static void mC(GLFWwindow*, int, int, int);
 	static void mPC(GLFWwindow*, double, double);
 	static void wRC(GLFWwindow*, int, int);
+public:
+	static Controller* getController();
+};
+
+class MenuController : public Controller
+{
+private:
+	static MenuController* controller;
+	MenuController();
+	~MenuController();
+	static void kC(GLFWwindow*, int, int, int, int);
+	static void sC(GLFWwindow*, double, double);
+	static void mC(GLFWwindow*, int, int, int);
+	static void mPC(GLFWwindow*, double, double);
+	static void wRC(GLFWwindow*, int, int);
+	static glm::vec2 mouseScreenToGUICoords(double x, double y);
+
 public:
 	static Controller* getController();
 };
