@@ -4,8 +4,10 @@
 #include "Terrain.h"
 #include "Controller.h"
 #include <mutex>
+#include "ScreenState.h"
+#include <glfw3.h>
 
-class StateSpace
+class StateSpace : public ScreenState
 {
 public:
 	static StateSpace* activeStateSpace;
@@ -35,5 +37,9 @@ public:
 	int totalFrames = 0;
 	int totalFramesLoaded;
 	int currGlobalFrame;
+	GLFWwindow* window;
+
+	void loadAnimation();
+	void execute();
 };
 

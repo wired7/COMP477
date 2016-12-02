@@ -20,14 +20,13 @@
 #include "Menu.h"
 #include <windows.h>
 #include <omp.h>
+#include "SceneManager.h"
 
 using namespace std;
 using namespace glm;
 
 GLFWwindow* window;
-StateSpace* stateSpace;
 Skybox* skybox;
-Menu* menu;
 
 //Nvidia GPU support
 extern "C" {
@@ -52,7 +51,6 @@ int init() {
 
 	// Open a window and create its OpenGL context
 	window = glfwCreateWindow(1200, 800, "COMP477", NULL, NULL);
-	glfwHideWindow(window);
 	if (window == NULL) {
 		fprintf(stderr, "Failed to open GLFW window.\n");
 		getchar();
@@ -88,7 +86,16 @@ int init() {
 
 	LitShader::shader = new LitShader("shaders\\litShader.VERTEXSHADER", "shaders\\InstancedFragmentShader.FRAGMENTSHADER");
 	InstancedLitShader::shader = new InstancedLitShader("shaders\\InstancedVertexShader.VERTEXSHADER", "shaders\\InstancedFragmentShader.FRAGMENTSHADER");
+	UnlitShader::shader = new UnlitShader("shaders\\unlit2DShader.VERTEXSHADER", "shaders\\unlit2DShader.FRAGMENTSHADER");
 	CubeMapShader::shader = new CubeMapShader("shaders\\CubeMap.VERTEXSHADER", "shaders\\CubeMap.FRAGMENTSHADER");
+	GUIShader::shader = new GUIShader("shaders\\GUIShader.VERTEXSHADER", "shaders\\GUIShader.FRAGMENTSHADER");
+	TextShader::shader = new TextShader("shaders\\TextShader.VERTEXSHADER", "shaders\\TextShader.FRAGMENTSHADER");
+
+	Skybox* skybox = new Skybox("skyboxes\\ame_majesty\\");
+	Scenes::stateSpace = new StateSpace(window, skybox);
+	Scenes::menu = new Menu(window);
+	StateSpace::activeStateSpace = Scenes::stateSpace;
+	SceneManager::getInstance()->changeActiveScene(Scenes::menu);
 
 	srand(time(NULL));
 }
@@ -98,6 +105,7 @@ int main()
 	if (init() < 0)
 		return -1;
 
+	/*
 menu:
 //	system("CLS");
 	cout << "What would you like to do?" << endl;
@@ -124,7 +132,7 @@ menu:
 
 		if (sysParamsFile == "")
 			goto menu;
-		
+
 		auto sysParams = FileStorage::loadSysParams(sysParamsFile);
 
 		string simParams;
@@ -172,7 +180,7 @@ menu:
 		rigidbodies.push_back(rB);
 //		rigidbodies.push_back(rB1);
 
-		ParticleSystem::getInstance()->sysParams = sysParams;		
+		ParticleSystem::getInstance()->sysParams = sysParams;
 		ParticleSystem::getInstance()->grid = Grid3D(gridSize / sysParams.searchRadius, sysParams.searchRadius);
 		ParticleSystem::getInstance()->setStiffnessOfParticleSystem(blockSize); // calculating the stiffness of the system by using the blockSize * particleRadius to get the height of the water
 		ParticleSystem::getInstance()->addParticles(pos);
@@ -187,28 +195,26 @@ menu:
 	else if (stoi(s) == 3)
 	{
 		skybox = new Skybox("skyboxes\\ame_majesty\\");
-		stateSpace = new StateSpace(window, skybox);
+		StateSpace* stateSpace = new StateSpace(window, skybox);
 
 		StateSpace::activeStateSpace = stateSpace;
+		SceneManager::getInstance()->changeActiveState(stateSpace);
 
 		glfwShowWindow(window);
-
+		*/
 		do {
 			// Clear the screen
 			glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
 
-			stateSpace->draw();
+			SceneManager::getInstance()->getActiveState()->execute();
 
 			// Swap buffers
 			glfwSwapBuffers(window);
 			glfwPollEvents();
 		} while (glfwWindowShouldClose(window) == 0);
 
-		goto menu;
-	}
+		// Close OpenGL window and terminate GLFW
+		glfwTerminate();
 
-	// Close OpenGL window and terminate GLFW
-	glfwTerminate();
-
-	return 0;
+		return 0;
 }

@@ -11,7 +11,7 @@ using namespace std::chrono;
 
 std::mutex _mutex;
 
-StateSpace* StateSpace::activeStateSpace = NULL;
+StateSpace* StateSpace::activeStateSpace = nullptr;
 
 StateSpace::StateSpace(GLFWwindow* window, Skybox* skybox)
 {
@@ -20,12 +20,19 @@ StateSpace::StateSpace(GLFWwindow* window, Skybox* skybox)
 	framesBuffSize = 60;
 	currGlobalFrame = 0;
 
-	milliseconds ms = duration_cast<milliseconds>(system_clock::now().time_since_epoch());
-	time = ms.count();
 	frameCount = 0;
 	playModeOn = false;
 	this->skybox = skybox;
+	this->window = window;
 //	terrain = new Terrain(1, 40, 40, 32, STATIC);
+
+	//loadAnimation();
+}
+
+void StateSpace::loadAnimation()
+{
+	milliseconds ms = duration_cast<milliseconds>(system_clock::now().time_since_epoch());
+	time = ms.count();
 	int width, height;
 	glfwGetWindowSize(window, &width, &height);
 	Camera::activeCamera = new StateSpaceCamera(window, vec2(0, 0), vec2(1, 1), vec3(5, 5, 0), vec3(4, 4, 4), vec3(0, 1, 0), perspective(45.0f, (float)width / height, 0.1f, 1000.0f), terrain);
@@ -36,7 +43,7 @@ StateSpace::StateSpace(GLFWwindow* window, Skybox* skybox)
 	fileName = _strdup(OpenFileDialog().SelectFile().c_str());
 	initializeFrameRead();
 
-//	cout << framesFront->at(0)[0].x << " " << framesFront->at(0)[0].y << " " << framesFront->at(0)[0].z << endl;
+	//	cout << framesFront->at(0)[0].x << " " << framesFront->at(0)[0].y << " " << framesFront->at(0)[0].z << endl;
 
 	instancedModels.push_back(new InstancedSpheres(ParticleSystem::getInstance()->sysParams.particleRadius, 32, vec4(0.5, 0.5, 1, 1.0f), framesFront->at(0)));
 
@@ -48,7 +55,6 @@ StateSpace::StateSpace(GLFWwindow* window, Skybox* skybox)
 StateSpace::~StateSpace()
 {
 }
-
 
 void StateSpace::draw()
 {
@@ -96,7 +102,6 @@ void StateSpace::draw()
 				currGlobalFrame++;
 			}
 		}
-
 	}
 }
 
@@ -156,4 +161,9 @@ void StateSpace::initializeFrameRead()
 	FileStorage::readFrames(fileName, totalFramesLoaded, framesFront);
 	std::thread t1(&StateSpace::loadFramesInBack, this);
 	t1.detach();
+}
+
+void StateSpace::execute()
+{
+	draw();
 }

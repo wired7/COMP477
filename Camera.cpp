@@ -7,10 +7,12 @@ Camera::Camera(GLFWwindow* window, vec2 relativePosition, vec2 relativeDimension
 	this->window = window;
 	this->relativePosition = relativePosition;
 	this->relativeDimensions = relativeDimensions;
+	glfwGetWindowSize(window, &screenWidth, &screenHeight);
 
 	mat4 ratioMatrix(1);
 	ratioMatrix[1][1] *= relativeDimensions.x;
 	Projection = Projection * ratioMatrix;
+	OrthoProjection = glm::ortho(0.0f, (float)screenWidth, 0.0f, (float)screenHeight);
 	this->Projection = Projection;
 
 	View = glm::lookAt(pos, lookAt, up);

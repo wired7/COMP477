@@ -35,10 +35,12 @@
     <ClInclude Include="ParticleSystem.h" />
     <ClInclude Include="Rigidbody.h" />
     <ClInclude Include="SaveFileDialog.h" />
+    <ClInclude Include="ScreenState.h" />
     <ClInclude Include="Shader.h" />
     <ClInclude Include="Shape.h" />
     <ClInclude Include="Skybox.h" />
     <ClInclude Include="SPH.h" />
+    <ClInclude Include="SceneManager.h" />
     <ClInclude Include="StateSpace.h" />
     <ClInclude Include="Terrain.h" />
     <ClInclude Include="TextRenderer.h" />
@@ -66,6 +68,7 @@
     <ClCompile Include="Skybox.cpp" />
     <ClCompile Include="Source.cpp" />
     <ClCompile Include="SPH.cpp" />
+    <ClCompile Include="SceneManager.cpp" />
     <ClCompile Include="StateSpace.cpp" />
     <ClCompile Include="Terrain.cpp" />
     <ClCompile Include="TextRenderer.cpp" />
