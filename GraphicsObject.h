@@ -8,6 +8,8 @@
 #include <glm.hpp>
 #include <gtc/matrix_transform.hpp>
 #include <gtx/rotate_vector.hpp>
+#include <functional>
+#include "ScreenState.h"
 /*#include <Importer.hpp>
 #include <scene.h>
 #include <postprocess.h>
@@ -160,13 +162,30 @@ class GUIButton : public MeshObject
 {
 public:
 	GUIButton() {};
-	GUIButton(vec3, vec3, vec4, char* text, bool);
+	GUIButton(vec3 position, vec3 dimensions, vec4 color, char* text, char* texFilePath, bool isRendered, std::function<void()> clickEvent);
 	void draw();
+	void checkMouseClick();
+	void checkHover();
 	glm::vec3 position;
+	glm::vec3 dimensions;
+	glm::vec4 hoverColor = glm::vec4(1.0f);
 
 	char* getText();
 
 private:
+	bool isPointInRect(double x, double y);
+
+	std::function<void()> clickEvent;
 	TextRenderer textRend;
 	char* text;
+};
+
+class GUIBackground : public MeshObject
+{
+public:
+	GUIBackground() {};
+	GUIBackground(vec3 position, vec3 dimensions, vec4 color, char* texturePath, bool isRendered);
+	glm::vec3 position;
+	void draw();
+
 };

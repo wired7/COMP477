@@ -139,6 +139,8 @@ GUIShader* GUIShader::shader;
 GUIShader::GUIShader(const char* vertexPath, const char* fragmentPath) : Shader(vertexPath, fragmentPath)
 {
 	modelID = glGetUniformLocation(program, "Model");
+	texID = glGetUniformLocation(program, "tex");
+	hoverID = glGetUniformLocation(program, "hoverColor");
 }
 
 TextShader* TextShader::shader;
@@ -146,4 +148,13 @@ TextShader* TextShader::shader;
 TextShader::TextShader(const char* vertexPath, const char* fragmentPath) : Shader(vertexPath, fragmentPath)
 {
 	colorID = glGetUniformLocation(program, "textColor");
+	text = glGetUniformLocation(program, "text");
+}
+
+UnlitShader* UnlitShader::shader;
+
+UnlitShader::UnlitShader(const char* vertexPath, const char* fragmentPath) : Shader(vertexPath, fragmentPath)
+{
+	texID = glGetUniformLocation(program, "tex");
+	modelID = glGetUniformLocation(program, "Model");
 }

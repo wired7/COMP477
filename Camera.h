@@ -19,6 +19,7 @@ public:
 	vec2 relativePosition;
 	vec2 relativeDimensions;
 	mat4 Projection;
+	mat4 OrthoProjection;
 	mat4 View;
 	vec3 lookAtVector;
 	vec3 camPosVector;

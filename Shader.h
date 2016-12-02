@@ -58,6 +58,8 @@ class GUIShader : public Shader
 public:
 	static GUIShader* shader;
 	GLuint modelID;
+	GLuint texID;
+	GLuint hoverID;
 	GUIShader() {};
 	GUIShader(const char* vertexPath, const char* fragmentPath);
 };
@@ -67,6 +69,18 @@ class TextShader : public Shader
 public:
 	static TextShader* shader;
 	GLuint colorID; //uniform reprensenting the text color
+	GLuint text;
 	TextShader() {};
 	TextShader(const char* vertexPath, const char* fragmentPath);
+};
+
+class UnlitShader : public Shader
+{
+public:
+	GLuint texID;
+	GLuint modelID;
+	static UnlitShader* shader;
+	GLuint colorID; //uniform reprensenting the text color
+	UnlitShader() {};
+	UnlitShader(const char* vertexPath, const char* fragmentPath);
 };

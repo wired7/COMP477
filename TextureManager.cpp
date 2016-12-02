@@ -49,8 +49,8 @@ GLint TextureManager::addTexture(std::string filePath, GLfloat shininess) {
         int width = 0;
         int height = 0;
         
-        unsigned char* imageContents = SOIL_load_image(filePath.c_str(), &width, &height, 0, SOIL_LOAD_RGB);
-        
+        unsigned char* imageContents = SOIL_load_image(filePath.c_str(), &width, &height, 0, SOIL_LOAD_RGBA);
+
         assert(sizeof(imageContents) > 0);
         assert(imageContents != NULL);
         assert(width > 0);
@@ -65,7 +65,7 @@ GLint TextureManager::addTexture(std::string filePath, GLfloat shininess) {
         glBindTexture(GL_TEXTURE_2D, texture);
         
         // Send data
-        glTexImage2D(GL_TEXTURE_2D, 0, GL_RGB, width, height, 0, GL_RGB, GL_UNSIGNED_BYTE, imageContents);
+        glTexImage2D(GL_TEXTURE_2D, 0, GL_RGBA, width, height, 0, GL_RGBA, GL_UNSIGNED_BYTE, imageContents);
         
         // Generate minimap
         glGenerateMipmap(GL_TEXTURE_2D);

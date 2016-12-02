@@ -1,4 +1,5 @@
 #include "TextRenderer.h"
+#include "Camera.h"
 
 #include <gtc\type_ptr.hpp>
 #include <gtc\matrix_transform.hpp>
@@ -19,10 +20,9 @@ void TextRenderer::RenderText(std::string text, GLfloat x, GLfloat y, GLfloat sc
 	// Activate corresponding render state	
 	TextShader::shader->Use();
 
-	glm::mat4 projection = glm::ortho(0.0f, static_cast<GLfloat>(screenWidth), 0.0f, static_cast<GLfloat>(screenHeight), -5.0f, 5.0f);
-	glUniformMatrix4fv(TextShader::shader->projectionID, 1, GL_FALSE, glm::value_ptr(projection));
-
+	glUniformMatrix4fv(TextShader::shader->projectionID, 1, GL_FALSE, &Camera::activeCamera->OrthoProjection[0][0]);
 	glUniform3f(TextShader::shader->colorID, color.x, color.y, color.z);
+	glUniform1i(TextShader::shader->text, 0);
 	glActiveTexture(GL_TEXTURE0);
 	glBindVertexArray(VAO);
 
@@ -83,7 +83,9 @@ void TextRenderer::Initialize()
 	}
 
 	// Set font size to extract
-	FT_Set_Pixel_Sizes(face, 0, 48);
+	FT_Set_Pixel_Sizes(face, 0, 24);
+
+	glPixelStorei(GL_UNPACK_ALIGNMENT, 1);
 
 	// Load font characters
 	LoadCharacters(face);

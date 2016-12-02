@@ -139,11 +139,23 @@ void StateSpaceController::mPC(GLFWwindow* window, double xpos, double ypos)
 
 	InputState::previousMousePosX = xpos;
 	InputState::previousMousePosY = ypos;
+
+	InputState::mouseCoords = glm::vec2(xpos, ypos);
+	InputState::mouseGuiCoords = mouseScreenToGUICoords(xpos, ypos);
 }
 
 void StateSpaceController::wRC(GLFWwindow*, int, int)
 {
 	Camera::activeCamera->update();
+}
+
+glm::vec2 StateSpaceController::mouseScreenToGUICoords(double x, double y)
+{
+	glm::vec2 coords;
+
+	coords = glm::vec2(x, Camera::activeCamera->getScreenHeight() - y);
+
+	return coords;
 }
 
 Controller* StateSpaceController::getController()
@@ -157,3 +169,55 @@ Controller* StateSpaceController::getController()
 }
 
 EditorController* EditorController::controller = NULL;
+
+MenuController* MenuController::controller = NULL;
+
+MenuController::MenuController()
+{
+	key_callback = kC;
+	scroll_callback = sC;
+	mouse_callback = mC;
+	mousePos_callback = mPC;
+	windowResize_callback = wRC;
+}
+
+MenuController::~MenuController()
+{
+
+}
+void MenuController::kC(GLFWwindow*, int, int, int, int)
+{
+
+}
+void MenuController::sC(GLFWwindow*, double, double)
+{
+}
+void MenuController::mC(GLFWwindow* window , int button, int action, int mods)
+{
+}
+void MenuController::mPC(GLFWwindow* window, double xpos, double ypos)
+{
+	InputState::mouseCoords = glm::vec2(xpos, ypos);
+	InputState::mouseGuiCoords = mouseScreenToGUICoords(xpos, ypos);
+}
+void MenuController::wRC(GLFWwindow*, int, int)
+{
+
+}
+
+Controller* MenuController::getController()
+{
+	if (controller == NULL)
+		controller = new MenuController();
+
+	return controller;
+}
+
+glm::vec2 MenuController::mouseScreenToGUICoords(double x, double y)
+{
+	glm::vec2 coords;
+
+	coords = glm::vec2(x, Camera::activeCamera->getScreenHeight() - y);
+
+	return coords;
+}

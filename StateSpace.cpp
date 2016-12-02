@@ -11,7 +11,17 @@ using namespace std::chrono;
 
 std::mutex _mutex;
 
-StateSpace* StateSpace::activeStateSpace = NULL;
+StateSpace* StateSpace::activeStateSpace = nullptr;
+
+void play()
+{
+	StateSpace::activeStateSpace->playModeOn = true;
+}
+
+void pause()
+{
+	StateSpace::activeStateSpace->playModeOn = false;
+}
 
 StateSpace::StateSpace(GLFWwindow* window, Skybox* skybox)
 {
@@ -20,12 +30,20 @@ StateSpace::StateSpace(GLFWwindow* window, Skybox* skybox)
 	framesBuffSize = 60;
 	currGlobalFrame = 0;
 
-	milliseconds ms = duration_cast<milliseconds>(system_clock::now().time_since_epoch());
-	time = ms.count();
 	frameCount = 0;
 	playModeOn = false;
 	this->skybox = skybox;
+	this->window = window;
 //	terrain = new Terrain(1, 40, 40, 32, STATIC);
+
+	playButton = new GUIButton(vec3(1000, 100, 0.0f), vec3(64, 64, 0), vec4(1.0f, 1.0f, 1.0f, 1.0f), "", "textures\\playButton.png", true, play);
+	pauseButton = new GUIButton(vec3(1100, 100, 0.0f), vec3(64, 64, 0), vec4(1.0f, 1.0f, 1.0f, 1.0f), "", "textures\\pauseButton.png", true, pause);
+}
+
+void StateSpace::loadAnimation()
+{
+	milliseconds ms = duration_cast<milliseconds>(system_clock::now().time_since_epoch());
+	time = ms.count();
 	int width, height;
 	glfwGetWindowSize(window, &width, &height);
 	Camera::activeCamera = new StateSpaceCamera(window, vec2(0, 0), vec2(1, 1), vec3(3, 3, 0), vec3(3, 3, 3), vec3(0, 1, 0), perspective(45.0f, (float)width / height, 0.1f, 1000.0f), terrain);
@@ -35,6 +53,8 @@ StateSpace::StateSpace(GLFWwindow* window, Skybox* skybox)
 
 	fileName = _strdup(OpenFileDialog().SelectFile().c_str());
 	initializeFrameRead();
+
+	//	cout << framesFront->at(0)[0].x << " " << framesFront->at(0)[0].y << " " << framesFront->at(0)[0].z << endl;
 
 	instancedModels.push_back(new InstancedSpheres(ParticleSystem::getInstance()->sysParams.particleRadius, 32, vec4(0.5, 0.5, 1, 1.0f), framesFront->at(0)));
 
@@ -52,9 +72,9 @@ StateSpace::~StateSpace()
 		delete models[i];
 }
 
-
 void StateSpace::draw()
 {
+	glEnable(GL_DEPTH_TEST);
 	updateFrames();
 	for (int i = 0; i < observers.size(); i++)
 	{
@@ -99,8 +119,12 @@ void StateSpace::draw()
 				currGlobalFrame++;
 			}
 		}
-
 	}
+
+	glDisable(GL_DEPTH_TEST);
+
+	playButton->draw();
+	pauseButton->draw();
 }
 
 void StateSpace::loadFramesInBack()
@@ -164,4 +188,29 @@ void StateSpace::initializeFrameRead()
 	FileStorage::readFrames(fileName, loadSize, framesFront, &models);
 	std::thread t1(&StateSpace::loadFramesInBack, this);
 	t1.detach();
+}
+
+void StateSpace::execute()
+{
+	draw();
+	checkInput();
+}
+
+void StateSpace::checkInput()
+{
+	//hover
+	playButton->checkHover();
+	pauseButton->checkHover();
+
+	static int oldLeftClickState = GLFW_RELEASE;
+
+	int leftClick = glfwGetMouseButton(window, GLFW_MOUSE_BUTTON_LEFT);
+	if (leftClick == GLFW_PRESS && oldLeftClickState == GLFW_RELEASE)
+	{
+		oldLeftClickState = GLFW_PRESS;
+		playButton->checkMouseClick();
+		pauseButton->checkMouseClick();
+	}
+
+	oldLeftClickState = leftClick;
 }

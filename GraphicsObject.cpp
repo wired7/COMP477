@@ -1,5 +1,6 @@
 #include "GraphicsObject.h"
 #include "Camera.h"
+#include "InputState.h"
 
 void GraphicsObject::loadTexture(char* filePath)
 {
@@ -198,7 +199,6 @@ InstancedSpheres::InstancedSpheres(float radius, int resolution, vec4 color, vec
 
 void InstancedSpheres::bindInstances(void)
 {
-	GLuint positionsVertexBuffer;
 	glBindVertexArray(VAO);
 	glGenBuffers(1, &positionsVertexBuffer);
 	glBindBuffer(GL_ARRAY_BUFFER, positionsVertexBuffer);
@@ -209,13 +209,12 @@ void InstancedSpheres::bindInstances(void)
 
 	glBindVertexArray(0);
 
-//	positionsVertexBuffer = VBO;
 }
 
 void InstancedSpheres::updateInstances()
 {
 	glBindVertexArray(VAO);
-	glBindBuffer(GL_ARRAY_BUFFER, 6);
+	glBindBuffer(GL_ARRAY_BUFFER, positionsVertexBuffer);
 	glBufferData(GL_ARRAY_BUFFER, positions.size() * sizeof(vec3), &(positions[0]), GL_DYNAMIC_DRAW);
 
 	glBindVertexArray(0);
@@ -224,13 +223,11 @@ void InstancedSpheres::updateInstances()
 void InstancedSpheres::updateInstances(vector<vec3>* positions)
 {
 	glBindVertexArray(VAO);
-//	GLuint VBO = positionsVertexBuffer;
-	glBindBuffer(GL_ARRAY_BUFFER, 6);
+	glBindBuffer(GL_ARRAY_BUFFER, positionsVertexBuffer);
 	glBufferData(GL_ARRAY_BUFFER, positions->size() * sizeof(vec3), &((*positions)[0]), GL_DYNAMIC_DRAW);
 
 	glBindVertexArray(0);
 
-//	positionsVertexBuffer = VBO;
 }
 
 void InstancedSpheres::enableInstances(void)
@@ -299,17 +296,15 @@ void Cube::draw()
 	glDrawElements(GL_TRIANGLES, indices.size(), GL_UNSIGNED_INT, 0);
 }
 
-GUIButton::GUIButton(vec3 position, vec3 dimensions, vec4 color, char* text, bool isRendered)
+GUIButton::GUIButton(vec3 position, vec3 dimensions, vec4 color, char* text, char* filePath, bool isRendered, std::function<void()> clickEvent)
 {
-	this->text = text;
-
 	shader = GUIShader::shader;
-	loadTexture("textures\\blank.jpg");
+	loadTexture(filePath);
 
-	addVertex(vec3(0, 0, 0), color, vec2(), vec3(0, 0, -1));
-	addVertex(vec3(0, 1, 0), color, vec2(), vec3(0, 0, -1));
-	addVertex(vec3(1, 0, 0), color, vec2(), vec3(0, 0, -1));
-	addVertex(vec3(1, 1, 0), color, vec2(), vec3(0, 0, -1));
+	addVertex(vec3(0, 0, 0), color, vec2(0, 0), vec3(0, 0, -1));
+	addVertex(vec3(0, 1, 0), color, vec2(0, 1), vec3(0, 0, -1));
+	addVertex(vec3(1, 0, 0), color, vec2(1, 0), vec3(0, 0, -1));
+	addVertex(vec3(1, 1, 0), color, vec2(1, 1), vec3(0, 0, -1));
 
 	indices = { 0, 1, 2, 1, 2, 3 };
 
@@ -317,6 +312,9 @@ GUIButton::GUIButton(vec3 position, vec3 dimensions, vec4 color, char* text, boo
 	position -= (dimensions / 2.0f);
 
 	this->position = position;
+	this->dimensions = dimensions;
+	this->clickEvent = clickEvent;
+	this->text = text;
 
 	model = translate(mat4(1.0f), position) * scale(mat4(1.0f), dimensions);
 
@@ -326,21 +324,84 @@ GUIButton::GUIButton(vec3 position, vec3 dimensions, vec4 color, char* text, boo
 
 void GUIButton::draw()
 {
-	//Draw text
-	textRend.RenderText(text, 0.0f, 0.0f, 1.0f, glm::vec3(0.0f, 0.0f, 0.0f), Camera::activeCamera->getScreenWidth(), Camera::activeCamera->getScreenHeight());
-
 	GUIShader::shader->Use();
+
+	glUniformMatrix4fv(((GUIShader*)shader)->modelID, 1, GL_FALSE, &model[0][0]);
+	glUniformMatrix4fv(GUIShader::shader->projectionID, 1, GL_FALSE, &Camera::activeCamera->OrthoProjection[0][0]);
+	glUniform1i(GUIShader::shader->texID, 0);
+	glUniform4f(GUIShader::shader->hoverID, hoverColor.x, hoverColor.y, hoverColor.z, hoverColor.w);
 
 	//Draw Rectangle
 	enableBuffers();
-	glUniformMatrix4fv(((GUIShader*)shader)->modelID, 1, GL_FALSE, &model[0][0]);
 	glBindTexture(GL_TEXTURE_2D, texture);
 	glDrawElements(GL_TRIANGLES, indices.size(), GL_UNSIGNED_INT, 0);
+
+	//Draw text
+	textRend.RenderText(text, position.x, position.y + dimensions.y / 2.0f, 1.0f, glm::vec3(0.0f, 0.0f, 0.0f), Camera::activeCamera->getScreenWidth(), Camera::activeCamera->getScreenHeight());
+}
+
+void GUIButton::checkMouseClick()
+{
+	if (isPointInRect(InputState::mouseGuiCoords.x, InputState::mouseGuiCoords.y))
+	{
+		clickEvent();
+	}
+}
+
+void GUIButton::checkHover() {
+	if (isPointInRect(InputState::mouseGuiCoords.x, InputState::mouseGuiCoords.y))
+	{
+		hoverColor = glm::vec4(0.7f, 0.7f, 0.7f, 1.0f);
+	}
+	else
+		hoverColor = glm::vec4(1.0f);
+}
+
+bool GUIButton::isPointInRect(double x, double y)
+{
+	if (x > position.x && x < position.x + dimensions.x && y > position.y && y < position.y + dimensions.y)
+		return true;
+	else
+		return false;
 }
 
 char* GUIButton::getText()
 {
 	return text;
+}
+
+GUIBackground::GUIBackground(vec3 position, vec3 dimensions, vec4 color, char* texturePath, bool isRendered)
+{
+	shader = UnlitShader::shader;
+	loadTexture(texturePath);
+
+	this->position = position;
+
+	addVertex(vec3(0, 0, 0), color, vec2(0,0), vec3(0, 0, -1));
+	addVertex(vec3(0, 1, 0), color, vec2(0,1), vec3(0, 0, -1));
+	addVertex(vec3(1, 0, 0), color, vec2(1,0), vec3(0, 0, -1));
+	addVertex(vec3(1, 1, 0), color, vec2(1,1), vec3(0, 0, -1));
+
+	model = translate(mat4(1.0f), position) * scale(mat4(1.0f), dimensions);
+
+	indices = { 0, 1, 2, 1, 2, 3 };
+
+	if (isRendered)
+		bindBuffers();
+
+}
+void GUIBackground::draw()
+{
+	UnlitShader::shader->Use();
+
+	glUniformMatrix4fv(((UnlitShader*)shader)->modelID, 1, GL_FALSE, &model[0][0]);
+	glUniformMatrix4fv(UnlitShader::shader->projectionID, 1, GL_FALSE, &Camera::activeCamera->OrthoProjection[0][0]);
+	glUniform1i(UnlitShader::shader->texID, 0);
+
+	//Draw Rectangle
+	enableBuffers();
+	glBindTexture(GL_TEXTURE_2D, texture);
+	glDrawElements(GL_TRIANGLES, indices.size(), GL_UNSIGNED_INT, 0);
 }
 
 /*ImportedMesh::ImportedMesh(char* s, vec3 position, vec3 dimensions)
