@@ -77,7 +77,7 @@ void collisionsSubFunction(ParticleSystem* pS, int n)
 							backwardsDisplacement = d1 * (distanceToPlaneAtCollision + pS->sysParams.particleRadius) / distanceToPlaneAtCollision; // using law of sines
 						}
 
-						currParticle->params.velocity = glm::reflect(currParticle->params.velocity, direction);
+						currParticle->params.velocity = 0.8f * glm::reflect(currParticle->params.velocity, direction);
 						currParticle->nextPosition -= velDir * backwardsDisplacement;
 
 						// time retrocession = backwardsDisplacement / currParticle->params.velocity. So tStep -= tRetrocession.
