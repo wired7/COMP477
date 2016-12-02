@@ -154,7 +154,6 @@ InstancedSpheres::InstancedSpheres(float radius, int resolution, vec4 color, vec
 
 void InstancedSpheres::bindInstances(void)
 {
-	GLuint positionsVertexBuffer;
 	glBindVertexArray(VAO);
 	glGenBuffers(1, &positionsVertexBuffer);
 	glBindBuffer(GL_ARRAY_BUFFER, positionsVertexBuffer);
@@ -165,13 +164,12 @@ void InstancedSpheres::bindInstances(void)
 
 	glBindVertexArray(0);
 
-//	positionsVertexBuffer = VBO;
 }
 
 void InstancedSpheres::updateInstances()
 {
 	glBindVertexArray(VAO);
-	glBindBuffer(GL_ARRAY_BUFFER, 6);
+	glBindBuffer(GL_ARRAY_BUFFER, positionsVertexBuffer);
 	glBufferData(GL_ARRAY_BUFFER, positions.size() * sizeof(vec3), &(positions[0]), GL_DYNAMIC_DRAW);
 
 	glBindVertexArray(0);
@@ -180,13 +178,11 @@ void InstancedSpheres::updateInstances()
 void InstancedSpheres::updateInstances(vector<vec3>* positions)
 {
 	glBindVertexArray(VAO);
-//	GLuint VBO = positionsVertexBuffer;
-	glBindBuffer(GL_ARRAY_BUFFER, 6);
+	glBindBuffer(GL_ARRAY_BUFFER, positionsVertexBuffer);
 	glBufferData(GL_ARRAY_BUFFER, positions->size() * sizeof(vec3), &((*positions)[0]), GL_DYNAMIC_DRAW);
 
 	glBindVertexArray(0);
 
-//	positionsVertexBuffer = VBO;
 }
 
 void InstancedSpheres::enableInstances(void)
@@ -255,10 +251,10 @@ void Cube::draw()
 	glDrawElements(GL_TRIANGLES, indices.size(), GL_UNSIGNED_INT, 0);
 }
 
-GUIButton::GUIButton(vec3 position, vec3 dimensions, vec4 color, char* text, bool isRendered, std::function<void()> clickEvent)
+GUIButton::GUIButton(vec3 position, vec3 dimensions, vec4 color, char* text, char* filePath, bool isRendered, std::function<void()> clickEvent)
 {
 	shader = GUIShader::shader;
-	loadTexture("textures\\button.png");
+	loadTexture(filePath);
 
 	addVertex(vec3(0, 0, 0), color, vec2(0, 0), vec3(0, 0, -1));
 	addVertex(vec3(0, 1, 0), color, vec2(0, 1), vec3(0, 0, -1));

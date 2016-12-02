@@ -13,6 +13,11 @@ std::mutex _mutex;
 
 StateSpace* StateSpace::activeStateSpace = nullptr;
 
+void play()
+{
+	StateSpace::activeStateSpace->playModeOn = true;
+}
+
 StateSpace::StateSpace(GLFWwindow* window, Skybox* skybox)
 {
 	framesFront = new vector<vector<vec3>>();
@@ -26,7 +31,7 @@ StateSpace::StateSpace(GLFWwindow* window, Skybox* skybox)
 	this->window = window;
 //	terrain = new Terrain(1, 40, 40, 32, STATIC);
 
-	//loadAnimation();
+	playButton = new GUIButton(vec3(1000, 100, 0.0f), vec3(64, 64, 0), vec4(1.0f, 1.0f, 1.0f, 1.0f), "", "textures\\playButton.png", true, play);
 }
 
 void StateSpace::loadAnimation()
@@ -58,6 +63,7 @@ StateSpace::~StateSpace()
 
 void StateSpace::draw()
 {
+	glEnable(GL_DEPTH_TEST);
 	updateFrames();
 	for (int i = 0; i < observers.size(); i++)
 	{
@@ -103,6 +109,10 @@ void StateSpace::draw()
 			}
 		}
 	}
+
+	glDisable(GL_DEPTH_TEST);
+
+	playButton->draw();
 }
 
 void StateSpace::loadFramesInBack()
@@ -166,4 +176,23 @@ void StateSpace::initializeFrameRead()
 void StateSpace::execute()
 {
 	draw();
+	checkInput();
+}
+
+void StateSpace::checkInput()
+{
+	//hover
+	playButton->checkHover();
+
+	static int oldLeftClickState = GLFW_RELEASE;
+
+	int leftClick = glfwGetMouseButton(window, GLFW_MOUSE_BUTTON_LEFT);
+	if (leftClick == GLFW_PRESS && oldLeftClickState == GLFW_RELEASE)
+	{
+		oldLeftClickState = GLFW_PRESS;
+		playButton->checkMouseClick();
+
+	}
+
+	oldLeftClickState = leftClick;
 }

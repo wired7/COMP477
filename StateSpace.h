@@ -41,5 +41,9 @@ public:
 
 	void loadAnimation();
 	void execute();
+	void checkInput();
+
+private:
+	GUIButton* playButton;
 };
 

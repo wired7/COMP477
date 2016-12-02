@@ -15,7 +15,7 @@ void newSimulation()
 
 void runSimulation()
 {
-	Scenes::stateSpace->loadAnimation();
+	StateSpace::activeStateSpace->loadAnimation();
 	SceneManager::getInstance()->changeActiveScene(Scenes::stateSpace);
 }
 
@@ -33,9 +33,9 @@ Menu::Menu(GLFWwindow* window)
 	Controller::setController(MenuController::getController());
 	//	bucket = new ImportedMesh("models\\bucket.3DS", vec3(0, 0.3, 0), vec3(0.5, 0.1, 0.1));
 	//rectangle = new Rectangle(vec3(100, 1, 1), vec3(2, 1, 1), vec4(0, 0, 0, 1.0), true);
-	menuButtons.push_back(new GUIButton(vec3(600, 600, 0), vec3(180, 70, 1), vec4(1.0, 1.0, 1.0, 1.0), "Create Simulation", true, newSimulation));
-	menuButtons.push_back(new GUIButton(vec3(600, 450, 0), vec3(180, 70, 1), vec4(1.0, 1.0, 1.0, 1.0), "Run Simulation", true, runSimulation));
-	menuButtons.push_back(new GUIButton(vec3(600, 300, 0), vec3(180, 70, 1), vec4(1.0, 1.0, 1.0, 1.0), "Exit Program", true, exitSim));
+	menuButtons.push_back(new GUIButton(vec3(600, 600, 0), vec3(180, 70, 1), vec4(1.0, 1.0, 1.0, 1.0), "Create Simulation", "textures\\button.png", true, newSimulation));
+	menuButtons.push_back(new GUIButton(vec3(600, 450, 0), vec3(180, 70, 1), vec4(1.0, 1.0, 1.0, 1.0), "Run Simulation", "textures\\button.png", true, runSimulation));
+	menuButtons.push_back(new GUIButton(vec3(600, 300, 0), vec3(180, 70, 1), vec4(1.0, 1.0, 1.0, 1.0), "Exit Program", "textures\\button.png", true, exitSim));
 	background = new GUIBackground(vec3(0.0f, 0.0f, 0.0f), 
 								   vec3(1200, 
 								   800, 1.0f), 

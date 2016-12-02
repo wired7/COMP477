@@ -139,11 +139,23 @@ void StateSpaceController::mPC(GLFWwindow* window, double xpos, double ypos)
 
 	InputState::previousMousePosX = xpos;
 	InputState::previousMousePosY = ypos;
+
+	InputState::mouseCoords = glm::vec2(xpos, ypos);
+	InputState::mouseGuiCoords = mouseScreenToGUICoords(xpos, ypos);
 }
 
 void StateSpaceController::wRC(GLFWwindow*, int, int)
 {
 	Camera::activeCamera->update();
+}
+
+glm::vec2 StateSpaceController::mouseScreenToGUICoords(double x, double y)
+{
+	glm::vec2 coords;
+
+	coords = glm::vec2(x, Camera::activeCamera->getScreenHeight() - y);
+
+	return coords;
 }
 
 Controller* StateSpaceController::getController()

@@ -31,6 +31,7 @@ private:
 	static void mPC(GLFWwindow*, double, double);
 	static void wRC(GLFWwindow*, int, int);
 public:
+	static glm::vec2 mouseScreenToGUICoords(double x, double y);
 	static Controller* getController();
 };
 
