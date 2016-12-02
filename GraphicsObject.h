@@ -162,13 +162,14 @@ class GUIButton : public MeshObject
 {
 public:
 	GUIButton() {};
-	GUIButton(vec3 position, vec3 dimensions, vec4 color, char* text, char* texFilePath, bool isRendered, std::function<void()> clickEvent);
+	GUIButton(vec3 position, vec3 dimensions, vec4 color, char* text, vec4 textColor, char* texFilePath, bool isRendered, std::function<void()> clickEvent);
 	void draw();
 	void checkMouseClick();
 	void checkHover();
 	glm::vec3 position;
 	glm::vec3 dimensions;
 	glm::vec4 hoverColor = glm::vec4(1.0f);
+	glm::vec4 textColor;
 
 	char* getText();
 

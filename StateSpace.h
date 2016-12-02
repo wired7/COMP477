@@ -44,7 +44,6 @@ public:
 	void checkInput();
 
 private:
-	GUIButton* playButton;
-	GUIButton* pauseButton;
+	//std::vector<GUIButton*> buttons;
 };
 

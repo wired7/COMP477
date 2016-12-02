@@ -296,7 +296,7 @@ void Cube::draw()
 	glDrawElements(GL_TRIANGLES, indices.size(), GL_UNSIGNED_INT, 0);
 }
 
-GUIButton::GUIButton(vec3 position, vec3 dimensions, vec4 color, char* text, char* filePath, bool isRendered, std::function<void()> clickEvent)
+GUIButton::GUIButton(vec3 position, vec3 dimensions, vec4 color, char* text, vec4 textColor, char* filePath, bool isRendered, std::function<void()> clickEvent)
 {
 	shader = GUIShader::shader;
 	loadTexture(filePath);
@@ -315,6 +315,7 @@ GUIButton::GUIButton(vec3 position, vec3 dimensions, vec4 color, char* text, cha
 	this->dimensions = dimensions;
 	this->clickEvent = clickEvent;
 	this->text = text;
+	this->textColor = textColor;
 
 	model = translate(mat4(1.0f), position) * scale(mat4(1.0f), dimensions);
 
@@ -337,7 +338,7 @@ void GUIButton::draw()
 	glDrawElements(GL_TRIANGLES, indices.size(), GL_UNSIGNED_INT, 0);
 
 	//Draw text
-	textRend.RenderText(text, position.x, position.y + dimensions.y / 2.0f, 1.0f, glm::vec3(0.0f, 0.0f, 0.0f), Camera::activeCamera->getScreenWidth(), Camera::activeCamera->getScreenHeight());
+	textRend.RenderText(text, position.x, position.y + dimensions.y / 2.0f, 1.0f, glm::vec3(textColor.x, textColor.y, textColor.z) , Camera::activeCamera->getScreenWidth(), Camera::activeCamera->getScreenHeight());
 }
 
 void GUIButton::checkMouseClick()
