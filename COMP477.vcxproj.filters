@@ -90,10 +90,10 @@
     <ClInclude Include="TextRenderer.h">
       <Filter>Header Files</Filter>
     </ClInclude>
-    <ClInclude Include="ScreenState.h">
+    <ClInclude Include="SceneManager.h">
       <Filter>Header Files</Filter>
     </ClInclude>
-    <ClInclude Include="SceneManager.h">
+    <ClInclude Include="ScreenState.h">
       <Filter>Header Files</Filter>
     </ClInclude>
   </ItemGroup>
