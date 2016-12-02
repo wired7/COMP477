@@ -188,11 +188,7 @@ menu:
 		vec3 center = vec3(1, 1, 1) - b.min;
 		vec3 maximum = center + b.max + vec3(1, 1, 1);
 
-		int gridSize = 10;//max(maximum.x, max(maximum.y, maximum.z));
-		
-		cout << gridSize << endl;
-
-		system("PAUSE");
+		int gridSize = max(maximum.x, max(maximum.y, maximum.z));
 
 		int floorHeight = floor(heightWater * particlesPerMeter);
 		int floorWidth = floor(widthWater * particlesPerMeter);
