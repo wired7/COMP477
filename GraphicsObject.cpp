@@ -1,4 +1,5 @@
 #include "GraphicsObject.h"
+#include "Camera.h"
 
 void GraphicsObject::loadTexture(char* filePath)
 {
@@ -251,6 +252,50 @@ void Cube::draw()
 	glUniformMatrix4fv(((LitShader*)shader)->modelID, 1, GL_FALSE, &model[0][0]);
 	glBindTexture(GL_TEXTURE_2D, texture);
 	glDrawElements(GL_TRIANGLES, indices.size(), GL_UNSIGNED_INT, 0);
+}
+
+GUIButton::GUIButton(vec3 position, vec3 dimensions, vec4 color, char* text, bool isRendered)
+{
+	this->text = text;
+
+	shader = GUIShader::shader;
+	loadTexture("textures\\blank.jpg");
+
+	addVertex(vec3(0, 0, 0), color, vec2(), vec3(0, 0, -1));
+	addVertex(vec3(0, 1, 0), color, vec2(), vec3(0, 0, -1));
+	addVertex(vec3(1, 0, 0), color, vec2(), vec3(0, 0, -1));
+	addVertex(vec3(1, 1, 0), color, vec2(), vec3(0, 0, -1));
+
+	indices = { 0, 1, 2, 1, 2, 3 };
+
+	//center button
+	position -= (dimensions / 2.0f);
+
+	this->position = position;
+
+	model = translate(mat4(1.0f), position) * scale(mat4(1.0f), dimensions);
+
+	if (isRendered)
+		bindBuffers();
+}
+
+void GUIButton::draw()
+{
+	//Draw text
+	textRend.RenderText(text, 0.0f, 0.0f, 1.0f, glm::vec3(0.0f, 0.0f, 0.0f), Camera::activeCamera->getScreenWidth(), Camera::activeCamera->getScreenHeight());
+
+	GUIShader::shader->Use();
+
+	//Draw Rectangle
+	enableBuffers();
+	glUniformMatrix4fv(((GUIShader*)shader)->modelID, 1, GL_FALSE, &model[0][0]);
+	glBindTexture(GL_TEXTURE_2D, texture);
+	glDrawElements(GL_TRIANGLES, indices.size(), GL_UNSIGNED_INT, 0);
+}
+
+char* GUIButton::getText()
+{
+	return text;
 }
 
 /*ImportedMesh::ImportedMesh(char* s, vec3 position, vec3 dimensions)

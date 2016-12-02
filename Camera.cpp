@@ -21,10 +21,8 @@ Camera::Camera(GLFWwindow* window, vec2 relativePosition, vec2 relativeDimension
 
 void Camera::setViewport()
 {
-	int width;
-	int height;
-	glfwGetWindowSize(window, &width, &height);
-	glViewport(relativePosition.x * width, relativePosition.y * height, relativeDimensions.x * width, relativeDimensions.y * height);
+	glfwGetWindowSize(window, &screenWidth, &screenHeight);
+	glViewport(relativePosition.x * screenWidth, relativePosition.y * screenHeight, relativeDimensions.x * screenWidth, relativeDimensions.y * screenHeight);
 }
 
 void Camera::setCamera(Camera* cam)
@@ -33,7 +31,15 @@ void Camera::setCamera(Camera* cam)
 	activeCamera->setViewport();
 }
 
+int Camera::getScreenWidth()
+{
+	return screenWidth;
+}
 
+int Camera::getScreenHeight()
+{
+	return screenHeight;
+}
 
 SphericalCamera::SphericalCamera(GLFWwindow* window, vec2 relativePosition, vec2 relativeDimensions, vec3 pos, vec3 lookAt, vec3 up, mat4 Projection) :
 	Camera(window, relativePosition, relativeDimensions, pos, lookAt, up, Projection)

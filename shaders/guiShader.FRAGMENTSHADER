@@ -1,0 +1,15 @@
+#version 410 core
+
+// Interpolated values from the vertex shaders
+in vec4 fragColor;
+in vec2 fragUV;
+
+// Ouput data
+out vec4 output;
+
+uniform mat4 View;
+
+void main(){
+
+	output = fragColor;
+}
