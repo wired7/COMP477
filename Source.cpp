@@ -220,9 +220,12 @@ menu:
 
 		ParticleSystem::getInstance()->sysParams = sysParams;		
 		ParticleSystem::getInstance()->grid = Grid3D(gridSize / sysParams.searchRadius, sysParams.searchRadius);
-		ParticleSystem::getInstance()->setStiffnessOfParticleSystem(); // calculating the stiffness of the system by using the blockSize * particleRadius to get the height of the water
 		ParticleSystem::getInstance()->addParticles(pos);
 		ParticleSystem::getInstance()->addRigidbodies(rigidbodies);
+
+		// set up mass and stiffness of system
+		ParticleSystem::getInstance()->setStiffnessOfParticleSystem(); // calculating the stiffness of the system by using the height of water * particleRadius to get the height of the water
+		ParticleSystem::getInstance()->calculateMassOfParticles();
 
 		ParticleSystem::getInstance()->goNuts(animationTime, 0.016f, animFile);
 
