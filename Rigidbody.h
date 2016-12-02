@@ -14,7 +14,6 @@ public:
 	Rigidbody(vector<Vertex2>, vector<GLuint>, mat4, float, bool rendered, bool dynamic = false); 
 	~Rigidbody();
 	void draw();
-	void applyTransform();
 private:
 	void calculateInertiaTensor(void);
 };

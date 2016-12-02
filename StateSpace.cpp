@@ -28,7 +28,7 @@ StateSpace::StateSpace(GLFWwindow* window, Skybox* skybox)
 //	terrain = new Terrain(1, 40, 40, 32, STATIC);
 	int width, height;
 	glfwGetWindowSize(window, &width, &height);
-	Camera::activeCamera = new StateSpaceCamera(window, vec2(0, 0), vec2(1, 1), vec3(5, 5, 0), vec3(4, 4, 4), vec3(0, 1, 0), perspective(45.0f, (float)width / height, 0.1f, 1000.0f), terrain);
+	Camera::activeCamera = new StateSpaceCamera(window, vec2(0, 0), vec2(1, 1), vec3(3, 3, 0), vec3(3, 3, 3), vec3(0, 1, 0), perspective(45.0f, (float)width / height, 0.1f, 1000.0f), terrain);
 	observers.push_back(Camera::activeCamera);
 
 	Controller::setController(StateSpaceController::getController());
@@ -36,17 +36,20 @@ StateSpace::StateSpace(GLFWwindow* window, Skybox* skybox)
 	fileName = _strdup(OpenFileDialog().SelectFile().c_str());
 	initializeFrameRead();
 
-//	cout << framesFront->at(0)[0].x << " " << framesFront->at(0)[0].y << " " << framesFront->at(0)[0].z << endl;
-
 	instancedModels.push_back(new InstancedSpheres(ParticleSystem::getInstance()->sysParams.particleRadius, 32, vec4(0.5, 0.5, 1, 1.0f), framesFront->at(0)));
 
-	for (int i = 0; i < ParticleSystem::getInstance()->rigidbodies.size(); i++)
-		models.push_back(new Rigidbody(ParticleSystem::getInstance()->rigidbodies[i]->vertices, ParticleSystem::getInstance()->rigidbodies[i]->indices, ParticleSystem::getInstance()->rigidbodies[i]->model, 0, true));
+	for (int i = 0; i < models.size(); i++)
+		models[i]->bindBuffers();
 }
 
 
 StateSpace::~StateSpace()
 {
+	for (int i = 0; i < instancedModels.size(); i++)
+		delete instancedModels[i];
+
+	for (int i = 0; i < models.size(); i++)
+		delete models[i];
 }
 
 
@@ -110,7 +113,7 @@ void StateSpace::loadFramesInBack()
 	if (framesLeft > 0) {
 		int loadSize = (framesLeft > framesBuffSize)? framesBuffSize : framesLeft;
 		totalFramesLoaded += loadSize;
-		FileStorage::readFrames(fileName, framesBuffSize, framesBack);
+		FileStorage::readFrames(fileName, framesBuffSize, framesBack, nullptr);
 	}
 
 	_mutex.unlock();
@@ -153,7 +156,7 @@ void StateSpace::initializeFrameRead()
 		totalFrames = FileStorage::getFramesTotal(fileName);
 	}
 	totalFramesLoaded = framesBuffSize % totalFrames;
-	FileStorage::readFrames(fileName, totalFramesLoaded, framesFront);
+	FileStorage::readFrames(fileName, totalFramesLoaded, framesFront, &models);
 	std::thread t1(&StateSpace::loadFramesInBack, this);
 	t1.detach();
 }

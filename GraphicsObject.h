@@ -15,12 +15,33 @@ using namespace Assimp;*/
 using namespace glm;
 using namespace std;
 
+struct Bounds {
+	vec3 min;
+	vec3 max;
+
+	Bounds::Bounds() : max({ -INFINITY, -INFINITY, -INFINITY }), min({ INFINITY, INFINITY, INFINITY }) {};
+
+	void join(Bounds b)
+	{
+		for (int i = 0; i < 3; i++)
+		{
+			if (b.min[i] < min[i])
+				min[i] = b.min[i];
+			if (b.max[i] > max[i])
+				max[i] = b.max[i];
+		}
+	}
+};
+
 struct Vertex2 {
 	glm::vec3 position;
 	glm::vec4 color;
 	glm::vec2 texCoord;
 	glm::vec3 normal;
 	GLuint id;
+
+	Vertex2() {};
+	Vertex2(vec3 pos, vec3 norm, vec4 col, vec2 tC) : position(pos), normal(norm), color(col), texCoord(tC) {};
 };
 
 class GraphicsObject
@@ -48,6 +69,8 @@ public:
 	virtual void bindBuffers(void);
 	virtual void enableBuffers(void);
 	void addVertex(vec3, vec4, vec2, vec3);
+	void applyTransform();
+	Bounds getBounds();
 };
 
 class InstancedMeshObject : public MeshObject
@@ -83,7 +106,7 @@ class Polyhedron : public MeshObject
 public:
 	int resolution;
 	Polyhedron() {};
-	Polyhedron(int, double, vec3, vec4);
+	Polyhedron(int, vec3, vec3, vec4, bool);
 	void draw();
 };
 

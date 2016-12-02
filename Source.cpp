@@ -127,15 +127,18 @@ menu:
 		
 		auto sysParams = FileStorage::loadSysParams(sysParamsFile);
 
+		string rigidBodiesFile = dialog.SelectFile();
+
+		if (rigidBodiesFile == "")
+			goto menu;
+
+		auto rigidBodies = FileStorage::loadRigidbodies(rigidBodiesFile);
+
 		string simParams;
 		system("CLS");
 		cout << "Enter number of particles: " << endl;
 		getline(cin, simParams);
 		int blockSize = pow(stof(simParams), 1.0f / 3.0f);
-
-		cout << "Enter total grid size per axis:" << endl;
-		getline(cin, simParams);
-		int gridSize = stoi(simParams);
 
 		cout << "Enter animation time" << endl;
 		getline(cin, simParams);
@@ -151,8 +154,18 @@ menu:
 			goto menu;
 
 		float separation = sysParams.particleRadius;
-		vec3 cubeDimensions(1.0f, 3.0f, 1.0f);
-		vec3 cubeCenter(4.0f, 4.0f, 4.0f);
+
+		Bounds b;
+
+		for (int i = 0; i < rigidBodies.size(); i++)
+		{
+			b.join(rigidBodies[i]->getBounds());
+		}
+
+		vec3 center = vec3(1, 1, 1) - b.min;
+		vec3 maximum = center + b.max + vec3(1, 1, 1);
+
+		int gridSize = max(maximum.x, max(maximum.y, maximum.z));
 
 		float particleSpan = separation * blockSize / 2.0f;
 
@@ -160,17 +173,16 @@ menu:
 		for (int k = 0; k < blockSize; k++)
 			for (int j = 0; j < blockSize; j++)
 				for (int i = 0; i < blockSize; i++)
-					pos.push_back(new Particle(cubeCenter + vec3(separation * (float)i - particleSpan, separation * (float)j - particleSpan, separation * (float)k - particleSpan)));
+					pos.push_back(new Particle(center + vec3(separation * (float)i - particleSpan, separation * (float)j - particleSpan, separation * (float)k - particleSpan)));
 
-		Cube cube(cubeCenter, cubeDimensions, vec4(1.0f, 0.0f, 0.0f, 0.5f), false);
-//		Rectangle rect(vec3(5, 4, 5), vec3(1, 2, 1), vec4(1, 1, 0, 1), false);
-//		rect.model = rect.model * rotate(mat4(1.0f), 1.5f, vec3(1, 1, 1));
-
-		Rigidbody* rB = new Rigidbody(cube.vertices, cube.indices, cube.model, 1000, false);
-//		Rigidbody* rB1 = new Rigidbody(rect.vertices, rect.indices, rect.model, 1000, false);
 		vector<Rigidbody*> rigidbodies;
-		rigidbodies.push_back(rB);
-//		rigidbodies.push_back(rB1);
+
+		for (int i = 0; i < rigidBodies.size(); i++)
+		{
+			rigidBodies[i]->applyTransform();
+			rigidBodies[i]->model = translate(rigidBodies[i]->model, center);
+			rigidbodies.push_back(new Rigidbody(rigidBodies[i]->vertices, rigidBodies[i]->indices, rigidBodies[i]->model, 1000, false));
+		}
 
 		ParticleSystem::getInstance()->sysParams = sysParams;		
 		ParticleSystem::getInstance()->grid = Grid3D(gridSize / sysParams.searchRadius, sysParams.searchRadius);
