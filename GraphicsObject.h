@@ -1,6 +1,7 @@
 #pragma once
 #include "Shader.h"
 #include "Shape.h"
+#include "TextRenderer.h"
 #include "TextureManager.h"
 #include <vector>
 #include <glew.h>
@@ -139,4 +140,19 @@ class Cube : public MeshObject
 public:
 	Cube(vec3, vec3, vec4, bool);
 	void draw();
+};
+
+class GUIButton : public MeshObject
+{
+public:
+	GUIButton() {};
+	GUIButton(vec3, vec3, vec4, char* text, bool);
+	void draw();
+	glm::vec3 position;
+
+	char* getText();
+
+private:
+	TextRenderer textRend;
+	char* text;
 };

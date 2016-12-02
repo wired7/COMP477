@@ -15,7 +15,7 @@ using namespace glm;
 class Shader
 {
 public:
-	GLuint Program;
+	GLuint program;
 	GLuint viewID;
 	GLuint projectionID;
 	Shader() {};
@@ -51,4 +51,22 @@ public:
 	GLuint cubeMap;
 	CubeMapShader() {};
 	CubeMapShader(const char* vertexPath, const char* fragmentPath);
+};
+
+class GUIShader : public Shader
+{
+public:
+	static GUIShader* shader;
+	GLuint modelID;
+	GUIShader() {};
+	GUIShader(const char* vertexPath, const char* fragmentPath);
+};
+
+class TextShader : public Shader
+{
+public:
+	static TextShader* shader;
+	GLuint colorID; //uniform reprensenting the text color
+	TextShader() {};
+	TextShader(const char* vertexPath, const char* fragmentPath);
 };
