@@ -11,7 +11,7 @@ uniform mat4 View;
 out vec4 color;
 
 void main(){
-	
+	float alpha = vColor.w;
 	// Output color = color specified in the vertex shader, 
 	// interpolated between all 3 surrounding vertices
 	
@@ -31,6 +31,6 @@ void main(){
 	vec3 R = reflect(-l,n);
 	float cosAlpha = clamp(dot(E,R), 0, 1);
 
-	color =  vec4(100 * vec3(1, 1, 1) * vColor.xyz * cosTheta / (1.0f + pow(distance, 2)), 1);
+	color =  vec4(100 * vec3(1, 1, 1) * vColor.xyz * cosTheta / (1.0f + pow(distance, 2)), alpha);
 
 }

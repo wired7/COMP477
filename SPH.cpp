@@ -172,12 +172,12 @@ void SPH::calcSPH()
 	}
 
 	// Find external forces (collisions with rigidbodies) and apply them to the particle
-	/*	#pragma omp parallel for schedule(dynamic, 2)
+	#pragma omp parallel for schedule(dynamic, 2)
 	for (int i = 0; i < sys->particles.size(); ++i)
 	{
-	collisionsSubFunction(sys, i);
+		collisionsSubFunction(sys, i);
 	}
-	*/
+	
 	// update list of particles
 	sys->updateList();
 }

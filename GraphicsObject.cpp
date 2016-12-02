@@ -56,6 +56,46 @@ void MeshObject::addVertex(vec3 pos, vec4 color, vec2 textCoord, vec3 normal)
 	vertices[vertices.size() - 1].normal = glm::normalize(normal);
 }
 
+void MeshObject::applyTransform()
+{
+	//convert each vertex of the rigidbody to world coordinates based on latest model matrix
+	if (model != mat4(1.0f))
+	{
+		mat4 transposeInverse = transpose(inverse(model));
+
+		for (int j = 0; j < vertices.size(); ++j)
+		{
+			vertices[j].position = vec3(model * vec4(vertices[j].position, 1));
+			vertices[j].normal = vec3(transposeInverse * vec4(vertices[j].position, 1));
+		}
+
+		model = mat4(1.0f);
+	}
+}
+
+Bounds MeshObject::getBounds()
+{
+	Bounds b;
+
+	for (int j = 0; j < vertices.size(); ++j)
+	{
+		vec3 pos(model * vec4(vertices[j].position, 1));
+
+		for (int i = 0; i < 3; i++)
+		{
+			if (pos[i] > b.max[i])
+			{
+				b.max[i] = pos[i];
+			}
+			if (pos[i] < b.min[i])
+			{
+				b.min[i] = pos[i];
+			}
+		}
+	}
+
+	return b;
+}
 
 void InstancedMeshObject::bindInstances(void)
 {
@@ -89,12 +129,12 @@ void InstancedMeshObject::enableInstances(void)
 }
 
 
-Polyhedron::Polyhedron(int resolution, double radius, vec3 pos, vec4 color)
+Polyhedron::Polyhedron(int resolution, vec3 pos, vec3 radii, vec4 color, bool isRendered)
 {
 	shader = LitShader::shader;
 	
 	loadTexture("textures\\blank.jpg");
-	model = scale(translate(mat4(1.0f), pos), vec3(radius, radius, radius));
+	model = scale(translate(mat4(1.0f), pos), radii);
 	this->resolution = resolution;
 	double angle = 2 * 3.1415 / resolution;
 	vector<vector<vec3>> circles;
@@ -109,18 +149,23 @@ Polyhedron::Polyhedron(int resolution, double radius, vec3 pos, vec4 color)
 
 	for (int j = 0; j < circles.size() - 1; j++)
 		for (int i = 0; i < circles[j].size(); i++)
+		{
 			addVertex(circles[j][i], color, vec2(i, 1) / (GLfloat)resolution, normalize(circles[j][i]));
 
-	int m = resolution + 1;
-	int s = vertices.size() - m;
+			if (j > 0 && i > 0)
+			{
+				indices.push_back(vertices.size() - 2 - circles.size());
+				indices.push_back(vertices.size() - 2);
+				indices.push_back(vertices.size() - 1 - circles.size());
 
-	for (int i = 0; i < s; i++)
-	{
-		indices.push_back((i % m) + m * (i / m));
-		indices.push_back((i % m) + m * ((i / m) + 1));
-	}
+				indices.push_back(vertices.size() - 2);
+				indices.push_back(vertices.size() - 1);
+				indices.push_back(vertices.size() - 1 - circles.size());
+			}
+		}
 
-	bindBuffers();
+	if(isRendered)
+		bindBuffers();
 }
 
 void Polyhedron::draw(void)
@@ -128,7 +173,7 @@ void Polyhedron::draw(void)
 	enableBuffers();
 	glUniformMatrix4fv(((LitShader*)shader)->modelID, 1, GL_FALSE, &model[0][0]);
 	glBindTexture(GL_TEXTURE_2D, texture);
-	glDrawElements(GL_TRIANGLE_STRIP, indices.size(), GL_UNSIGNED_INT, 0);
+	glDrawElements(GL_TRIANGLES, indices.size(), GL_UNSIGNED_INT, 0);
 }
 
 Polyhedron* InstancedSpheres::sphere;
@@ -136,7 +181,7 @@ Polyhedron* InstancedSpheres::sphere;
 InstancedSpheres::InstancedSpheres(float radius, int resolution, vec4 color, vector<vec3> positions)
 {
 	shader = InstancedLitShader::shader;
-	sphere = new Polyhedron(resolution, radius, vec3(0, 0, 0), color);
+	sphere = new Polyhedron(resolution, vec3(radius, radius, radius), vec3(0, 0, 0), color, true);
 	model = scale(mat4(1.0f), vec3(radius, radius, radius));
 
 	vertices = sphere->vertices;

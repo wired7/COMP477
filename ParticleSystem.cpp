@@ -102,6 +102,33 @@ void ParticleSystem::goNuts(float playbackTime, float frameRate, string filePath
 
 	ofstream myfile;
 	myfile.open(filePath);
+
+	for (int i = 0; i < rigidbodies.size(); i++)
+	{
+		myfile << "Rigidbody:" << endl;
+
+		for (int j = 0; j < rigidbodies[i]->vertices.size(); j++)
+		{
+			for (int k = 0; k < 3; k++)
+				myfile << rigidbodies[i]->vertices[j].position[k] << " ";
+			for (int k = 0; k < 3; k++)
+				myfile << rigidbodies[i]->vertices[j].normal[k] << " ";
+			for (int k = 0; k < 4; k++)
+				myfile << rigidbodies[i]->vertices[j].color[k] << " ";
+		}
+
+		myfile << endl;
+
+		for (int j = 0; j < rigidbodies[i]->indices.size(); j++)
+		{
+			myfile << rigidbodies[i]->indices[j] << " ";
+		}
+
+		myfile << endl;
+	}
+
+	myfile << "Particles:" << endl;
+
 	myfile << sysParams.volume << " " << sysParams.particleRadius << " " << sysParams.searchRadius << " " << sysParams.viscocity << " " << sysParams.stiffness << " ";
 	myfile << sysParams.restDensity << " " << sysParams.gravity << " " << sysParams.tStep << " " << sysParams.maxTStep << endl;
 	myfile.close();
@@ -246,6 +273,9 @@ vector<MeshObject*> ParticleSystem::rayTrace(vector<vec3>* points, float radius,
 
 //			buffer[i][j] = clamp(rayTrace(origin, c.direction, 1), 0.0f, 1.0f);
 		}
+	}
+	
+	return vector<MeshObject*>();
 	}
 }
 */
