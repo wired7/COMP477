@@ -398,6 +398,6 @@ vec3 SPH::calcAcceleration(Particle particle)
 	
 	auto g = particle.params.density * vec3(0.0f, sys->sysParams.gravity, 0.0f);
 
-	return ((particle.params.gradientPressure + sys->sysParams.viscocity * particle.params.laplacianVelocity) / particle.params.density);
+	return ((particle.params.gradientPressure + sys->sysParams.viscocity * particle.params.laplacianVelocity + g + surfaceForce) / particle.params.density);
 }
 
