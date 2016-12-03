@@ -132,6 +132,8 @@ void exitSim()
 
 void enterEditor()
 {
+	Skybox* skybox = new Skybox("skyboxes\\ame_nebula\\");
+	Scenes::sceneEditor = new SceneEditor(Camera::activeCamera->getWindow(), skybox);
 	Scenes::sceneEditor->setup();
 	SceneManager::getInstance()->changeActiveScene(Scenes::sceneEditor);
 }
