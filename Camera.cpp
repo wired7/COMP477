@@ -43,6 +43,11 @@ int Camera::getScreenHeight()
 	return screenHeight;
 }
 
+GLFWwindow* Camera::getWindow()
+{
+	return window;
+}
+
 SphericalCamera::SphericalCamera(GLFWwindow* window, vec2 relativePosition, vec2 relativeDimensions, vec3 pos, vec3 lookAt, vec3 up, mat4 Projection) :
 	Camera(window, relativePosition, relativeDimensions, pos, lookAt, up, Projection)
 {

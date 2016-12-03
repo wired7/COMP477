@@ -7,6 +7,7 @@
 #include "OpenFileDialog.h"
 #include <thread>
 #include "SceneManager.h"
+#include "ButtonFunctions.h"
 
 using namespace std::chrono;
 
@@ -22,12 +23,6 @@ void play()
 void pause()
 {
 	StateSpace::activeStateSpace->playModeOn = false;
-}
-
-void backToMenu()
-{
-	SceneManager::getInstance()->changeActiveScene(Scenes::menu);
-	delete Scenes::stateSpace;
 }
 
 StateSpace::StateSpace(GLFWwindow* window, Skybox* skybox)

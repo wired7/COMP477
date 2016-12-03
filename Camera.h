@@ -32,6 +32,7 @@ public:
 
 	int getScreenWidth();
 	int getScreenHeight();
+	GLFWwindow* getWindow();
 
 private:
 	int screenWidth;

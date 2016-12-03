@@ -2,6 +2,7 @@
 #include "SceneEditor.h"
 #include "Controller.h"
 #include "SceneManager.h"
+#include "ButtonFunctions.h"
 
 void increment()
 {
@@ -105,6 +106,7 @@ SceneEditor::SceneEditor(GLFWwindow* window, Skybox* skybox)
 	buttons.push_back(new GUIButton(vec3(1050, 100, 0.0f), vec3(150, 40, 0), vec4(1.0f, 1.0f, 1.0f, 1.0f), "Spawn Cube", vec4(0.0f), "textures\\button.png", true, spawnCube));
 	buttons.push_back(new GUIButton(vec3(900, 100, 0.0f), vec3(150, 40, 0), vec4(1.0f, 1.0f, 1.0f, 1.0f), "Spawn Sphere", vec4(0.0f), "textures\\button.png", true, spawnSphere));
 	buttons.push_back(new GUIButton(vec3(750, 100, 0.0f), vec3(150, 40, 0), vec4(1.0f, 1.0f, 1.0f, 1.0f), "Sweep", vec4(0.0f), "textures\\button.png", true, sweep));
+	buttons.push_back(new GUIButton(vec3(150, 100, 0.0f), vec3(180, 64, 0), vec4(1.0f, 1.0f, 1.0f, 1.0f), "Back To Menu", vec4(0.0f), "textures\\button.png", true, backToMenu));
 }
 
 SceneEditor::~SceneEditor()

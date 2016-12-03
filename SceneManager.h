@@ -11,7 +11,7 @@ static struct Scenes
 	static SceneEditor* sceneEditor;
 };
 
-static class SceneManager
+class SceneManager
 {
 public:
 	SceneManager();
