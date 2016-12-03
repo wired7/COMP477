@@ -162,7 +162,7 @@ class GUIButton : public MeshObject
 {
 public:
 	GUIButton() {};
-	GUIButton(vec3 position, vec3 dimensions, vec4 color, char* text, vec4 textColor, char* texFilePath, bool isRendered, std::function<void()> clickEvent);
+	GUIButton(vec3 position, vec3 dimensions, vec4 color, char* text, vec4 textColor, char* texFilePath, bool isRendered, std::function<void()> clickEvent, int FontSize = 24);
 	void draw();
 	virtual void checkMouseClick();
 	void checkHover();
@@ -170,6 +170,7 @@ public:
 	glm::vec3 dimensions;
 	glm::vec4 hoverColor = glm::vec4(1.0f);
 	glm::vec4 textColor;
+	int fontSize;
 
 	char* getText();
 
@@ -177,6 +178,7 @@ protected:
 	bool isPointInRect(double x, double y);
 	TextRenderer textRend;
 	char* text;
+	glm::vec2 calcScale();
 private:
 	std::function<void()> clickEvent;
 };
@@ -195,7 +197,7 @@ class GUIButtonValued : public GUIButton
 {
 public:
 	GUIButtonValued(float& Value) : valueToChange(Value) {};
-	GUIButtonValued(vec3 position, vec3 dimensions, vec4 color, char* text, vec4 textColor, char* texFilePath, bool isRendered, std::function<void(float&)> clickEvent, float& ValueToChange);
+	GUIButtonValued(vec3 position, vec3 dimensions, vec4 color, char* text, vec4 textColor, char* texFilePath, bool isRendered, std::function<void(float&)> clickEvent, float& ValueToChange, int FontSize = 24);
 	void checkMouseClick();
 
 	float& valueToChange;

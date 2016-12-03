@@ -16,9 +16,12 @@ void decrement(float& value)
 
 void acceptChanges()
 {
+	float maxValue = 8.0f;
+
 	vec3 center(0.0f, 0.0f, 0.0f);
 	vec3 dimensions(5.0f, 5.0f, 5.0f);
-	vec4 color(0.0f, 0.0f, 0.0f, 1.0f);
+
+	vec4 color(Scenes::sceneEditor->color.r / maxValue, Scenes::sceneEditor->color.g / maxValue, Scenes::sceneEditor->color.b / maxValue, Scenes::sceneEditor->color.a / maxValue);
 
 	Scenes::sceneEditor->rigidbodies.push_back(new Cube(center, dimensions, color, true));
 
@@ -27,9 +30,8 @@ void acceptChanges()
 
 GUIValueChanger::GUIValueChanger(vec3 position, float& ValueToChange) : pos(position), value(ValueToChange)
 {
-	inc = new GUIButtonValued(vec3(pos.x + 50, pos.y, 0), vec3(32, 32, 1), vec4(1.0, 1.0, 1.0, 1.0), "+", vec4(0.0f, 0.0f, 0.0f, 1.0f), "textures\\button.png", true, increment, value);
-	dec = new GUIButtonValued(vec3(pos.x - 50, pos.y, 0), vec3(32, 32, 1), vec4(1.0, 1.0, 1.0, 1.0), "-", vec4(0.0f, 0.0f, 0.0f, 1.0f), "textures\\button.png", true, decrement, value);
-	done = new GUIButton(vec3(pos.x - 100, pos.y, 0), vec3(32, 32, 1), vec4(1.0, 1.0, 1.0, 1.0), "DONE", vec4(0.0f, 0.0f, 0.0f, 1.0f), "textures\\button.png", true, acceptChanges);
+	inc = new GUIButtonValued(vec3(pos.x + 20, pos.y, 0), vec3(16, 16, 1), vec4(1.0, 1.0, 1.0, 1.0), " +", vec4(0.0f, 0.0f, 0.0f, 1.0f), "textures\\button.png", true, increment, value, 12);
+	dec = new GUIButtonValued(vec3(pos.x - 20, pos.y, 0), vec3(16, 16, 1), vec4(1.0, 1.0, 1.0, 1.0), " -", vec4(0.0f, 0.0f, 0.0f, 1.0f), "textures\\button.png", true, decrement, value, 12);
 }
 
 GUIValueChanger::~GUIValueChanger()
@@ -41,36 +43,33 @@ void GUIValueChanger::draw()
 {
 	inc->draw();
 	dec->draw();
-	done->draw();
 
-	textRend.RenderText(std::to_string(value), pos.x, pos.y, 1.0f, glm::vec3(0.0f, 0.0f, 0.0f), Camera::activeCamera->getScreenWidth(), Camera::activeCamera->getScreenHeight());
+	textRend.RenderText(std::to_string((int)value), pos.x - 5.0f, pos.y - 3.0f, 1.0f, glm::vec3(0.0f, 0.0f, 0.0f), Camera::activeCamera->getScreenWidth(), Camera::activeCamera->getScreenHeight(), 14);
 }
 
 void GUIValueChanger::checkHover()
 {
 	inc->checkHover();
 	dec->checkHover();
-	done->checkHover();
 }
 
 void GUIValueChanger::checkMouseClick()
 {
 	inc->checkMouseClick();
 	dec->checkMouseClick();
-	done->checkMouseClick();
 }
 
 void spawnCube()
 {
-	Scenes::sceneEditor->color = vec4(0.0f);
-	Scenes::sceneEditor->pos = vec3(0.0f);
-	Scenes::sceneEditor->dimensions = vec3(0.0f);
+	Scenes::sceneEditor->resetOptionsMenu();
 
-	for (int i = 0; i < Scenes::sceneEditor->valueChangers.size(); i++)
-		delete Scenes::sceneEditor->valueChangers[i];
-	Scenes::sceneEditor->valueChangers.clear();
+	//Color pickers
+	Scenes::sceneEditor->valueChangers.push_back(new GUIValueChanger(vec3(600, 600, 0), Scenes::sceneEditor->color.r));
+	Scenes::sceneEditor->valueChangers.push_back(new GUIValueChanger(vec3(600, 550, 0), Scenes::sceneEditor->color.g));
+	Scenes::sceneEditor->valueChangers.push_back(new GUIValueChanger(vec3(600, 500, 0), Scenes::sceneEditor->color.b));
+	Scenes::sceneEditor->valueChangers.push_back(new GUIValueChanger(vec3(600, 450, 0), Scenes::sceneEditor->color.a));
 
-	Scenes::sceneEditor->valueChangers.push_back(new GUIValueChanger(vec3(600, 600, 0), Scenes::sceneEditor->pos.x));
+	Scenes::sceneEditor->acceptButton = new GUIButton(vec3(500, 600, 0), vec3(32, 32, 1), vec4(1.0, 1.0, 1.0, 1.0), "Done", vec4(0.0f, 0.0f, 0.0f, 1.0f), "textures\\button.png", true, acceptChanges, 14);
 
 	Scenes::sceneEditor->displayOptions = true;	
 }
@@ -79,7 +78,8 @@ void spawnSphere()
 {
 	vec3 center(0.0f, 10.0f, 0.0f);
 	vec3 dimensions(5.0f, 5.0f, 5.0f);
-	vec4 color(0.0f, 0.0f, 0.0f, 1.0f);
+	std::cout << Scenes::sceneEditor->color.r << std::endl;
+	vec4 color(Scenes::sceneEditor->color.r, Scenes::sceneEditor->color.g, Scenes::sceneEditor->color.b, Scenes::sceneEditor->color.a);
 
 	Scenes::sceneEditor->rigidbodies.push_back(new Polyhedron(64, center, dimensions, color, true));
 }
@@ -140,8 +140,12 @@ void SceneEditor::draw()
 		buttons[i]->draw();
 
 	if (displayOptions)
+	{
+		acceptButton->draw();
 		for (int i = 0; i < valueChangers.size(); i++)
 			valueChangers[i]->draw();
+	}
+
 }
 
 void SceneEditor::checkInput()
@@ -153,8 +157,12 @@ void SceneEditor::checkInput()
 	}
 
 	if (displayOptions)
+	{
+		acceptButton->checkHover();
 		for (int i = 0; i < valueChangers.size(); i++)
 			valueChangers[i]->checkHover();
+	}
+
 
 	static int oldLeftClickState = GLFW_RELEASE;
 
@@ -166,8 +174,11 @@ void SceneEditor::checkInput()
 			buttons[i]->checkMouseClick();
 
 		if (displayOptions)
+		{
+			acceptButton->checkMouseClick();
 			for (int i = 0; i < valueChangers.size(); i++)
 				valueChangers[i]->checkMouseClick();
+		}
 	}
 
 	oldLeftClickState = leftClick;
@@ -177,4 +188,16 @@ void SceneEditor::execute()
 {
 	draw();
 	checkInput();
+}
+
+void SceneEditor::resetOptionsMenu()
+{
+	color = vec4(0.0f);
+	pos = vec3(0.0f);
+	dimensions = vec3(0.0f);
+
+	for (int i = 0; i < Scenes::sceneEditor->valueChangers.size(); i++)
+		delete valueChangers[i];
+	valueChangers.clear();
+	delete acceptButton;
 }

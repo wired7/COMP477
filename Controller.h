@@ -17,6 +17,8 @@ public:
 	void(*mouse_callback)(GLFWwindow*, int, int, int) = NULL;
 	void(*mousePos_callback)(GLFWwindow*, double, double) = NULL;
 	void(*windowResize_callback)(GLFWwindow*, int, int) = NULL;
+
+	static glm::vec2 mouseScreenToGUICoords(GLFWwindow* window, double x, double y);
 };
 
 class StateSpaceController : public Controller
@@ -31,7 +33,6 @@ private:
 	static void mPC(GLFWwindow*, double, double);
 	static void wRC(GLFWwindow*, int, int);
 public:
-	static glm::vec2 mouseScreenToGUICoords(double x, double y);
 	static Controller* getController();
 };
 
@@ -61,7 +62,6 @@ private:
 	static void mC(GLFWwindow*, int, int, int);
 	static void mPC(GLFWwindow*, double, double);
 	static void wRC(GLFWwindow*, int, int);
-	static glm::vec2 mouseScreenToGUICoords(double x, double y);
 
 public:
 	static Controller* getController();

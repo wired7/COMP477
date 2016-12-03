@@ -12,7 +12,7 @@ Camera::Camera(GLFWwindow* window, vec2 relativePosition, vec2 relativeDimension
 	mat4 ratioMatrix(1);
 	ratioMatrix[1][1] *= relativeDimensions.x;
 	Projection = Projection * ratioMatrix;
-	OrthoProjection = glm::ortho(0.0f, (float)screenWidth, 0.0f, (float)screenHeight);
+	OrthoProjection = glm::ortho(0.0f, (float)1200, 0.0f, (float)800);
 	this->Projection = Projection;
 
 	View = glm::lookAt(pos, lookAt, up);
@@ -35,12 +35,18 @@ void Camera::setCamera(Camera* cam)
 
 int Camera::getScreenWidth()
 {
-	return screenWidth;
+	int width;
+	int height;
+	glfwGetWindowSize(window, &width, &height);
+	return width;
 }
 
 int Camera::getScreenHeight()
 {
-	return screenHeight;
+	int width;
+	int height;
+	glfwGetWindowSize(window, &width, &height);
+	return height;
 }
 
 GLFWwindow* Camera::getWindow()
@@ -150,6 +156,7 @@ void StateSpaceCamera::update()
 	int width, height;
 	glfwGetWindowSize(window, &width, &height);
 	Projection = perspective(45.0f, (float)width / height, 0.1f, 100.0f);
+	//OrthoProjection = glm::ortho(0.0f, (float)width, 0.0f, (float)height);
 }
 
 MenuCamera::MenuCamera(GLFWwindow* window, vec2 relativePosition, vec2 relativeDimensions, vec3 pos, vec3 lookAt, vec3 up, mat4 Projection) :
@@ -160,5 +167,11 @@ MenuCamera::MenuCamera(GLFWwindow* window, vec2 relativePosition, vec2 relativeD
 
 void MenuCamera::update()
 {
-
+	/*
+	int width;
+	int height;
+	glfwGetWindowSize(window, &width, &height);
+	OrthoProjection = glm::ortho(0.0f, (float)width, 0.0f, (float)height);
+	*/
+	
 }

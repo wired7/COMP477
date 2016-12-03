@@ -7,7 +7,6 @@ class GUIValueChanger
 public:
 	GUIButtonValued* inc;
 	GUIButtonValued* dec;
-	GUIButton* done;
 	TextRenderer textRend;
 	vec3 pos;
 	float& value;
@@ -38,6 +37,7 @@ public:
 	void checkInput();
 
 	std::vector<GUIValueChanger*> valueChangers;
+	GUIButton* acceptButton;
 	std::vector<MeshObject*> rigidbodies;
 	bool displayOptions;
 
@@ -46,6 +46,8 @@ public:
 	vec4 color;
 
 	TextRenderer textRend;
+
+	void resetOptionsMenu();
 
 private:
 	std::vector<GUIButton*> buttons;

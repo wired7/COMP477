@@ -1,0 +1,16 @@
+#version 420 core
+
+// Interpolated values from the vertex shaders
+in vec4 vColor;
+in vec3 FragPos;
+in vec3 n;
+
+uniform mat4 View;
+
+// Ouput data
+out vec4 color;
+
+void main(){
+
+	color =  vColor;
+}

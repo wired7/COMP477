@@ -13,6 +13,24 @@ void Controller::setController(Controller* controller)
 	glfwSetWindowSizeCallback(Camera::activeCamera->window, activeController->windowResize_callback);
 }
 
+glm::vec2 Controller::mouseScreenToGUICoords(GLFWwindow* window, double x, double y)
+{
+	glm::vec2 coords;
+
+	float guiScaleX;
+	float guiScaleY;
+
+	float GUI_RES_X = 1200;
+	float GUI_RES_Y = 800;
+
+	guiScaleX = Camera::activeCamera->getScreenWidth() / GUI_RES_X;
+	guiScaleY = Camera::activeCamera->getScreenHeight() / GUI_RES_Y;
+
+	coords = glm::vec2(x / guiScaleX, GUI_RES_Y - y / guiScaleY);
+
+	return coords;
+}
+
 StateSpaceController* StateSpaceController::controller = NULL;
 
 StateSpaceController::StateSpaceController()
@@ -141,21 +159,12 @@ void StateSpaceController::mPC(GLFWwindow* window, double xpos, double ypos)
 	InputState::previousMousePosY = ypos;
 
 	InputState::mouseCoords = glm::vec2(xpos, ypos);
-	InputState::mouseGuiCoords = mouseScreenToGUICoords(xpos, ypos);
+	InputState::mouseGuiCoords = mouseScreenToGUICoords(window, xpos, ypos);
 }
 
 void StateSpaceController::wRC(GLFWwindow*, int, int)
 {
 	Camera::activeCamera->update();
-}
-
-glm::vec2 StateSpaceController::mouseScreenToGUICoords(double x, double y)
-{
-	glm::vec2 coords;
-
-	coords = glm::vec2(x, Camera::activeCamera->getScreenHeight() - y);
-
-	return coords;
 }
 
 Controller* StateSpaceController::getController()
@@ -198,11 +207,11 @@ void MenuController::mC(GLFWwindow* window , int button, int action, int mods)
 void MenuController::mPC(GLFWwindow* window, double xpos, double ypos)
 {
 	InputState::mouseCoords = glm::vec2(xpos, ypos);
-	InputState::mouseGuiCoords = mouseScreenToGUICoords(xpos, ypos);
+	InputState::mouseGuiCoords = mouseScreenToGUICoords(window, xpos, ypos);
 }
 void MenuController::wRC(GLFWwindow*, int, int)
 {
-
+	Camera::activeCamera->update();
 }
 
 Controller* MenuController::getController()
@@ -211,13 +220,4 @@ Controller* MenuController::getController()
 		controller = new MenuController();
 
 	return controller;
-}
-
-glm::vec2 MenuController::mouseScreenToGUICoords(double x, double y)
-{
-	glm::vec2 coords;
-
-	coords = glm::vec2(x, Camera::activeCamera->getScreenHeight() - y);
-
-	return coords;
 }

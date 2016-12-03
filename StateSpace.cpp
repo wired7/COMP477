@@ -38,6 +38,11 @@ StateSpace::StateSpace(GLFWwindow* window, Skybox* skybox)
 	this->window = window;
 //	terrain = new Terrain(1, 40, 40, 32, STATIC);
 
+	int width, height;
+	glfwGetWindowSize(window, &width, &height);
+	Camera::activeCamera = new StateSpaceCamera(window, vec2(0, 0), vec2(1, 1), vec3(3, 3, 0), vec3(3, 3, 3), vec3(0, 1, 0), perspective(45.0f, (float)width / height, 0.1f, 1000.0f), terrain);
+	observers.push_back(Camera::activeCamera);
+
 	buttons.push_back(new GUIButton(vec3(1000, 100, 0.0f), vec3(64, 64, 0), vec4(1.0f, 1.0f, 1.0f, 1.0f), "", vec4(1.0f), "textures\\playButton.png", true, play));
 	buttons.push_back(new GUIButton(vec3(1100, 100, 0.0f), vec3(64, 64, 0), vec4(1.0f, 1.0f, 1.0f, 1.0f), "", vec4(1.0f), "textures\\pauseButton.png", true, pause));
 	buttons.push_back(new GUIButton(vec3(750, 100, 0.0f), vec3(180, 64, 0), vec4(1.0f, 1.0f, 1.0f, 1.0f), "Back To Menu", vec4(0.0f), "textures\\button.png", true, backToMenu));
@@ -49,11 +54,7 @@ int StateSpace::loadAnimation()
 {
 	milliseconds ms = duration_cast<milliseconds>(system_clock::now().time_since_epoch());
 	time = ms.count();
-	int width, height;
-	glfwGetWindowSize(window, &width, &height);
 
-	Camera::activeCamera = new StateSpaceCamera(window, vec2(0, 0), vec2(1, 1), vec3(3, 3, 0), vec3(3, 3, 3), vec3(0, 1, 0), perspective(45.0f, (float)width / height, 0.1f, 1000.0f), terrain);
-	observers.push_back(Camera::activeCamera);
 
 	Controller::setController(StateSpaceController::getController());
 

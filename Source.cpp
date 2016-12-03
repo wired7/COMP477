@@ -87,7 +87,7 @@ int init() {
 
 	glPointSize(3.0f);
 
-	LitShader::shader = new LitShader("shaders\\litShader.VERTEXSHADER", "shaders\\InstancedFragmentShader.FRAGMENTSHADER");
+	LitShader::shader = new LitShader("shaders\\litShader.VERTEXSHADER", "shaders\\litShader.FRAGMENTSHADER");
 	InstancedLitShader::shader = new InstancedLitShader("shaders\\InstancedVertexShader.VERTEXSHADER", "shaders\\InstancedFragmentShader.FRAGMENTSHADER");
 	UnlitShader::shader = new UnlitShader("shaders\\unlit2DShader.VERTEXSHADER", "shaders\\unlit2DShader.FRAGMENTSHADER");
 	CubeMapShader::shader = new CubeMapShader("shaders\\CubeMap.VERTEXSHADER", "shaders\\CubeMap.FRAGMENTSHADER");
