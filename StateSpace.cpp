@@ -7,6 +7,7 @@
 #include "OpenFileDialog.h"
 #include <thread>
 #include "SceneManager.h"
+#include "ButtonFunctions.h"
 
 using namespace std::chrono;
 
@@ -22,12 +23,6 @@ void play()
 void pause()
 {
 	StateSpace::activeStateSpace->playModeOn = false;
-}
-
-void backToMenu()
-{
-	SceneManager::getInstance()->changeActiveScene(Scenes::menu);
-	delete Scenes::stateSpace;
 }
 
 StateSpace::StateSpace(GLFWwindow* window, Skybox* skybox)
@@ -49,7 +44,8 @@ StateSpace::StateSpace(GLFWwindow* window, Skybox* skybox)
 	
 }
 
-void StateSpace::loadAnimation()
+// Returns 1 when animation is correctly loaded, 0 otherwise
+int StateSpace::loadAnimation()
 {
 	milliseconds ms = duration_cast<milliseconds>(system_clock::now().time_since_epoch());
 	time = ms.count();
@@ -62,6 +58,11 @@ void StateSpace::loadAnimation()
 	Controller::setController(StateSpaceController::getController());
 
 	fileName = _strdup(OpenFileDialog().SelectFile().c_str());
+	std::string str(fileName);
+
+	//User did not choose a file, return to menu without changing scene
+	if (str == "")
+		return 0;
 
 	clearFrameRead();
 	initializeFrameRead();
@@ -72,6 +73,8 @@ void StateSpace::loadAnimation()
 
 	for (int i = 0; i < models.size(); i++)
 		models[i]->bindBuffers();
+
+	return 1;
 }
 
 
@@ -120,6 +123,12 @@ void StateSpace::draw()
 
 		if (ms.count() - time >= 16 && playModeOn)
 		{
+			if (framesFront->size() == 0)
+			{
+				FileStorage::resetReadFrames(fileName);
+				initializeFrameRead();
+				break;
+			}
 			frameCount = (frameCount + 1) % framesFront->size();
 			if ((*framesFront)[frameCount].size() == 0) {
 				FileStorage::resetReadFrames(fileName);

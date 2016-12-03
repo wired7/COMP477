@@ -16,7 +16,6 @@ struct ParticleParameters {
 	glm::vec3 tensionForce;
 	glm::vec3 gradientSmoothColor;
 	glm::vec3 laplacianSmoothColor;
-
 	ParticleParameters(glm::vec3 v) : velocity(v) {}
 };
 

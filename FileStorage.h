@@ -3,6 +3,7 @@
 #include <vector>
 #include <fstream>
 #include "ParticleSystem.h"
+#include "ProgramState.h"
 
 using namespace std;
 
@@ -17,8 +18,17 @@ public:
 	static void resetReadFrames(char* file);
 	static SystemParameters loadSysParams(string);
 	static vector<MeshObject*> loadRigidbodies(string);
+	static void serializeData(string file);
+	static ProgramState deserializeData(string file);
+	static string rigidBodyFile;
+	static string getSerializedFile(string file);
 private:
 	static SystemParameters matchSysParams(vector<pair<string, float>> values);
 	static vector<MeshObject*> matchRigidbodies(vector<pair<string, vector<float>>> values);
+	static string serializeStrPS();
+	static string serializeStrParticle(Particle particle);
+	static void serializeRigidData(string outFile);
+	static SystemParameters deserializeMatchPS(string values);
+	static Particle* deserializeParticle(string values);
 };
 

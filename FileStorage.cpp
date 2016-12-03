@@ -14,6 +14,18 @@ int FileStorage::startPos;
 fstream FileStorage::filePos;
 bool FileStorage::hasOpen = false;
 
+string FileStorage::rigidBodyFile;
+
+vector<string> split(const string &s, char delim) {
+	stringstream ss(s);
+	string item;
+	vector<string> tokens;
+	while (getline(ss, item, delim)) {
+		tokens.push_back(item);
+	}
+	return tokens;
+}
+
 SystemParameters FileStorage::loadSysParams(string filePath)
 {
 	vector<pair<string, float>> sysParams;
@@ -80,6 +92,7 @@ SystemParameters FileStorage::matchSysParams(vector<pair<string, float>> values)
 
 vector<MeshObject*> FileStorage::loadRigidbodies(string filePath)
 {
+	rigidBodyFile = filePath;
 	vector<pair<string, vector<float>>> rigidbodies;
 
 	ifstream myfile;
@@ -241,6 +254,10 @@ void FileStorage::readFrames(char* file, int count, vector<vector<glm::vec3>>* f
 
 						rigidbodies->push_back(new Rigidbody(vertices, indices, mat4(1.0f), 1000, false));
 					}
+					else if (name == "serialized")
+					{
+
+					}
 					else
 						break;
 
@@ -321,4 +338,419 @@ int FileStorage::getFramesTotal(char* file)
 	return count; //we dont count the first line
 }
 
+void FileStorage::serializeData(string file)
+{
+	/*
+	vector<string> vec = split(file, '\\');
 
+	string newFile = "Animations/Serialize/s_" + vec.at(vec.size() - 1);
+
+	std::fstream f(file, std::ios_base::app);
+	if (f.is_open())
+	{
+		f << "Serialized:" << newFile << endl;
+	}
+	else
+	{
+		cout << "SERIALIZATION FAILED" << endl;
+	}
+	f.close();
+	*/
+
+	vector<string> vec = split(file, '\\');
+	string newFile = "Animations/Serialize/s_" + vec.at(vec.size() - 1);
+
+	cout << "Serialized file path: " << newFile << endl;
+	std::fstream f2(newFile, ios::out);
+	if (f2.is_open())
+	{
+
+		f2 << "Particle System: " << endl;
+		f2 << serializeStrPS() << endl;
+
+		f2 << "Particles: " << endl;
+		for (int i = 0; i < ParticleSystem::getInstance()->particles.size(); ++i)
+		{
+			f2 << serializeStrParticle(*ParticleSystem::getInstance()->particles[i]) << endl;
+		}
+		f2.close();
+		serializeRigidData(newFile);
+	}
+	else {
+		cout << "SERIALIZATION FAILED" << endl;
+	}
+}
+
+ProgramState FileStorage::deserializeData(string file)
+{
+	fstream fs(file);
+
+	ProgramState programState;
+	SystemParameters sysParams;
+	vector<Particle*> particlesVec;
+	vector<MeshObject*> vecMeshes;
+
+	if (fs.is_open())
+	{
+		string line;
+		while (getline(fs, line))
+		{
+			startLoop:
+			vector<string> vec = split(line, ':');
+
+			if (vec.size() == 1 || vec.size() == 2) {
+				if (vec[0] == "Particle System")
+				{
+					getline(fs, line);
+					sysParams = deserializeMatchPS(line);
+				}
+				else if (vec[0] == "Particles")
+				{
+					while (getline(fs, line))
+					{
+						vec = split(line, ':');
+						if (vec.size() == 1 || vec.size() == 2)
+						{
+							break;
+						}
+						Particle* particle = deserializeParticle(line);
+						particlesVec.push_back(particle);
+					}
+				}
+				
+				if (vec[0] == "Rigid")
+				{
+					ofstream out("tempfile");
+					string str;
+
+					while (getline(fs, str))
+					{
+						out << str;
+					}
+					out.close();
+					vecMeshes = loadRigidbodies("tempfile");
+				}
+			}			
+		}
+	}
+	fs.close();
+	programState.particlesVec = particlesVec;
+	programState.sysParams = sysParams;
+	programState.vecMeshes = vecMeshes;
+
+	return programState;
+}
+
+
+using namespace std;
+string FileStorage::serializeStrPS()
+{
+	SystemParameters params = ParticleSystem::getInstance()->sysParams;
+	string ret = "";
+
+	ret += "volume: " + to_string(params.volume) + ":";
+	ret += "particleRadius: " + to_string(params.particleRadius) + ":";
+	ret += "searchRadius: " + to_string(params.searchRadius) + ":";
+	ret += "viscocity: " + to_string(params.viscocity) + ":";
+	ret += "stiffness: " + to_string(params.stiffness) + ":";
+	ret += "restDensity: " + to_string(params.restDensity) + ":";
+	ret += "gravity: " + to_string(params.gravity) + ":";
+	ret += "tStep: " + to_string(params.tStep) + ":";
+	ret += "maxTStep: " + to_string(params.maxTStep) + ":";
+	ret += "blockSize: " + to_string(params.blockSize) + ":";
+	ret += "mass: " + to_string(params.mass) + ":";
+	ret += "tensionCoefficient: " + to_string(params.tensionCoefficient) + ":";
+	ret += "pressureGamma: " + to_string(params.pressureGamma) + ":";
+
+	return ret;
+}
+
+string FileStorage::serializeStrParticle(Particle particle)
+{
+	ParticleParameters params = particle.params;
+	string ret = "";
+	ret += "velocity: " + to_string(params.velocity.x) + " " + to_string(params.velocity.y) + " " + to_string(params.velocity.z) + ":";
+	ret += "acceleration: " + to_string(params.acceleration.x) + " " + to_string(params.acceleration.y) + " " + to_string(params.acceleration.z) + ":";
+	ret += "gradientPressure: " + to_string(params.gradientPressure.x) + " " + to_string(params.gradientPressure.y) + " " + to_string(params.gradientPressure.z) + ":";
+	ret += "laplacianVelocity: " + to_string(params.laplacianVelocity.x) + " " + to_string(params.laplacianVelocity.y) + " " + to_string(params.laplacianVelocity.z) + ":";
+	ret += "tensionForce: " + to_string(params.tensionForce.x) + " " + to_string(params.tensionForce.y) + " " + to_string(params.tensionForce.z) + ":";
+	ret += "gradientSmoothColor: " + to_string(params.gradientSmoothColor.x) + " " + to_string(params.gradientSmoothColor.y) + " " + to_string(params.gradientSmoothColor.z) + ":";
+	ret += "laplacianSmoothColor: " + to_string(params.laplacianSmoothColor.x) + " " + to_string(params.laplacianSmoothColor.y) + " " + to_string(params.laplacianSmoothColor.z) + ":";
+	ret += "density: " + to_string(params.density) + ":";
+	ret += "pressure: " + to_string(params.pressure) + ":";
+	ret += "kernel: " + to_string(params.kernel) + ":";
+	ret += "position: " + to_string(particle.position.x) + " " + to_string(particle.position.y) + " " + to_string(particle.position.z) + ":";
+
+	return ret;
+}
+
+void FileStorage::serializeRigidData(string outFile)
+{
+	cout << "rigidBodyFile: " << rigidBodyFile << endl;
+	ifstream in(rigidBodyFile);
+	ofstream out(outFile, std::ios_base::app);
+	string str;
+	out << "Rigid: " << endl;
+	while (getline(in, str))
+	{
+		cout << str << endl;
+		out << str;
+	}
+	in.close(); 
+	out.close(); 
+}
+
+SystemParameters FileStorage::deserializeMatchPS(string values)
+{
+	vector<string> vec = split(values, ':');
+	SystemParameters sysParams;
+
+	float volume;
+	float particleRadius;
+	float searchRadius;
+	float viscocity;
+	float stiffness;
+	float restDensity;
+	float gravity;
+	float tStep;
+	float maxTStep;
+	float blockSize;
+	float mass;
+	float tensionCoefficient;
+	float pressureGamma;
+
+	for (int i = 0; i < vec.size();)
+	{
+		if (vec[i] == "volume")
+		{
+			i++;
+			stringstream ss(vec[i++]);
+			ss >> volume;
+			sysParams.volume = volume;
+		}
+		else if (vec[i] == "particleRadius")
+		{
+			i++;
+			stringstream ss(vec[i++]);
+			ss >> particleRadius;
+			sysParams.particleRadius = particleRadius;
+		}
+		else if (vec[i] == "searchRadius")
+		{
+			i++;
+			stringstream ss(vec[i++]);
+			ss >> searchRadius;
+			sysParams.searchRadius = searchRadius;
+		}
+		else if (vec[i] == "viscocity")
+		{
+			i++;
+			stringstream ss(vec[i++]);
+			ss >> viscocity;
+			sysParams.viscocity = viscocity;
+		}
+		else if (vec[i] == "stiffness")
+		{
+			i++;
+			stringstream ss(vec[i++]);
+			ss >> stiffness;
+			sysParams.stiffness = stiffness;
+		}
+		else if (vec[i] == "restDensity")
+		{
+			i++;
+			stringstream ss(vec[i++]);
+			ss >> restDensity;
+			sysParams.restDensity = restDensity;
+		}
+		else if (vec[i] == "gravity")
+		{
+			i++;
+			stringstream ss(vec[i++]);
+			ss >> gravity;
+			sysParams.gravity = gravity;
+		}
+		else if (vec[i] == "tStep")
+		{
+			i++;
+			stringstream ss(vec[i++]);
+			ss >> tStep;
+			sysParams.tStep = tStep;
+		}
+		else if (vec[i] == "maxTStep")
+		{
+			i++;
+			stringstream ss(vec[i++]);
+			ss >> maxTStep;
+			sysParams.maxTStep = maxTStep;
+		}
+		else if (vec[i] == "blockSize")
+		{
+			i++;
+			stringstream ss(vec[i++]);
+			ss >> blockSize;
+			sysParams.blockSize = blockSize;
+		}
+		else if (vec[i] == "mass")
+		{
+			i++;
+			stringstream ss(vec[i++]);
+			ss >> mass;
+			sysParams.mass = mass;
+		}
+		else if (vec[i] == "tensionCoefficient")
+		{
+			i++;
+			stringstream ss(vec[i++]);
+			ss >> tensionCoefficient;
+			sysParams.tensionCoefficient = tensionCoefficient;
+		}
+		else if (vec[i] == "pressureGamma")
+		{
+			i++;
+			stringstream ss(vec[i++]);
+			ss >> pressureGamma;
+			sysParams.pressureGamma = pressureGamma;
+		}
+	}
+	return sysParams;
+}
+
+Particle* FileStorage::deserializeParticle(string values)
+{
+	vector<string> vec = split(values, ':');
+	ParticleSystem* sys = ParticleSystem::getInstance();
+
+	glm::vec3 velocity;
+	glm::vec3 acceleration;
+	glm::vec3 gradientPressure;
+	glm::vec3 laplacianVelocity;
+	glm::vec3 tensionForce;
+	glm::vec3 gradientSmoothColor;
+	glm::vec3 laplacianSmoothColor;
+	glm::vec3 position;
+	float density;
+	float pressure;
+	float kernel;
+
+	Particle* particle = new Particle(glm::vec3());
+
+	for (int i = 0; i < vec.size();)
+	{
+		if (vec[i] == "velocity")
+		{
+			i++;
+			stringstream ss(vec[i++]);
+			ss >> velocity.x;
+			ss >> velocity.y;
+			ss >> velocity.z;
+			particle->params.velocity = velocity;
+		}
+		else if (vec[i] == "acceleration")
+		{
+			i++;
+			stringstream ss(vec[i++]);
+			ss >> acceleration.x;
+			ss >> acceleration.y;
+			ss >> acceleration.z;
+			particle->params.acceleration = acceleration;
+		}
+		else if (vec[i] == "gradientPressure")
+		{
+			i++;
+			stringstream ss(vec[i++]);
+			ss >> gradientPressure.x;
+			ss >> gradientPressure.y;
+			ss >> gradientPressure.z;
+			particle->params.gradientPressure = gradientPressure;
+		}
+		else if (vec[i] == "laplacianVelocity")
+		{
+			i++;
+			stringstream ss(vec[i++]);
+			ss >> laplacianVelocity.x;
+			ss >> laplacianVelocity.y;
+			ss >> laplacianVelocity.z;
+			particle->params.laplacianVelocity = laplacianVelocity;
+		}
+		else if (vec[i] == "tensionForce")
+		{
+			i++;
+			stringstream ss(vec[i++]);
+			ss >> tensionForce.x;
+			ss >> tensionForce.y;
+			ss >> tensionForce.z;
+			particle->params.tensionForce = tensionForce;
+		}
+		else if (vec[i] == "gradientSmoothColor")
+		{
+			i++;
+			stringstream ss(vec[i++]);
+			ss >> gradientSmoothColor.x;
+			ss >> gradientSmoothColor.y;
+			ss >> gradientSmoothColor.z;
+			particle->params.gradientSmoothColor = gradientSmoothColor;
+		}
+		else if (vec[i] == "laplacianSmoothColor")
+		{
+			i++;
+			stringstream ss(vec[i++]);
+			ss >> laplacianSmoothColor.x;
+			ss >> laplacianSmoothColor.y;
+			ss >> laplacianSmoothColor.z;
+			particle->params.laplacianSmoothColor = laplacianSmoothColor;
+		}
+		else if (vec[i] == "position")
+		{
+			i++;
+			stringstream ss(vec[i++]);
+			ss >> position.x;
+			ss >> position.y;
+			ss >> position.z;
+			particle->position = position;
+		}
+		else if (vec[i] == "density")
+		{
+			i++;
+			stringstream ss(vec[i++]);
+			ss >> density;
+			particle->params.density = density;
+		}
+		else if (vec[i] == "pressure")
+		{
+			i++;
+			stringstream ss(vec[i++]);
+			ss >> pressure;
+			particle->params.pressure = pressure;
+		}
+		else if (vec[i] == "kernel")
+		{
+			i++;
+			stringstream ss(vec[i++]);
+			ss >> kernel;
+			particle->params.kernel = kernel;
+		}
+	}
+	return particle;
+}
+
+string FileStorage::getSerializedFile(string file)
+{
+	fstream fs(file);
+	vector<string> vec;
+
+	if (fs.is_open())
+	{
+		string line;
+		while (getline(fs, line))
+		{
+			vec = split(line, ':');
+			if (vec[0] == "Serialized")
+			{
+				return vec[1];
+			}
+		}
+	}
+
+	return "";
+}

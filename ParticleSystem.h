@@ -30,7 +30,7 @@ class ParticleSystem
 public:
 	~ParticleSystem();
 	static ParticleSystem* getInstance();
-	void goNuts(float, float, string);
+	void goNuts(float, float, string, bool continueFlag);
 	vector<glm::vec3>* getParticlePositions();
 	SystemParameters sysParams;
 	vector<Particle*> particles;
@@ -43,6 +43,8 @@ public:
 	void calculateMassOfParticles();
 	Grid3D grid;
 	vector<MeshObject*> rayTrace(vector<glm::vec3>*, float, int);
+	static bool SerializeData;
+	void watchCIN();
 private:
 	static ParticleSystem* particleSystem;
 	ParticleSystem();

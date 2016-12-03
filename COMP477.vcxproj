@@ -35,6 +35,7 @@
     <ClInclude Include="ParticleSystem.h" />
     <ClInclude Include="Rigidbody.h" />
     <ClInclude Include="SaveFileDialog.h" />
+    <ClInclude Include="SceneEditor.h" />
     <ClInclude Include="SceneManager.h" />
     <ClInclude Include="ScreenState.h" />
     <ClInclude Include="Shader.h" />
@@ -63,6 +64,7 @@
     <ClCompile Include="Particle.cpp" />
     <ClCompile Include="ParticleSystem.cpp" />
     <ClCompile Include="Rigidbody.cpp" />
+    <ClCompile Include="SceneEditor.cpp" />
     <ClCompile Include="SceneManager.cpp" />
     <ClCompile Include="Shader.cpp" />
     <ClCompile Include="Shape.cpp" />

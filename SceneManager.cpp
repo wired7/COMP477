@@ -3,6 +3,7 @@
 SceneManager* SceneManager::instance = nullptr;
 Menu* Scenes::menu = nullptr;
 StateSpace* Scenes::stateSpace = nullptr;
+SceneEditor* Scenes::sceneEditor = nullptr;
 
 SceneManager::SceneManager()
 {

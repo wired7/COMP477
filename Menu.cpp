@@ -108,9 +108,12 @@ void newSimulation()
 	ParticleSystem::getInstance()->setStiffnessOfParticleSystem(); // calculating the stiffness of the system by using the height of water * particleRadius to get the height of the water
 	ParticleSystem::getInstance()->calculateMassOfParticles();
 
-	ParticleSystem::getInstance()->goNuts(animationTime, 0.016f, animFile);
+	ParticleSystem::getInstance()->goNuts(animationTime, 0.016f, animFile, false);
 
 	cout << "Animation complete!" << std::endl;
+
+	FileStorage::serializeData(animFile);
+	cout << "Data serialized. Exiting ..." << endl;
 }
 
 void runSimulation()
@@ -127,6 +130,67 @@ void exitSim()
 	glfwSetWindowShouldClose(windowHandle, 1);
 }
 
+void enterEditor()
+{
+	Scenes::sceneEditor->setup();
+	SceneManager::getInstance()->changeActiveScene(Scenes::sceneEditor);
+}
+
+void continueSim() 
+{
+	cout << "Load animation file to continue..." << endl;
+	OpenFileDialog dialog;
+	string animFile = dialog.SelectFile();
+	string serializedFile = FileStorage::getSerializedFile(animFile);
+	ProgramState programState = FileStorage::deserializeData(serializedFile);
+
+	float animationTime;
+	cout << "Enter animation time" << endl;
+	cin >> animationTime;
+
+	auto rigidBodies = programState.vecMeshes;
+
+	Bounds b;
+
+	for (int i = 0; i < rigidBodies.size(); i++)
+	{
+		b.join(rigidBodies[i]->getBounds());
+	}
+
+	vec3 center = vec3(1, 1, 1) - b.min;
+	vec3 maximum = center + b.max + vec3(1, 1, 1);
+
+	int gridSize = max(maximum.x, max(maximum.y, maximum.z));
+
+
+	vector<Rigidbody*> rigidbodies;
+
+	for (int i = 0; i < rigidBodies.size(); i++)
+	{
+		rigidBodies[i]->applyTransform();
+		rigidBodies[i]->model = translate(rigidBodies[i]->model, center);
+		rigidbodies.push_back(new Rigidbody(rigidBodies[i]->vertices, rigidBodies[i]->indices, rigidBodies[i]->model, 1000, false));
+	}
+
+	SystemParameters sysParams = programState.sysParams;
+
+	ParticleSystem::getInstance()->sysParams = sysParams;
+	ParticleSystem::getInstance()->grid = Grid3D(gridSize / sysParams.searchRadius, sysParams.searchRadius);
+	ParticleSystem::getInstance()->addParticles(programState.particlesVec);
+	ParticleSystem::getInstance()->addRigidbodies(rigidbodies);
+
+	// set up mass and stiffness of system
+	//ParticleSystem::getInstance()->setStiffnessOfParticleSystem(); // calculating the stiffness of the system by using the height of water * particleRadius to get the height of the water
+	//ParticleSystem::getInstance()->calculateMassOfParticles();
+
+	ParticleSystem::getInstance()->goNuts(animationTime, 0.016f, animFile, true);
+
+	cout << "Animation complete!" << std::endl;
+
+	FileStorage::serializeData(animFile);
+	cout << "Data serialized. Exiting ..." << endl;
+}
+
 Menu::Menu(GLFWwindow* window)
 {
 	this->window = window;
@@ -135,8 +199,11 @@ Menu::Menu(GLFWwindow* window)
 	Camera::activeCamera = observer;
 	Controller::setController(MenuController::getController());
 	menuButtons.push_back(new GUIButton(vec3(600, 600, 0), vec3(180, 70, 1), vec4(1.0, 1.0, 1.0, 1.0), "Create Simulation", vec4(0.0f, 0.0f, 0.0f, 1.0f), "textures\\button.png", true, newSimulation));
-	menuButtons.push_back(new GUIButton(vec3(600, 450, 0), vec3(180, 70, 1), vec4(1.0, 1.0, 1.0, 1.0), "Run Simulation", vec4(0.0f, 0.0f, 0.0f, 1.0f), "textures\\button.png", true, runSimulation));
-	menuButtons.push_back(new GUIButton(vec3(600, 300, 0), vec3(180, 70, 1), vec4(1.0, 1.0, 1.0, 1.0), "Exit Program", vec4(0.0f, 0.0f, 0.0f, 1.0f), "textures\\button.png", true, exitSim));
+	menuButtons.push_back(new GUIButton(vec3(600, 500, 0), vec3(180, 70, 1), vec4(1.0, 1.0, 1.0, 1.0), "Run Simulation", vec4(0.0f, 0.0f, 0.0f, 1.0f), "textures\\button.png", true, runSimulation));
+	menuButtons.push_back(new GUIButton(vec3(600, 400, 0), vec3(180, 70, 1), vec4(1.0, 1.0, 1.0, 1.0), "Continue Simulation", vec4(0.0f, 0.0f, 0.0f, 1.0f), "textures\\button.png", true, continueSim));
+	menuButtons.push_back(new GUIButton(vec3(600, 300, 0), vec3(180, 70, 1), vec4(1.0, 1.0, 1.0, 1.0), "Enter Editor", vec4(0.0f, 0.0f, 0.0f, 1.0f), "textures\\button.png", true, enterEditor));
+	menuButtons.push_back(new GUIButton(vec3(600, 200, 0), vec3(180, 70, 1), vec4(1.0, 1.0, 1.0, 1.0), "Exit Program", vec4(0.0f, 0.0f, 0.0f, 1.0f), "textures\\button.png", true, exitSim));
+	
 	background = new GUIBackground(vec3(0.0f, 0.0f, 0.0f), 
 								   vec3(1200, 
 								   800, 1.0f), 
