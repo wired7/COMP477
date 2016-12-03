@@ -120,6 +120,12 @@ void StateSpace::draw()
 
 		if (ms.count() - time >= 16 && playModeOn)
 		{
+			if (framesFront->size() == 0)
+			{
+				FileStorage::resetReadFrames(fileName);
+				initializeFrameRead();
+				break;
+			}
 			frameCount = (frameCount + 1) % framesFront->size();
 			if ((*framesFront)[frameCount].size() == 0) {
 				FileStorage::resetReadFrames(fileName);
