@@ -203,6 +203,7 @@ void MenuController::sC(GLFWwindow*, double, double)
 }
 void MenuController::mC(GLFWwindow* window , int button, int action, int mods)
 {
+	glfwSetInputMode(window, GLFW_CURSOR, GLFW_CURSOR_NORMAL);
 }
 void MenuController::mPC(GLFWwindow* window, double xpos, double ypos)
 {
