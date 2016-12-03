@@ -127,6 +127,13 @@ void exitSim()
 	glfwSetWindowShouldClose(windowHandle, 1);
 }
 
+void enterEditor()
+{
+	Scenes::sceneEditor->setup();
+	SceneManager::getInstance()->changeActiveScene(Scenes::sceneEditor);
+}
+
+
 Menu::Menu(GLFWwindow* window)
 {
 	this->window = window;
@@ -137,6 +144,7 @@ Menu::Menu(GLFWwindow* window)
 	menuButtons.push_back(new GUIButton(vec3(600, 600, 0), vec3(180, 70, 1), vec4(1.0, 1.0, 1.0, 1.0), "Create Simulation", vec4(0.0f, 0.0f, 0.0f, 1.0f), "textures\\button.png", true, newSimulation));
 	menuButtons.push_back(new GUIButton(vec3(600, 450, 0), vec3(180, 70, 1), vec4(1.0, 1.0, 1.0, 1.0), "Run Simulation", vec4(0.0f, 0.0f, 0.0f, 1.0f), "textures\\button.png", true, runSimulation));
 	menuButtons.push_back(new GUIButton(vec3(600, 300, 0), vec3(180, 70, 1), vec4(1.0, 1.0, 1.0, 1.0), "Exit Program", vec4(0.0f, 0.0f, 0.0f, 1.0f), "textures\\button.png", true, exitSim));
+	menuButtons.push_back(new GUIButton(vec3(600, 150, 0), vec3(180, 70, 1), vec4(1.0, 1.0, 1.0, 1.0), "Enter Editor", vec4(0.0f, 0.0f, 0.0f, 1.0f), "textures\\button.png", true, enterEditor));
 	background = new GUIBackground(vec3(0.0f, 0.0f, 0.0f), 
 								   vec3(1200, 
 								   800, 1.0f), 

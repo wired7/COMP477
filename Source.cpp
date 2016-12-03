@@ -93,6 +93,7 @@ int init() {
 
 	Skybox* skybox = new Skybox("skyboxes\\ame_nebula\\");
 	Scenes::stateSpace = new StateSpace(window, skybox);
+	Scenes::sceneEditor = new SceneEditor(window, skybox);
 	Scenes::menu = new Menu(window);
 	StateSpace::activeStateSpace = Scenes::stateSpace;
 	SceneManager::getInstance()->changeActiveScene(Scenes::menu);

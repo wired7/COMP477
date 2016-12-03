@@ -76,6 +76,16 @@ StateSpaceCamera::StateSpaceCamera(GLFWwindow* window, vec2 relativePosition, ve
 	update();
 }
 
+StateSpaceCamera::StateSpaceCamera(GLFWwindow* window, vec2 relativePosition, vec2 relativeDimensions, vec3 pos, vec3 lookAt, vec3 up, mat4 Projection) :
+	Camera(window, relativePosition, relativeDimensions, pos, lookAt, up, Projection)
+{
+	maxCamPhi = 0.7;
+
+	camTheta = atan2(lookAt.z - pos.z, lookAt.x - pos.x);
+
+	update();
+}
+
 void StateSpaceCamera::translate(vec2 offset)
 {
 	vec3 diff(cos(camTheta), 0, sin(camTheta));

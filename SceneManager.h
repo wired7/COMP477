@@ -2,12 +2,13 @@
 #include "ScreenState.h"
 #include "Menu.h"
 #include "StateSpace.h"
-#include "glfw3.h"
+#include "SceneEditor.h"
 
 static struct Scenes
 {
 	static Menu* menu;
 	static StateSpace* stateSpace;
+	static SceneEditor* sceneEditor;
 };
 
 static class SceneManager

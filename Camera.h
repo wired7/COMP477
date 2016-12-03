@@ -59,6 +59,7 @@ public:
 	double camPhi = 0;
 	Terrain* terrain;
 	StateSpaceCamera(GLFWwindow* window, vec2 relativePosition, vec2 relativeDimensions, vec3 pos, vec3 lookAt, vec3 up, mat4 Projection, Terrain* terrain);
+	StateSpaceCamera(GLFWwindow* window, vec2 relativePosition, vec2 relativeDimensions, vec3 pos, vec3 lookAt, vec3 up, mat4 Projection);
 	void translate(vec2);
 	void update();
 
