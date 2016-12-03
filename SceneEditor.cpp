@@ -26,6 +26,40 @@ void acceptChanges()
 	Scenes::sceneEditor->displayOptions = false;
 }
 
+GUIValueChanger::GUIValueChanger(vec3 position) : pos(position)
+{
+	inc = new GUIButton(vec3(pos.x + 50, pos.y, 0), vec3(32, 32, 1), vec4(1.0, 1.0, 1.0, 1.0), "+", vec4(0.0f, 0.0f, 0.0f, 1.0f), "textures\\button.png", true, increment);
+	dec = new GUIButton(vec3(pos.x - 50, pos.y, 0), vec3(32, 32, 1), vec4(1.0, 1.0, 1.0, 1.0), "-", vec4(0.0f, 0.0f, 0.0f, 1.0f), "textures\\button.png", true, decrement);
+	done = new GUIButton(vec3(pos.x - 100, pos.y, 0), vec3(32, 32, 1), vec4(1.0, 1.0, 1.0, 1.0), "DONE", vec4(0.0f, 0.0f, 0.0f, 1.0f), "textures\\button.png", true, acceptChanges);
+}
+
+GUIValueChanger::~GUIValueChanger()
+{
+
+}
+
+void GUIValueChanger::draw()
+{
+	inc->draw();
+	dec->draw();
+	done->draw();
+	textRend.RenderText("0", pos.x, pos.y, 1.0f, glm::vec3(0.0f, 0.0f, 0.0f), Camera::activeCamera->getScreenWidth(), Camera::activeCamera->getScreenHeight());
+}
+
+void GUIValueChanger::checkHover()
+{
+	inc->checkHover();
+	dec->checkHover();
+	done->checkHover();
+}
+
+void GUIValueChanger::checkMouseClick()
+{
+	inc->checkMouseClick();
+	dec->checkMouseClick();
+	done->checkMouseClick();
+}
+
 void spawnCube()
 {
 	Scenes::sceneEditor->color = vec4(0.0f);
@@ -63,7 +97,7 @@ SceneEditor::SceneEditor(GLFWwindow* window, Skybox* skybox)
 	int width, height;
 	glfwGetWindowSize(window, &width, &height);
 
-	Camera::activeCamera = new StateSpaceCamera(window, vec2(0, 0), vec2(1, 1), vec3(3, 0, 0), vec3(0,0,0), vec3(0, 1, 0), perspective(45.0f, (float)width / height, 0.1f, 1000.0f));
+	Camera::activeCamera = new StateSpaceCamera(window, vec2(0, 0), vec2(1, 1), vec3(-10, 0, 0), vec3(0,0,0), vec3(0, 1, 0), perspective(45.0f, (float)width / height, 0.1f, 1000.0f));
 	observer = Camera::activeCamera;
 
 	Controller::setController(StateSpaceController::getController());

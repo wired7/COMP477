@@ -2,8 +2,9 @@
 #include "Skybox.h"
 #include "Camera.h"
 
-struct GUIValueChanger
+class GUIValueChanger
 {
+public:
 	GUIButton* inc;
 	GUIButton* dec;
 	GUIButton* done;
@@ -11,34 +12,13 @@ struct GUIValueChanger
 	TextRenderer textRend;
 	vec3 pos;
 
-	GUIValueChanger(vec3 position) : pos(position)
-	{
-		//inc = new GUIButton(vec3(pos.x + 50, pos.y, 0), vec3(32, 32, 1), vec4(1.0, 1.0, 1.0, 1.0), "+", vec4(0.0f, 0.0f, 0.0f, 1.0f), "textures\\button.png", true, increment);
-		//dec = new GUIButton(vec3(pos.x - 50, pos.y, 0), vec3(32, 32, 1), vec4(1.0, 1.0, 1.0, 1.0), "-", vec4(0.0f, 0.0f, 0.0f, 1.0f), "textures\\button.png", true, decrement);
-		//done = new GUIButton(vec3(pos.x - 100, pos.y, 0), vec3(32, 32, 1), vec4(1.0, 1.0, 1.0, 1.0), "DONE", vec4(0.0f, 0.0f, 0.0f, 1.0f), "textures\\button.png", true, acceptChanges);
-	};
+	GUIValueChanger(vec3 position);
+	~GUIValueChanger();
 
-	void draw()
-	{
-		inc->draw();
-		dec->draw();
-		done->draw();
-		textRend.RenderText("0", pos.x, pos.y, 1.0f, glm::vec3(0.0f, 0.0f, 0.0f), Camera::activeCamera->getScreenWidth(), Camera::activeCamera->getScreenHeight());
-	}
+	void draw();
+	void checkMouseClick();
+	void checkHover();
 
-	void checkHover()
-	{
-		inc->checkHover();
-		dec->checkHover();
-		done->checkHover();
-	}
-
-	void checkMouseClick()
-	{
-		inc->checkMouseClick();
-		dec->checkMouseClick();
-		done->checkMouseClick();
-	}
 };
 
 class SceneEditor : public ScreenState
