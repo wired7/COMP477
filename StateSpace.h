@@ -40,7 +40,7 @@ public:
 	int currGlobalFrame;
 	GLFWwindow* window;
 
-	void loadAnimation();
+	int loadAnimation();
 	void execute();
 	void checkInput();
 
