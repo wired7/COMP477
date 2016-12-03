@@ -84,7 +84,7 @@ void newSimulation()
 	for (int h = 0; h < floorHeight; ++h) {
 		for (int w = 0; w < floorWidth; ++w) {
 			for (int l = 0; l < floorLength; ++l) {
-				pos.push_back(new Particle(center + vec3(h * distanceOwnedByParticle - offsetFromBoundary, w * distanceOwnedByParticle - offsetFromBoundary, l * distanceOwnedByParticle - offsetFromBoundary)));
+				pos.push_back(new Particle(center - vec3(1, 0, 1) + vec3(h * distanceOwnedByParticle - offsetFromBoundary, w * distanceOwnedByParticle - offsetFromBoundary, l * distanceOwnedByParticle - offsetFromBoundary)));
 			}
 		}
 	}
