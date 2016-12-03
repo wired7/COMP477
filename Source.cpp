@@ -68,6 +68,9 @@ int init() {
 		return -1;
 	}
 
+	//Check version of OpenGL and print
+	std::printf("*** OpenGL Version: %s ***\n", glGetString(GL_VERSION));
+
 	// Ensure we can capture the escape key being pressed below
 	glfwSetInputMode(window, GLFW_STICKY_KEYS, GL_TRUE);
 
@@ -93,6 +96,7 @@ int init() {
 
 	Skybox* skybox = new Skybox("skyboxes\\ame_nebula\\");
 	Scenes::stateSpace = new StateSpace(window, skybox);
+	Scenes::sceneEditor = new SceneEditor(window, skybox);
 	Scenes::menu = new Menu(window);
 	StateSpace::activeStateSpace = Scenes::stateSpace;
 	SceneManager::getInstance()->changeActiveScene(Scenes::menu);
