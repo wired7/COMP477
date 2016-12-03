@@ -49,7 +49,8 @@ StateSpace::StateSpace(GLFWwindow* window, Skybox* skybox)
 	
 }
 
-void StateSpace::loadAnimation()
+// Returns 1 when animation is correctly loaded, 0 otherwise
+int StateSpace::loadAnimation()
 {
 	milliseconds ms = duration_cast<milliseconds>(system_clock::now().time_since_epoch());
 	time = ms.count();
@@ -62,6 +63,11 @@ void StateSpace::loadAnimation()
 	Controller::setController(StateSpaceController::getController());
 
 	fileName = _strdup(OpenFileDialog().SelectFile().c_str());
+	std::string str(fileName);
+
+	//User did not choose a file, return to menu without changing scene
+	if (str == "")
+		return 0;
 
 	clearFrameRead();
 	initializeFrameRead();
@@ -72,6 +78,8 @@ void StateSpace::loadAnimation()
 
 	for (int i = 0; i < models.size(); i++)
 		models[i]->bindBuffers();
+
+	return 1;
 }
 
 
