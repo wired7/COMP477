@@ -164,7 +164,7 @@ public:
 	GUIButton() {};
 	GUIButton(vec3 position, vec3 dimensions, vec4 color, char* text, vec4 textColor, char* texFilePath, bool isRendered, std::function<void()> clickEvent, int FontSize = 24);
 	void draw();
-	virtual void checkMouseClick();
+	virtual bool checkMouseClick();
 	void checkHover();
 	glm::vec3 position;
 	glm::vec3 dimensions;
@@ -198,7 +198,7 @@ class GUIButtonValued : public GUIButton
 public:
 	GUIButtonValued(float& Value) : valueToChange(Value) {};
 	GUIButtonValued(vec3 position, vec3 dimensions, vec4 color, char* text, vec4 textColor, char* texFilePath, bool isRendered, std::function<void(float&)> clickEvent, float& ValueToChange, int FontSize = 24);
-	void checkMouseClick();
+	bool checkMouseClick();
 
 	float& valueToChange;
 

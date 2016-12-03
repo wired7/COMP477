@@ -55,7 +55,6 @@ int StateSpace::loadAnimation()
 	milliseconds ms = duration_cast<milliseconds>(system_clock::now().time_since_epoch());
 	time = ms.count();
 
-
 	Controller::setController(StateSpaceController::getController());
 
 	fileName = _strdup(OpenFileDialog().SelectFile().c_str());
@@ -243,7 +242,8 @@ void StateSpace::checkInput()
 		oldLeftClickState = GLFW_PRESS;
 		for (int i = 0; i < buttons.size(); i++)
 		{
-			buttons[i]->checkMouseClick();
+			if (buttons[i]->checkMouseClick())
+				break;
 		}
 	}
 

@@ -253,7 +253,11 @@ void Menu::checkInput()
 	{
 		oldLeftClickState = GLFW_PRESS;
 		for (int i = 0; i < menuButtons.size(); i++)
-			menuButtons[i]->checkMouseClick();
+		{
+			if (menuButtons[i]->checkMouseClick())
+				break;
+		}
+
 
 	}
 

@@ -53,10 +53,12 @@ void GUIValueChanger::checkHover()
 	dec->checkHover();
 }
 
-void GUIValueChanger::checkMouseClick()
+bool GUIValueChanger::checkMouseClick()
 {
-	inc->checkMouseClick();
-	dec->checkMouseClick();
+	if (inc->checkMouseClick() || dec->checkMouseClick())
+		return true;
+	else
+		return false;
 }
 
 void spawnCube()
@@ -171,13 +173,15 @@ void SceneEditor::checkInput()
 	{
 		oldLeftClickState = GLFW_PRESS;
 		for (int i = 0; i < buttons.size(); i++)
-			buttons[i]->checkMouseClick();
+			if (buttons[i]->checkMouseClick())
+				break;
 
 		if (displayOptions)
 		{
 			acceptButton->checkMouseClick();
 			for (int i = 0; i < valueChangers.size(); i++)
-				valueChangers[i]->checkMouseClick();
+				if (valueChangers[i]->checkMouseClick())
+					break;
 		}
 	}
 

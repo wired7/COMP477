@@ -356,12 +356,15 @@ glm::vec2 GUIButton::calcScale()
 
 }
 
-void GUIButton::checkMouseClick()
+bool GUIButton::checkMouseClick()
 {
 	if (isPointInRect(InputState::mouseGuiCoords.x, InputState::mouseGuiCoords.y))
 	{
 		clickEvent();
+		return true;
 	}
+
+	return false;
 }
 
 void GUIButton::checkHover() {
@@ -413,12 +416,16 @@ GUIButtonValued::GUIButtonValued(vec3 position, vec3 dimensions, vec4 color, cha
 	if (isRendered)
 		bindBuffers();
 }
-void GUIButtonValued::checkMouseClick()
+bool GUIButtonValued::checkMouseClick()
 {
 	if (isPointInRect(InputState::mouseGuiCoords.x, InputState::mouseGuiCoords.y))
 	{
 		clickEvent(valueToChange);
+		return true;
 	}
+
+	else
+		return false;
 }
 
 GUIBackground::GUIBackground(vec3 position, vec3 dimensions, vec4 color, char* texturePath, bool isRendered)

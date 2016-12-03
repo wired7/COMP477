@@ -15,7 +15,7 @@ public:
 	~GUIValueChanger();
 
 	void draw();
-	void checkMouseClick();
+	bool checkMouseClick();
 	void checkHover();
 
 };
