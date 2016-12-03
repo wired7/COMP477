@@ -96,7 +96,7 @@
   <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Release|Win32'" Label="Configuration">
     <ConfigurationType>Application</ConfigurationType>
     <UseDebugLibraries>false</UseDebugLibraries>
-    <PlatformToolset>v120</PlatformToolset>
+    <PlatformToolset>v140</PlatformToolset>
     <WholeProgramOptimization>true</WholeProgramOptimization>
     <CharacterSet>MultiByte</CharacterSet>
   </PropertyGroup>
@@ -137,10 +137,11 @@
       <WarningLevel>Level3</WarningLevel>
       <Optimization>Disabled</Optimization>
       <SDLCheck>true</SDLCheck>
-      <AdditionalIncludeDirectories>C:\Users\Wired\Documents\Visual Studio 2015\Projects\COMP477\Resources\Freetype\include;..\COMP477\Resources\GLM\glm;..\COMP477\Resources\Simple OpenGL Image Library\SOIL;..\COMP477\Resources\GLFW\include\GLFW;..\COMP477\Resources\GLEW\include\GL;%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
+      <AdditionalIncludeDirectories>C:\Users\Wired\Documents\Visual Studio 2015\Projects\COMP477\Resources\Simple OpenGL Image Library\SOIL;C:\Users\Wired\Documents\Visual Studio 2015\Projects\COMP477\Resources\Freetype\include;C:\Users\Wired\Documents\Visual Studio 2015\Projects\COMP477\Resources\GLM\glm;C:\Users\Wired\Documents\Visual Studio 2015\Projects\COMP477\Resources\GLFW\include\GLFW;C:\Users\Wired\Documents\Visual Studio 2015\Projects\COMP477\Resources\GLEW\include\GL;%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
+      <DebugInformationFormat />
     </ClCompile>
     <Link>
-      <AdditionalLibraryDirectories>C:\Users\Wired\Documents\Visual Studio 2015\Projects\COMP477\Resources\Freetype\lib;..\COMP477\Resources\Simple OpenGL Image Library\lib;..\COMP477\Resources\GLFW\lib-vc2015;..\COMP477\Resources\GLEW\lib\Release\Win32;%(AdditionalLibraryDirectories)</AdditionalLibraryDirectories>
+      <AdditionalLibraryDirectories>C:\Users\Wired\Documents\Visual Studio 2015\Projects\COMP477\Resources\Simple OpenGL Image Library\lib;C:\Users\Wired\Documents\Visual Studio 2015\Projects\COMP477\Resources\GLFW\lib-vc2015;C:\Users\Wired\Documents\Visual Studio 2015\Projects\COMP477\Resources\GLEW\lib\Release\Win32;C:\Users\Wired\Documents\Visual Studio 2015\Projects\COMP477\Resources\Freetype\lib;%(AdditionalLibraryDirectories)</AdditionalLibraryDirectories>
       <AdditionalDependencies>opengl32.lib;glew32.lib;glfw3.lib;soil.lib;freetype27.lib;%(AdditionalDependencies)</AdditionalDependencies>
     </Link>
   </ItemDefinitionGroup>
@@ -163,16 +164,17 @@
       <FunctionLevelLinking>true</FunctionLevelLinking>
       <IntrinsicFunctions>true</IntrinsicFunctions>
       <SDLCheck>true</SDLCheck>
-      <AdditionalIncludeDirectories>$(SolutionDir)\Resources\Freetype\include;$(SolutionDir)\Resources\GLM\glm;$(SolutionDir)\Resources\Simple OpenGL Image Library\SOIL;$(SolutionDir)\Resources\GLFW\include\GLFW;$(SolutionDir)\Resources\GLEW\include\GL;%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
+      <AdditionalIncludeDirectories>C:\Users\Wired\Documents\Visual Studio 2015\Projects\COMP477\Resources\Simple OpenGL Image Library\SOIL;C:\Users\Wired\Documents\Visual Studio 2015\Projects\COMP477\Resources\Freetype\include;C:\Users\Wired\Documents\Visual Studio 2015\Projects\COMP477\Resources\GLM\glm;C:\Users\Wired\Documents\Visual Studio 2015\Projects\COMP477\Resources\GLFW\include\GLFW;C:\Users\Wired\Documents\Visual Studio 2015\Projects\COMP477\Resources\GLEW\include\GL;%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
       <MultiProcessorCompilation>
       </MultiProcessorCompilation>
       <AdditionalOptions>/openmp %(AdditionalOptions)</AdditionalOptions>
+      <DebugInformationFormat />
     </ClCompile>
     <Link>
       <EnableCOMDATFolding>true</EnableCOMDATFolding>
       <OptimizeReferences>true</OptimizeReferences>
-      <AdditionalLibraryDirectories>$(SolutionDir)\Resources\Freetype\lib;$(SolutionDir)\Resources\Simple OpenGL Image Library\lib;$(SolutionDir)\Resources\GLFW\lib-vc2013;$(SolutionDir)\Resources\GLEW\lib\Release\Win32;%(AdditionalLibraryDirectories)</AdditionalLibraryDirectories>
-      <AdditionalDependencies>opengl32.lib;glew32.lib;glfw3.lib;soil.lib;freetype27.lib;freetype27.lib;freetype27d.lib;%(AdditionalDependencies)</AdditionalDependencies>
+      <AdditionalLibraryDirectories>C:\Users\Wired\Documents\Visual Studio 2015\Projects\COMP477\Resources\Simple OpenGL Image Library\lib;C:\Users\Wired\Documents\Visual Studio 2015\Projects\COMP477\Resources\GLFW\lib-vc2015;C:\Users\Wired\Documents\Visual Studio 2015\Projects\COMP477\Resources\GLEW\lib\Release\Win32;C:\Users\Wired\Documents\Visual Studio 2015\Projects\COMP477\Resources\Freetype\lib;%(AdditionalLibraryDirectories)</AdditionalLibraryDirectories>
+      <AdditionalDependencies>opengl32.lib;glew32.lib;glfw3.lib;soil.lib;freetype27.lib;%(AdditionalDependencies)</AdditionalDependencies>
     </Link>
   </ItemDefinitionGroup>
   <ItemDefinitionGroup Condition="'$(Configuration)|$(Platform)'=='Release|x64'">
