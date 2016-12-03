@@ -68,6 +68,9 @@ int init() {
 		return -1;
 	}
 
+	//Check version of OpenGL and print
+	std::printf("*** OpenGL Version: %s ***\n", glGetString(GL_VERSION));
+
 	// Ensure we can capture the escape key being pressed below
 	glfwSetInputMode(window, GLFW_STICKY_KEYS, GL_TRUE);
 
