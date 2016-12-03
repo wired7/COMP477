@@ -115,6 +115,9 @@ void newSimulation()
 
 void runSimulation()
 {
+	Skybox* skybox = new Skybox("skyboxes\\ame_nebula\\");
+	Scenes::stateSpace = new StateSpace(windowHandle, skybox);
+	StateSpace::activeStateSpace = Scenes::stateSpace;
 	StateSpace::activeStateSpace->loadAnimation();
 	SceneManager::getInstance()->changeActiveScene(Scenes::stateSpace);
 }

@@ -33,6 +33,7 @@ public:
 	void loadFramesInBack();
 	void swap(vector<vector<vec3>>* p1, vector<vector<vec3>>* p2);
 	void initializeFrameRead();
+	void clearFrameRead();
 	int framesBuffSize;
 	int totalFrames = 0;
 	int totalFramesLoaded;
