@@ -6,6 +6,8 @@
 #include "FileStorage.h"
 #include "OpenFileDialog.h"
 #include <thread>
+#include "SceneManager.h"
+#include "ButtonFunctions.h"
 
 using namespace std::chrono;
 
@@ -36,25 +38,32 @@ StateSpace::StateSpace(GLFWwindow* window, Skybox* skybox)
 	this->window = window;
 //	terrain = new Terrain(1, 40, 40, 32, STATIC);
 
-	/*
-	buttons.push_back(new GUIButton(vec3(1000, 100, 0.0f), vec3(64, 64, 0), vec4(1.0f, 1.0f, 1.0f, 1.0f), "", vec4(1.0f), "textures\\playButton.png", true, play));
-	buttons.push_back(new GUIButton(vec3(1100, 100, 0.0f), vec3(64, 64, 0), vec4(1.0f, 1.0f, 1.0f, 1.0f), "", vec4(1.0f), "textures\\pauseButton.png", true, pause));
-	buttons.push_back(new GUIButton(vec3(750, 100, 0.0f), vec3(180, 64, 0), vec4(1.0f, 1.0f, 1.0f, 1.0f), "Back To Menu", vec4(1.0f, 1.0f, 1.0f, 1.0f), "textures\\menuButton.png", true, pause));
-	*/
-}
-
-void StateSpace::loadAnimation()
-{
-	milliseconds ms = duration_cast<milliseconds>(system_clock::now().time_since_epoch());
-	time = ms.count();
 	int width, height;
 	glfwGetWindowSize(window, &width, &height);
 	Camera::activeCamera = new StateSpaceCamera(window, vec2(0, 0), vec2(1, 1), vec3(3, 3, 0), vec3(3, 3, 3), vec3(0, 1, 0), perspective(45.0f, (float)width / height, 0.1f, 1000.0f), terrain);
 	observers.push_back(Camera::activeCamera);
 
+	buttons.push_back(new GUIButton(vec3(1000, 100, 0.0f), vec3(64, 64, 0), vec4(1.0f, 1.0f, 1.0f, 1.0f), "", vec4(1.0f), "textures\\playButton.png", true, play));
+	buttons.push_back(new GUIButton(vec3(1100, 100, 0.0f), vec3(64, 64, 0), vec4(1.0f, 1.0f, 1.0f, 1.0f), "", vec4(1.0f), "textures\\pauseButton.png", true, pause));
+	buttons.push_back(new GUIButton(vec3(750, 100, 0.0f), vec3(180, 64, 0), vec4(1.0f, 1.0f, 1.0f, 1.0f), "Back To Menu", vec4(0.0f), "textures\\button.png", true, backToMenu));
+	
+}
+
+bool StateSpace::loadAnimation()
+{
+	milliseconds ms = duration_cast<milliseconds>(system_clock::now().time_since_epoch());
+	time = ms.count();
+
 	Controller::setController(StateSpaceController::getController());
 
 	fileName = _strdup(OpenFileDialog().SelectFile().c_str());
+	std::string str(fileName);
+
+	//User did not choose a file, return to menu without changing scene
+	if (str == "")
+		return false;
+
+	clearFrameRead();
 	initializeFrameRead();
 
 	//	cout << framesFront->at(0)[0].x << " " << framesFront->at(0)[0].y << " " << framesFront->at(0)[0].z << endl;
@@ -63,6 +72,8 @@ void StateSpace::loadAnimation()
 
 	for (int i = 0; i < models.size(); i++)
 		models[i]->bindBuffers();
+
+	return true;
 }
 
 
@@ -76,7 +87,7 @@ StateSpace::~StateSpace()
 }
 
 void StateSpace::draw()
-{
+{ 
 	glEnable(GL_DEPTH_TEST);
 	updateFrames();
 	for (int i = 0; i < observers.size(); i++)
@@ -111,6 +122,12 @@ void StateSpace::draw()
 
 		if (ms.count() - time >= 16 && playModeOn)
 		{
+			if (framesFront->size() == 0)
+			{
+				FileStorage::resetReadFrames(fileName);
+				initializeFrameRead();
+				break;
+			}
 			frameCount = (frameCount + 1) % framesFront->size();
 			if ((*framesFront)[frameCount].size() == 0) {
 				FileStorage::resetReadFrames(fileName);
@@ -126,11 +143,11 @@ void StateSpace::draw()
 	}
 
 	glDisable(GL_DEPTH_TEST);
-/*
+
 	for (int i = 0; i < buttons.size(); i++)
 	{
 		buttons[i]->draw();
-	*/
+	}
 }
 
 void StateSpace::loadFramesInBack()
@@ -196,6 +213,12 @@ void StateSpace::initializeFrameRead()
 	t1.detach();
 }
 
+void StateSpace::clearFrameRead() 
+{
+	FileStorage::filePos.close();
+	FileStorage::hasOpen = false;
+}
+
 void StateSpace::execute()
 {
 	draw();
@@ -204,7 +227,7 @@ void StateSpace::execute()
 
 void StateSpace::checkInput()
 {
-	/*
+	
 	//hover
 	for (int i = 0; i < buttons.size(); i++)
 	{
@@ -219,10 +242,11 @@ void StateSpace::checkInput()
 		oldLeftClickState = GLFW_PRESS;
 		for (int i = 0; i < buttons.size(); i++)
 		{
-			buttons[i]->checkMouseClick();
+			if (buttons[i]->checkMouseClick())
+				break;
 		}
 	}
 
 	oldLeftClickState = leftClick;
-	*/
+	
 }

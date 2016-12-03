@@ -1,4 +1,4 @@
-#version 410 core
+#version 420 core
 
 // Interpolated values from the vertex shaders
 in vec4 vColor;
@@ -32,5 +32,4 @@ void main(){
 	float cosAlpha = clamp(dot(E,R), 0, 1);
 
 	color =  vec4(100 * vec3(1, 1, 1) * vColor.xyz * cosTheta / (1.0f + pow(distance, 2)), alpha);
-
 }

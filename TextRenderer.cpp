@@ -9,8 +9,10 @@ TextRenderer::~TextRenderer()
 {
 }
 
-void TextRenderer::RenderText(std::string text, GLfloat x, GLfloat y, GLfloat scale, glm::vec3 color, GLuint screenWidth, GLuint screenHeight)
+void TextRenderer::RenderText(std::string text, GLfloat x, GLfloat y, GLfloat scale, glm::vec3 color, GLuint screenWidth, GLuint screenHeight, int FontSize)
 {
+	this->fontSize = FontSize;
+
 	if (!initialized)
 	{
 		Initialize();
@@ -83,7 +85,7 @@ void TextRenderer::Initialize()
 	}
 
 	// Set font size to extract
-	FT_Set_Pixel_Sizes(face, 0, 24);
+	FT_Set_Pixel_Sizes(face, 0, fontSize);
 
 	glPixelStorei(GL_UNPACK_ALIGNMENT, 1);
 

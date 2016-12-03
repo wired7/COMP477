@@ -33,17 +33,18 @@ public:
 	void loadFramesInBack();
 	void swap(vector<vector<vec3>>* p1, vector<vector<vec3>>* p2);
 	void initializeFrameRead();
+	void clearFrameRead();
 	int framesBuffSize;
 	int totalFrames = 0;
 	int totalFramesLoaded;
 	int currGlobalFrame;
 	GLFWwindow* window;
 
-	void loadAnimation();
+	bool loadAnimation();
 	void execute();
 	void checkInput();
 
 private:
-	//std::vector<GUIButton*> buttons;
+	std::vector<GUIButton*> buttons;
 };
 

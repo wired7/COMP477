@@ -296,7 +296,7 @@ void Cube::draw()
 	glDrawElements(GL_TRIANGLES, indices.size(), GL_UNSIGNED_INT, 0);
 }
 
-GUIButton::GUIButton(vec3 position, vec3 dimensions, vec4 color, char* text, vec4 textColor, char* filePath, bool isRendered, std::function<void()> clickEvent)
+GUIButton::GUIButton(vec3 position, vec3 dimensions, vec4 color, char* text, vec4 textColor, char* filePath, bool isRendered, std::function<void()> clickEvent, int FontSize)
 {
 	shader = GUIShader::shader;
 	loadTexture(filePath);
@@ -316,6 +316,7 @@ GUIButton::GUIButton(vec3 position, vec3 dimensions, vec4 color, char* text, vec
 	this->clickEvent = clickEvent;
 	this->text = text;
 	this->textColor = textColor;
+	this->fontSize = FontSize;
 
 	model = translate(mat4(1.0f), position) * scale(mat4(1.0f), dimensions);
 
@@ -338,15 +339,32 @@ void GUIButton::draw()
 	glDrawElements(GL_TRIANGLES, indices.size(), GL_UNSIGNED_INT, 0);
 
 	//Draw text
-	textRend.RenderText(text, position.x, position.y + dimensions.y / 2.0f, 1.0f, glm::vec3(textColor.x, textColor.y, textColor.z) , Camera::activeCamera->getScreenWidth(), Camera::activeCamera->getScreenHeight());
+	textRend.RenderText(text, position.x, position.y + dimensions.y / 2.0f, 1.0f, glm::vec3(textColor.x, textColor.y, textColor.z) , Camera::activeCamera->getScreenWidth(), Camera::activeCamera->getScreenHeight(), fontSize);
 }
 
-void GUIButton::checkMouseClick()
+glm::vec2 GUIButton::calcScale()
+{
+	int ORIGINAL_RES_X = 1200;
+	int ORIGINAL_RES_Y = 800;
+
+	int scaleX = Camera::activeCamera->getScreenWidth() / ORIGINAL_RES_X;
+	int scaleY = Camera::activeCamera->getScreenHeight() / ORIGINAL_RES_Y;
+
+	vec2 scale = vec2(scaleX, scaleY);
+
+	return scale;
+
+}
+
+bool GUIButton::checkMouseClick()
 {
 	if (isPointInRect(InputState::mouseGuiCoords.x, InputState::mouseGuiCoords.y))
 	{
 		clickEvent();
+		return true;
 	}
+
+	return false;
 }
 
 void GUIButton::checkHover() {
@@ -369,6 +387,45 @@ bool GUIButton::isPointInRect(double x, double y)
 char* GUIButton::getText()
 {
 	return text;
+}
+
+GUIButtonValued::GUIButtonValued(vec3 position, vec3 dimensions, vec4 color, char* text, vec4 textColor, char* filePath, bool isRendered, std::function<void(float&)> clickEvent, float& ValueToChange, int FontSize) : valueToChange(ValueToChange)
+{
+	shader = GUIShader::shader;
+	loadTexture(filePath);
+
+	addVertex(vec3(0, 0, 0), color, vec2(0, 0), vec3(0, 0, -1));
+	addVertex(vec3(0, 1, 0), color, vec2(0, 1), vec3(0, 0, -1));
+	addVertex(vec3(1, 0, 0), color, vec2(1, 0), vec3(0, 0, -1));
+	addVertex(vec3(1, 1, 0), color, vec2(1, 1), vec3(0, 0, -1));
+
+	indices = { 0, 1, 2, 1, 2, 3 };
+
+	//center button
+	position -= (dimensions / 2.0f);
+
+	this->position = position;
+	this->dimensions = dimensions;
+	this->clickEvent = clickEvent;
+	this->text = text;
+	this->textColor = textColor;
+	this->fontSize = FontSize;
+
+	model = translate(mat4(1.0f), position) * scale(mat4(1.0f), dimensions);
+
+	if (isRendered)
+		bindBuffers();
+}
+bool GUIButtonValued::checkMouseClick()
+{
+	if (isPointInRect(InputState::mouseGuiCoords.x, InputState::mouseGuiCoords.y))
+	{
+		clickEvent(valueToChange);
+		return true;
+	}
+
+	else
+		return false;
 }
 
 GUIBackground::GUIBackground(vec3 position, vec3 dimensions, vec4 color, char* texturePath, bool isRendered)

@@ -24,7 +24,7 @@ public:
 
 	~TextRenderer();
 
-	void RenderText(std::string text, GLfloat x, GLfloat y, GLfloat scale, vec3 color, GLuint screenWidth, GLuint screenHeight);
+	void RenderText(std::string text, GLfloat x, GLfloat y, GLfloat scale, vec3 color, GLuint screenWidth, GLuint screenHeight, int FontSize);
 
 private:
 
@@ -43,6 +43,7 @@ private:
 	map<char, Character> Characters;
 	GLuint VAO, VBO;
 
+	int fontSize;
 	bool initialized = false;
 
 	const string LOG_CHANNEL = "TextRenderer";

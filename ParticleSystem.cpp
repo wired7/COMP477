@@ -6,10 +6,13 @@
 #include <chrono>
 #include <omp.h>
 #include <fstream>
+#include "FileStorage.h"
+#include "Utils.h"
 
 using namespace std::chrono;
 
 ParticleSystem* ParticleSystem::particleSystem;
+bool ParticleSystem::SerializeData = false;
 
 void rigidbodyIntersections(int i)
 {
@@ -94,45 +97,73 @@ ParticleSystem::~ParticleSystem()
 
 }
 
-void ParticleSystem::goNuts(float playbackTime, float frameRate, string filePath)
+void ParticleSystem::watchCIN()
 {
+	char val = ' ';
+	while (val != 'x')
+	{
+		cin >> val;
+	}
+	ParticleSystem::SerializeData = true;
+}
+
+void ParticleSystem::goNuts(float playbackTime, float frameRate, string filePath, bool continueFlag)
+{
+	std::thread t1(&ParticleSystem::watchCIN, this);
+	t1.detach();
+
 	milliseconds ms;
 
 	float t = 0;
 
 	ofstream myfile;
-	myfile.open(filePath);
 
-	for (int i = 0; i < rigidbodies.size(); i++)
+	if (continueFlag)
 	{
-		myfile << "Rigidbody:" << endl;
+		myfile.open(filePath, std::ios_base::app);
+	}
+	else
+	{
+		myfile.open(filePath);
+		
+		vector<string> vec = Utils::split(filePath, '\\');
+		string newFile = "Animations/Serialize/s_" + vec.at(vec.size() - 1);
 
-		for (int j = 0; j < rigidbodies[i]->vertices.size(); j++)
-		{
-			for (int k = 0; k < 3; k++)
-				myfile << rigidbodies[i]->vertices[j].position[k] << " ";
-			for (int k = 0; k < 3; k++)
-				myfile << rigidbodies[i]->vertices[j].normal[k] << " ";
-			for (int k = 0; k < 4; k++)
-				myfile << rigidbodies[i]->vertices[j].color[k] << " ";
-		}
-
-		myfile << endl;
-
-		for (int j = 0; j < rigidbodies[i]->indices.size(); j++)
-		{
-			myfile << rigidbodies[i]->indices[j] << " ";
-		}
-
-		myfile << endl;
+		myfile << "Serialized:" << newFile << endl;
 	}
 
-	myfile << "Particles:" << endl;
+	if (!continueFlag)
+	{
+		for (int i = 0; i < rigidbodies.size(); i++)
+		{
+			myfile << "Rigidbody:" << endl;
 
-	myfile << sysParams.volume << " " << sysParams.particleRadius << " " << sysParams.searchRadius << " " << sysParams.viscocity << " " << sysParams.stiffness << " ";
-	myfile << sysParams.restDensity << " " << sysParams.gravity << " " << sysParams.tStep << " " << sysParams.maxTStep << endl;
-	myfile.close();
+			for (int j = 0; j < rigidbodies[i]->vertices.size(); j++)
+			{
+				for (int k = 0; k < 3; k++)
+					myfile << rigidbodies[i]->vertices[j].position[k] << " ";
+				for (int k = 0; k < 3; k++)
+					myfile << rigidbodies[i]->vertices[j].normal[k] << " ";
+				for (int k = 0; k < 4; k++)
+					myfile << rigidbodies[i]->vertices[j].color[k] << " ";
+			}
 
+			myfile << endl;
+
+			for (int j = 0; j < rigidbodies[i]->indices.size(); j++)
+			{
+				myfile << rigidbodies[i]->indices[j] << " ";
+			}
+
+			myfile << endl;
+		}
+
+		myfile << "Particles:" << endl;
+
+		myfile << sysParams.volume << " " << sysParams.particleRadius << " " << sysParams.searchRadius << " " << sysParams.viscocity << " " << sysParams.stiffness << " ";
+		myfile << sysParams.restDensity << " " << sysParams.gravity << " " << sysParams.tStep << " " << sysParams.maxTStep << endl;
+		myfile.close();
+	}
 	for (float simTime = 0; simTime < playbackTime; simTime += sysParams.tStep)
 	{
 		ms = duration_cast<milliseconds>(system_clock::now().time_since_epoch());
@@ -157,6 +188,15 @@ void ParticleSystem::goNuts(float playbackTime, float frameRate, string filePath
 			float deltaTime = duration_cast<milliseconds>(system_clock::now().time_since_epoch()).count() - ms.count();
 			cout << (simTime / playbackTime) * 100 << "%" << endl;
 			cout << "ETA: " << deltaTime * (playbackTime - simTime) / 1000 / 60 << " mins" << endl;
+
+			if (ParticleSystem::SerializeData)
+			{
+				FileStorage::serializeData(filePath);
+				cout << "Data serialized. Press any key to exit ..." << endl;
+				int temp;
+				cin >> temp;
+				std::exit(0);
+			}
 		}
 
 		SPH::calcSPH();
@@ -173,7 +213,17 @@ void ParticleSystem::addParticles(vector<Particle*> part)
 	{
 		particles[i]->index = i;
 		particles[i]->gridCellCoord = particles[i]->position / grid.getCellSize();
-		grid.data[(int)particles[i]->gridCellCoord.x][(int)particles[i]->gridCellCoord.y][(int)particles[i]->gridCellCoord.z].particles.push_back(i);
+
+		int gridX = particles[i]->gridCellCoord.x;
+		int gridY = particles[i]->gridCellCoord.y;
+		int gridZ = particles[i]->gridCellCoord.z;
+
+		bool offGrid = (gridX >= grid.dim.x || gridY >= grid.dim.y || gridZ >= grid.dim.z || gridX < 0 || gridY < 0 || gridZ < 0);
+
+		if (!offGrid)
+		{
+			grid.data[(int)particles[i]->gridCellCoord.x][(int)particles[i]->gridCellCoord.y][(int)particles[i]->gridCellCoord.z].particles.push_back(i);
+		}
 	}
 }
 

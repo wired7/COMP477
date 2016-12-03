@@ -24,8 +24,8 @@ public:
 	void update(Particle& particle);
 	vector<int> getNeighbors(Particle particle);
 	vector<GridCube> getNeighborCubes(Particle particle);
-private:
 	glm::vec3 dim;
+private:
 	float cellSize;
 	int numCells;
 	bool inRadius(glm::vec3 pos1, glm::vec3 pos2);

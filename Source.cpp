@@ -65,6 +65,9 @@ int init() {
 		return -1;
 	}
 
+	//Check version of OpenGL and print
+	std::printf("*** OpenGL Version: %s ***\n", glGetString(GL_VERSION));
+
 	// Ensure we can capture the escape key being pressed below
 	glfwSetInputMode(window, GLFW_STICKY_KEYS, GL_TRUE);
 
@@ -81,7 +84,7 @@ int init() {
 
 	glPointSize(3.0f);
 
-	LitShader::shader = new LitShader("shaders\\litShader.VERTEXSHADER", "shaders\\InstancedFragmentShader.FRAGMENTSHADER");
+	LitShader::shader = new LitShader("shaders\\litShader.VERTEXSHADER", "shaders\\litShader.FRAGMENTSHADER");
 	InstancedLitShader::shader = new InstancedLitShader("shaders\\InstancedVertexShader.VERTEXSHADER", "shaders\\InstancedFragmentShader.FRAGMENTSHADER");
 	UnlitShader::shader = new UnlitShader("shaders\\unlit2DShader.VERTEXSHADER", "shaders\\unlit2DShader.FRAGMENTSHADER");
 	CubeMapShader::shader = new CubeMapShader("shaders\\CubeMap.VERTEXSHADER", "shaders\\CubeMap.FRAGMENTSHADER");
@@ -90,6 +93,7 @@ int init() {
 
 	Skybox* skybox = new Skybox("skyboxes\\ame_nebula\\");
 	Scenes::stateSpace = new StateSpace(window, skybox);
+	Scenes::sceneEditor = new SceneEditor(window, skybox);
 	Scenes::menu = new Menu(window);
 	StateSpace::activeStateSpace = Scenes::stateSpace;
 	SceneManager::getInstance()->changeActiveScene(Scenes::menu);
