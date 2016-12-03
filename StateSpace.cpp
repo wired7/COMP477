@@ -27,6 +27,7 @@ void pause()
 void backToMenu()
 {
 	SceneManager::getInstance()->changeActiveScene(Scenes::menu);
+	delete Scenes::stateSpace;
 }
 
 StateSpace::StateSpace(GLFWwindow* window, Skybox* skybox)
@@ -50,9 +51,6 @@ StateSpace::StateSpace(GLFWwindow* window, Skybox* skybox)
 
 void StateSpace::loadAnimation()
 {
-	observers.clear();
-	instancedModels.clear();
-	models.clear();
 	milliseconds ms = duration_cast<milliseconds>(system_clock::now().time_since_epoch());
 	time = ms.count();
 	int width, height;
@@ -64,6 +62,8 @@ void StateSpace::loadAnimation()
 	Controller::setController(StateSpaceController::getController());
 
 	fileName = _strdup(OpenFileDialog().SelectFile().c_str());
+
+	clearFrameRead();
 	initializeFrameRead();
 
 	//	cout << framesFront->at(0)[0].x << " " << framesFront->at(0)[0].y << " " << framesFront->at(0)[0].z << endl;
@@ -85,7 +85,7 @@ StateSpace::~StateSpace()
 }
 
 void StateSpace::draw()
-{
+{ 
 	glEnable(GL_DEPTH_TEST);
 	updateFrames();
 	for (int i = 0; i < observers.size(); i++)
@@ -202,6 +202,12 @@ void StateSpace::initializeFrameRead()
 	FileStorage::readFrames(fileName, loadSize, framesFront, &models);
 	std::thread t1(&StateSpace::loadFramesInBack, this);
 	t1.detach();
+}
+
+void StateSpace::clearFrameRead() 
+{
+	FileStorage::filePos.close();
+	FileStorage::hasOpen = false;
 }
 
 void StateSpace::execute()
