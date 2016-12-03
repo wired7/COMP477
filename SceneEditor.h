@@ -5,14 +5,14 @@
 class GUIValueChanger
 {
 public:
-	GUIButton* inc;
-	GUIButton* dec;
+	GUIButtonValued* inc;
+	GUIButtonValued* dec;
 	GUIButton* done;
-	float value;
 	TextRenderer textRend;
 	vec3 pos;
+	float& value;
 
-	GUIValueChanger(vec3 position);
+	GUIValueChanger(vec3 position, float& ValueToChange);
 	~GUIValueChanger();
 
 	void draw();

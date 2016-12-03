@@ -4,20 +4,18 @@
 #include "SceneManager.h"
 #include "ButtonFunctions.h"
 
-void increment()
+void increment(float& value)
 {
-	std::cout << "inc" << std::endl;
+	value++;
 }
 
-void decrement()
+void decrement(float& value)
 {
-	std::cout << "dec" << std::endl;
+	value--;
 }
 
 void acceptChanges()
 {
-	std::cout << "DONE" << std::endl;
-
 	vec3 center(0.0f, 0.0f, 0.0f);
 	vec3 dimensions(5.0f, 5.0f, 5.0f);
 	vec4 color(0.0f, 0.0f, 0.0f, 1.0f);
@@ -27,10 +25,10 @@ void acceptChanges()
 	Scenes::sceneEditor->displayOptions = false;
 }
 
-GUIValueChanger::GUIValueChanger(vec3 position) : pos(position)
+GUIValueChanger::GUIValueChanger(vec3 position, float& ValueToChange) : pos(position), value(ValueToChange)
 {
-	inc = new GUIButton(vec3(pos.x + 50, pos.y, 0), vec3(32, 32, 1), vec4(1.0, 1.0, 1.0, 1.0), "+", vec4(0.0f, 0.0f, 0.0f, 1.0f), "textures\\button.png", true, increment);
-	dec = new GUIButton(vec3(pos.x - 50, pos.y, 0), vec3(32, 32, 1), vec4(1.0, 1.0, 1.0, 1.0), "-", vec4(0.0f, 0.0f, 0.0f, 1.0f), "textures\\button.png", true, decrement);
+	inc = new GUIButtonValued(vec3(pos.x + 50, pos.y, 0), vec3(32, 32, 1), vec4(1.0, 1.0, 1.0, 1.0), "+", vec4(0.0f, 0.0f, 0.0f, 1.0f), "textures\\button.png", true, increment, value);
+	dec = new GUIButtonValued(vec3(pos.x - 50, pos.y, 0), vec3(32, 32, 1), vec4(1.0, 1.0, 1.0, 1.0), "-", vec4(0.0f, 0.0f, 0.0f, 1.0f), "textures\\button.png", true, decrement, value);
 	done = new GUIButton(vec3(pos.x - 100, pos.y, 0), vec3(32, 32, 1), vec4(1.0, 1.0, 1.0, 1.0), "DONE", vec4(0.0f, 0.0f, 0.0f, 1.0f), "textures\\button.png", true, acceptChanges);
 }
 
@@ -44,7 +42,8 @@ void GUIValueChanger::draw()
 	inc->draw();
 	dec->draw();
 	done->draw();
-	textRend.RenderText("0", pos.x, pos.y, 1.0f, glm::vec3(0.0f, 0.0f, 0.0f), Camera::activeCamera->getScreenWidth(), Camera::activeCamera->getScreenHeight());
+
+	textRend.RenderText(std::to_string(value), pos.x, pos.y, 1.0f, glm::vec3(0.0f, 0.0f, 0.0f), Camera::activeCamera->getScreenWidth(), Camera::activeCamera->getScreenHeight());
 }
 
 void GUIValueChanger::checkHover()
@@ -71,7 +70,7 @@ void spawnCube()
 		delete Scenes::sceneEditor->valueChangers[i];
 	Scenes::sceneEditor->valueChangers.clear();
 
-	Scenes::sceneEditor->valueChangers.push_back(new GUIValueChanger(vec3(600, 600, 0)));
+	Scenes::sceneEditor->valueChangers.push_back(new GUIValueChanger(vec3(600, 600, 0), Scenes::sceneEditor->pos.x));
 
 	Scenes::sceneEditor->displayOptions = true;	
 }

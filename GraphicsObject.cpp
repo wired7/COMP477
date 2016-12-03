@@ -371,6 +371,40 @@ char* GUIButton::getText()
 	return text;
 }
 
+GUIButtonValued::GUIButtonValued(vec3 position, vec3 dimensions, vec4 color, char* text, vec4 textColor, char* filePath, bool isRendered, std::function<void(float&)> clickEvent, float& ValueToChange) : valueToChange(ValueToChange)
+{
+	shader = GUIShader::shader;
+	loadTexture(filePath);
+
+	addVertex(vec3(0, 0, 0), color, vec2(0, 0), vec3(0, 0, -1));
+	addVertex(vec3(0, 1, 0), color, vec2(0, 1), vec3(0, 0, -1));
+	addVertex(vec3(1, 0, 0), color, vec2(1, 0), vec3(0, 0, -1));
+	addVertex(vec3(1, 1, 0), color, vec2(1, 1), vec3(0, 0, -1));
+
+	indices = { 0, 1, 2, 1, 2, 3 };
+
+	//center button
+	position -= (dimensions / 2.0f);
+
+	this->position = position;
+	this->dimensions = dimensions;
+	this->clickEvent = clickEvent;
+	this->text = text;
+	this->textColor = textColor;
+
+	model = translate(mat4(1.0f), position) * scale(mat4(1.0f), dimensions);
+
+	if (isRendered)
+		bindBuffers();
+}
+void GUIButtonValued::checkMouseClick()
+{
+	if (isPointInRect(InputState::mouseGuiCoords.x, InputState::mouseGuiCoords.y))
+	{
+		clickEvent(valueToChange);
+	}
+}
+
 GUIBackground::GUIBackground(vec3 position, vec3 dimensions, vec4 color, char* texturePath, bool isRendered)
 {
 	shader = UnlitShader::shader;
