@@ -11,7 +11,6 @@ void collisionsSubFunction(ParticleSystem* pS, int n)
 {
 	Particle* currParticle = pS->particles[n];
 
-	pS->sysParams.tStep = pS->sysParams.maxTStep;
 	vector<GridCube> vec = pS->grid.getNeighborCubes(*currParticle);
 
 	for (int j = 0; j < vec.size(); ++j)
@@ -38,13 +37,14 @@ void collisionsSubFunction(ParticleSystem* pS, int n)
 			
 			if (currParticle->collisionNormal != direction)
 			{
+				vec3 velDir = normalize(currParticle->params.velocity);
 				if (distance < pS->sysParams.particleRadius)
 				{
-					if (triangle.intersects(origin, direction))
+					if (abs(triangle.intersects(origin, direction)) && abs(plane.intersects(origin, velDir)))
 					{
 						// Update particle velocity with reflected, assuming some loss in energy in terms of heat
 						// take particle back to position where it would have first collided with the plane given the current velocity
-						vec3 velDir = normalize(currParticle->params.velocity);
+						
 						float d1 = plane.intersection(origin, velDir);
 						float backwardsDisplacement;
 
@@ -53,7 +53,7 @@ void collisionsSubFunction(ParticleSystem* pS, int n)
 							//sin(theta) = radius / backwardsDisplacement -> bD = radius / sin(theta)
 							// theta = angle between velocity vector and plane -> dot(v, normal) = cos(phi) -> phi = arccos(dot(v, normal))
 							// theta = 90 - phi -> bD = radius / sin(90 - arccos(dot(v, normal)))
-							backwardsDisplacement = pS->sysParams.particleRadius / dot(-velDir, direction);
+							backwardsDisplacement = pS->sysParams.particleRadius / abs(dot(velDir, direction));
 						}
 						else if (d1 > 0)
 						{
@@ -65,12 +65,12 @@ void collisionsSubFunction(ParticleSystem* pS, int n)
 							backwardsDisplacement = d1 * pS->sysParams.particleRadius / distance; // using law of sines
 						}
 
+						float dT = pS->sysParams.maxTStep - backwardsDisplacement / length(currParticle->params.velocity);
+
 						currParticle->params.velocity = 0.8f * glm::reflect(currParticle->params.velocity, direction);
-						currParticle->nextPosition -= velDir * backwardsDisplacement;
+						currParticle->nextPosition = currParticle->position + (currParticle->nextPosition - currParticle->position) * dT / pS->sysParams.maxTStep;
 
-/*						float dT = backwardsDisplacement / length(currParticle->params.velocity);
-
-						if (pS->sysParams.maxTStep - dT < pS->sysParams.tStep)
+/*						if (pS->sysParams.maxTStep - dT < pS->sysParams.tStep)
 						{
 							pS->sysParams.tStep = pS->sysParams.maxTStep - dT;
 						}
@@ -90,14 +90,17 @@ void collisionsSubFunction(ParticleSystem* pS, int n)
 				else
 				{
 					vec3 difference = currParticle->nextPosition - currParticle->position;
-					float d1 = triangle.intersection(origin, normalize(difference));
-					if (d1 < length(difference) && d1 >= 0)
+					float d1 = plane.intersection(currParticle->position, normalize(difference));
+
+					if (abs(d1) < length(difference) && d1 > 0)
 					{
-						vec3 velDir = normalize(currParticle->params.velocity);
+//						vec3 velDir = normalize(currParticle->params.velocity);
 						float backwardsDisplacement = d1 * pS->sysParams.particleRadius / distance; // using law of sines
 
+						float dT = pS->sysParams.maxTStep - backwardsDisplacement / length(currParticle->params.velocity);
+
 						currParticle->params.velocity = 0.8f * glm::reflect(currParticle->params.velocity, direction);
-						currParticle->nextPosition -= velDir * backwardsDisplacement;
+						currParticle->nextPosition = currParticle->position + (currParticle->nextPosition - currParticle->position) * dT / pS->sysParams.maxTStep;
 
 /*						float dT = backwardsDisplacement / length(currParticle->params.velocity);
 

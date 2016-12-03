@@ -2,6 +2,8 @@ cube: center.x center.y center.z dimensions.x dimensions.y dimensions.z red gree
 
 sphere: center.x center.y center.z dimensions.x dimensions.y dimensions.z red green blue alpha resolution
 
+Cylinder: initialRadius engingRadius resolution red green blue alpha pt1.x pt1.y pt1.z pt2.x pt2.y pt2.z...
+
 triangle(not available yet): point1.x point1.y point1.z point2.x point2.y point2.z point3.x point3.y point3.z
 
 

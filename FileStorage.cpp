@@ -146,6 +146,20 @@ vector<MeshObject*> FileStorage::matchRigidbodies(vector<pair<string, vector<flo
 
 			rigidbodies.push_back(new Polyhedron(res, center, dimensions, color, false));
 		}
+		else if (values[i].first == "cylinder")
+		{
+			float startingRadius = values[i].second[0];
+			float endingRadius = values[i].second[1];
+			float resolution = values[i].second[2];
+			vec4 color(values[i].second[3], values[i].second[4], values[i].second[5], values[i].second[6]);
+			vector<vec3> points;
+
+			for (int j = 7; j < values[i].second.size(); j += 3)
+				for(int k = 0; k < 3; k++)
+					points.push_back(vec3(values[i].second[k])); 
+
+			rigidbodies.push_back(new Cylinder(startingRadius, endingRadius, vec2(resolution, 0), points, color, false));
+		}
 /*		else if (values[i].first == "triangle")
 		{
 			vec3 pt1(values[i].second[0], values[i].second[1], values[i].second[2]);
@@ -221,6 +235,8 @@ void FileStorage::readFrames(char* file, int count, vector<vector<glm::vec3>>* f
 								ss >> color[i];
 
 							vertices.push_back(Vertex2(pos, normal, color, vec2(0, 0)));
+
+							cout << pos.x << " " << pos.y << " " << pos.z << endl;
 
 							stringLen -= 10;
 						}

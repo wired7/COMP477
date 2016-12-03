@@ -117,6 +117,7 @@ void StateSpace::draw()
 				initializeFrameRead();
 			}
 			else {
+//				cout << framesFront->at(frameCount).size() << endl;;
 				((InstancedSpheres*)instancedModels[0])->updateInstances(&((*framesFront)[frameCount]));
 				time = duration_cast<milliseconds>(system_clock::now().time_since_epoch()).count();
 				currGlobalFrame++;

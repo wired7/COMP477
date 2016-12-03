@@ -5,7 +5,7 @@ in vec4 fragColor;
 in vec2 fragUV;
 
 // Ouput data
-out vec4 output;
+out vec4 outputVar;
 
 uniform mat4 View;
 uniform sampler2D tex;
@@ -14,5 +14,5 @@ uniform vec4 hoverColor;
 void main(){
 
 	vec4 textureColor = texture(tex, fragUV);
-	output = fragColor *hoverColor* textureColor;
+	outputVar = fragColor *hoverColor* textureColor;
 }
