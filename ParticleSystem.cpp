@@ -192,7 +192,7 @@ void ParticleSystem::goNuts(float playbackTime, float frameRate, string filePath
 			if (ParticleSystem::SerializeData)
 			{
 				FileStorage::serializeData(filePath);
-				cout << "Data serialized. Exiting ..." << endl;
+				cout << "Data serialized. Press any key to exit ..." << endl;
 				int temp;
 				cin >> temp;
 				std::exit(0);
