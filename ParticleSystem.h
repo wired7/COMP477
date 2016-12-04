@@ -25,6 +25,16 @@ struct SystemParameters {
 	SystemParameters(float vl, float pR, float sR, float v, float k, float rD, float g, float tS, float mS) : volume(vl), particleRadius(pR), searchRadius(sR), viscocity(v), stiffness(k), restDensity(rD), gravity(g), tStep(tS), maxTStep(mS){}
 };
 
+struct NodeInfo
+{
+	Vertex2* vertex;
+	int index;
+	bool visited;
+
+	NodeInfo() : vertex(NULL), index(-1), visited(false) {};
+	NodeInfo(Vertex2* vertx, int indx, bool visitd) : vertex(vertx), index(indx), visited(visitd) {};
+};
+
 class ParticleSystem 
 {
 public:
@@ -42,7 +52,7 @@ public:
 	void setStiffnessOfParticleSystem();
 	void calculateMassOfParticles();
 	Grid3D grid;
-	vector<MeshObject*> rayTrace(vector<glm::vec3>*, float, int);
+	static Rigidbody* rayTrace(vector<glm::vec3>*, float, int);
 	static bool SerializeData;
 	void watchCIN();
 private:
