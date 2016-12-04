@@ -138,6 +138,9 @@ Polyhedron::Polyhedron(int resolution, vec3 pos, vec3 radii, vec4 color, bool is
 	loadTexture("textures\\blank.jpg");
 	model = scale(translate(mat4(1.0f), pos), radii);
 	this->resolution = resolution;
+	this->pos = pos;
+	this->dimensions = radii;
+	this->color = color;
 	double theta = 2 * 3.1415 / resolution;
 	double phi = 3.1415 / resolution;
 	vector<vector<vec3>> circles;
@@ -464,6 +467,10 @@ void Rectangle::draw()
 
 Cube::Cube(vec3 center, vec3 dimensions, vec4 color, bool isRendered)
 {
+	this->pos = center;
+	this->dimensions = dimensions;
+	this->color = color;
+
 	shader = LitShader::shader;
 	loadTexture("textures\\blank.jpg");
 

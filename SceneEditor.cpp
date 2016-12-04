@@ -26,14 +26,13 @@ void acceptChanges()
 
 	Scenes::sceneEditor->rigidbodies.push_back(new Cube(center, dimensions, color, true));
 
+	Scenes::sceneEditor->showRecentShape = false;
 	Scenes::sceneEditor->displayOptions = false;
 }
 
 void cancelChanges()
 {
-	delete Scenes::sceneEditor->tempRigidbodies.back();
-	Scenes::sceneEditor->tempRigidbodies.clear();
-
+	Scenes::sceneEditor->showRecentShape = false;
 	Scenes::sceneEditor->displayOptions = false;
 }
 
@@ -73,31 +72,7 @@ bool GUIValueChanger::checkMouseClick()
 
 void spawnCube()
 {
-	Scenes::sceneEditor->resetOptionsMenu();
-
-	//Color pickers
-	Scenes::sceneEditor->valueChangers.push_back(new GUIValueChanger(vec3(50, 750, 0), Scenes::sceneEditor->color.r, "r"));
-	Scenes::sceneEditor->valueChangers.push_back(new GUIValueChanger(vec3(50, 700, 0), Scenes::sceneEditor->color.g, "g"));
-	Scenes::sceneEditor->valueChangers.push_back(new GUIValueChanger(vec3(50, 650, 0), Scenes::sceneEditor->color.b, "b"));
-	Scenes::sceneEditor->valueChangers.push_back(new GUIValueChanger(vec3(50, 600, 0), Scenes::sceneEditor->color.a, "a"));
-
-	//Pos pickers
-	Scenes::sceneEditor->valueChangers.push_back(new GUIValueChanger(vec3(150, 750, 0), Scenes::sceneEditor->pos.x, "x"));
-	Scenes::sceneEditor->valueChangers.push_back(new GUIValueChanger(vec3(150, 700, 0), Scenes::sceneEditor->pos.y, "y"));
-	Scenes::sceneEditor->valueChangers.push_back(new GUIValueChanger(vec3(150, 650, 0), Scenes::sceneEditor->pos.z, "z"));
-
-	//Dimension pickers
-	Scenes::sceneEditor->valueChangers.push_back(new GUIValueChanger(vec3(250, 750, 0), Scenes::sceneEditor->dimensions.x, "x"));
-	Scenes::sceneEditor->valueChangers.push_back(new GUIValueChanger(vec3(250, 700, 0), Scenes::sceneEditor->dimensions.y, "y"));
-	Scenes::sceneEditor->valueChangers.push_back(new GUIValueChanger(vec3(250, 650, 0), Scenes::sceneEditor->dimensions.z, "z"));
-
-	Scenes::sceneEditor->dimensions.x = 1.0f;
-	Scenes::sceneEditor->dimensions.y = 1.0f;
-	Scenes::sceneEditor->dimensions.z = 1.0f;
-	Scenes::sceneEditor->color.a = 8.0f;
-
-	Scenes::sceneEditor->acceptButton = new GUIButton(vec3(50, 550, 0), vec3(40, 32, 1), vec4(1.0, 1.0, 1.0, 1.0), "Done", vec4(0.0f, 0.0f, 0.0f, 1.0f), "textures\\button.png", true, acceptChanges, 14);
-	Scenes::sceneEditor->cancelButton = new GUIButton(vec3(150, 550, 0), vec3(40, 32, 1), vec4(1.0, 1.0, 1.0, 1.0), "Cancel", vec4(0.0f, 0.0f, 0.0f, 1.0f), "textures\\button.png", true, cancelChanges, 12);
+	Scenes::sceneEditor->showAllOptions();
 
 	float maxValue = 8.0f;
 
@@ -107,16 +82,22 @@ void spawnCube()
 
 	Scenes::sceneEditor->tempRigidbodies.push_back(new Cube(center, dimensions, color, true));
 	Scenes::sceneEditor->displayOptions = true;	
+	Scenes::sceneEditor->showRecentShape = true;
 }
 
 void spawnSphere()
 {
-	vec3 center(0.0f, 10.0f, 0.0f);
-	vec3 dimensions(5.0f, 5.0f, 5.0f);
-	std::cout << Scenes::sceneEditor->color.r << std::endl;
-	vec4 color(Scenes::sceneEditor->color.r, Scenes::sceneEditor->color.g, Scenes::sceneEditor->color.b, Scenes::sceneEditor->color.a);
+	Scenes::sceneEditor->showAllOptions();
 
-	Scenes::sceneEditor->rigidbodies.push_back(new Polyhedron(64, center, dimensions, color, true));
+	float maxValue = 8.0f;
+
+	vec3 center(Scenes::sceneEditor->pos.x, Scenes::sceneEditor->pos.y, Scenes::sceneEditor->pos.z);
+	vec4 color(Scenes::sceneEditor->color.r / maxValue, Scenes::sceneEditor->color.g / maxValue, Scenes::sceneEditor->color.b / maxValue, Scenes::sceneEditor->color.a / maxValue);
+	vec3 dimensions(Scenes::sceneEditor->dimensions.x, Scenes::sceneEditor->dimensions.y, Scenes::sceneEditor->dimensions.z);
+
+	Scenes::sceneEditor->tempRigidbodies.push_back(new Polyhedron(64, center, dimensions, color, true));
+	Scenes::sceneEditor->displayOptions = true;
+	Scenes::sceneEditor->showRecentShape = true;
 }
 
 void sweep()
@@ -171,8 +152,10 @@ void SceneEditor::draw()
 	for (int i = 0; i < rigidbodies.size(); i++)
 		rigidbodies[i]->draw();
 
-	if (tempRigidbodies.size() > 0)
+	if (tempRigidbodies.size() > 0 && showRecentShape)
+	{
 		tempRigidbodies.back()->draw();
+	}
 
 	for (int i = 0; i < buttons.size(); i++)
 		buttons[i]->draw();
@@ -245,11 +228,60 @@ void SceneEditor::resetOptionsMenu()
 	valueChangers.clear();
 	delete acceptButton;
 	delete cancelButton;
+
+	Scenes::sceneEditor->tempRigidbodies.clear();
 }
 
 void SceneEditor::updateCurrentSpawn()
 {
-	delete tempRigidbodies.back();
+	/*
+	float maxValue = 8.0f;
+	vec3 center(pos.x, pos.y, pos.z);
+	vec4 color(color.r / maxValue, color.g / maxValue, color.b / maxValue, color.a / maxValue);
+	vec3 dimensions(dimensions.x, dimensions.y, dimensions.z);
 
+	std::cout << pos.x << std::endl;
+
+	tempRigidbodies.back()->pos = center;
+	tempRigidbodies.back()->dimensions = dimensions;
+	tempRigidbodies.back()->color = color;
+	*/
+
+	float maxValue = 8.0f;
+	vec3 center(pos.x, pos.y, pos.z);
+	vec4 color(color.r / maxValue, color.g / maxValue, color.b / maxValue, color.a / maxValue);
+	vec3 dimensions(dimensions.x, dimensions.y, dimensions.z);
+
+	delete tempRigidbodies.back();
 	tempRigidbodies.push_back(new Cube(pos, dimensions, color, true));
+}
+
+void SceneEditor::showAllOptions()
+{
+	Scenes::sceneEditor->resetOptionsMenu();
+
+	//Color pickers
+	Scenes::sceneEditor->valueChangers.push_back(new GUIValueChanger(vec3(50, 750, 0), Scenes::sceneEditor->color.r, "r"));
+	Scenes::sceneEditor->valueChangers.push_back(new GUIValueChanger(vec3(50, 700, 0), Scenes::sceneEditor->color.g, "g"));
+	Scenes::sceneEditor->valueChangers.push_back(new GUIValueChanger(vec3(50, 650, 0), Scenes::sceneEditor->color.b, "b"));
+	Scenes::sceneEditor->valueChangers.push_back(new GUIValueChanger(vec3(50, 600, 0), Scenes::sceneEditor->color.a, "a"));
+
+	//Pos pickers
+	Scenes::sceneEditor->valueChangers.push_back(new GUIValueChanger(vec3(150, 750, 0), Scenes::sceneEditor->pos.x, "x"));
+	Scenes::sceneEditor->valueChangers.push_back(new GUIValueChanger(vec3(150, 700, 0), Scenes::sceneEditor->pos.y, "y"));
+	Scenes::sceneEditor->valueChangers.push_back(new GUIValueChanger(vec3(150, 650, 0), Scenes::sceneEditor->pos.z, "z"));
+
+	//Dimension pickers
+	Scenes::sceneEditor->valueChangers.push_back(new GUIValueChanger(vec3(250, 750, 0), Scenes::sceneEditor->dimensions.x, "x"));
+	Scenes::sceneEditor->valueChangers.push_back(new GUIValueChanger(vec3(250, 700, 0), Scenes::sceneEditor->dimensions.y, "y"));
+	Scenes::sceneEditor->valueChangers.push_back(new GUIValueChanger(vec3(250, 650, 0), Scenes::sceneEditor->dimensions.z, "z"));
+
+	Scenes::sceneEditor->dimensions.x = 1.0f;
+	Scenes::sceneEditor->dimensions.y = 1.0f;
+	Scenes::sceneEditor->dimensions.z = 1.0f;
+	Scenes::sceneEditor->color.a = 8.0f;
+
+	Scenes::sceneEditor->acceptButton = new GUIButton(vec3(50, 550, 0), vec3(40, 32, 1), vec4(1.0, 1.0, 1.0, 1.0), "Done", vec4(0.0f, 0.0f, 0.0f, 1.0f), "textures\\button.png", true, acceptChanges, 14);
+	Scenes::sceneEditor->cancelButton = new GUIButton(vec3(150, 550, 0), vec3(40, 32, 1), vec4(1.0, 1.0, 1.0, 1.0), "Cancel", vec4(0.0f, 0.0f, 0.0f, 1.0f), "textures\\button.png", true, cancelChanges, 12);
+
 }

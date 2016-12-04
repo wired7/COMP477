@@ -74,6 +74,10 @@ public:
 	void addVertex(vec3, vec4, vec2, vec3);
 	void applyTransform();
 	Bounds getBounds();
+
+	vec3 pos;
+	vec3 dimensions;
+	vec4 color;
 };
 
 class InstancedMeshObject : public MeshObject
