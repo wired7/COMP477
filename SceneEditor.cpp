@@ -28,7 +28,7 @@ void acceptChanges()
 	Scenes::sceneEditor->displayOptions = false;
 }
 
-GUIValueChanger::GUIValueChanger(vec3 position, float& ValueToChange) : pos(position), value(ValueToChange)
+GUIValueChanger::GUIValueChanger(vec3 position, float& ValueToChange, std::string Name) : pos(position), value(ValueToChange), name(Name)
 {
 	inc = new GUIButtonValued(vec3(pos.x + 20, pos.y, 0), vec3(16, 16, 1), vec4(1.0, 1.0, 1.0, 1.0), " +", vec4(0.0f, 0.0f, 0.0f, 1.0f), "textures\\button.png", true, increment, value, 12);
 	dec = new GUIButtonValued(vec3(pos.x - 20, pos.y, 0), vec3(16, 16, 1), vec4(1.0, 1.0, 1.0, 1.0), " -", vec4(0.0f, 0.0f, 0.0f, 1.0f), "textures\\button.png", true, decrement, value, 12);
@@ -44,6 +44,7 @@ void GUIValueChanger::draw()
 	inc->draw();
 	dec->draw();
 
+	textRend.RenderText(name, pos.x - 40.0f, pos.y - 3.0f, 1.0f, glm::vec3(0.0f, 0.0f, 0.0f), Camera::activeCamera->getScreenWidth(), Camera::activeCamera->getScreenHeight(), 14);
 	textRend.RenderText(std::to_string((int)value), pos.x - 5.0f, pos.y - 3.0f, 1.0f, glm::vec3(0.0f, 0.0f, 0.0f), Camera::activeCamera->getScreenWidth(), Camera::activeCamera->getScreenHeight(), 14);
 }
 
@@ -66,10 +67,10 @@ void spawnCube()
 	Scenes::sceneEditor->resetOptionsMenu();
 
 	//Color pickers
-	Scenes::sceneEditor->valueChangers.push_back(new GUIValueChanger(vec3(600, 600, 0), Scenes::sceneEditor->color.r));
-	Scenes::sceneEditor->valueChangers.push_back(new GUIValueChanger(vec3(600, 550, 0), Scenes::sceneEditor->color.g));
-	Scenes::sceneEditor->valueChangers.push_back(new GUIValueChanger(vec3(600, 500, 0), Scenes::sceneEditor->color.b));
-	Scenes::sceneEditor->valueChangers.push_back(new GUIValueChanger(vec3(600, 450, 0), Scenes::sceneEditor->color.a));
+	Scenes::sceneEditor->valueChangers.push_back(new GUIValueChanger(vec3(600, 600, 0), Scenes::sceneEditor->color.r, "r"));
+	Scenes::sceneEditor->valueChangers.push_back(new GUIValueChanger(vec3(600, 550, 0), Scenes::sceneEditor->color.g, "g"));
+	Scenes::sceneEditor->valueChangers.push_back(new GUIValueChanger(vec3(600, 500, 0), Scenes::sceneEditor->color.b, "b"));
+	Scenes::sceneEditor->valueChangers.push_back(new GUIValueChanger(vec3(600, 450, 0), Scenes::sceneEditor->color.a, "a"));
 
 	Scenes::sceneEditor->acceptButton = new GUIButton(vec3(500, 600, 0), vec3(32, 32, 1), vec4(1.0, 1.0, 1.0, 1.0), "Done", vec4(0.0f, 0.0f, 0.0f, 1.0f), "textures\\button.png", true, acceptChanges, 14);
 
@@ -104,10 +105,10 @@ SceneEditor::SceneEditor(GLFWwindow* window, Skybox* skybox)
 
 	Controller::setController(StateSpaceController::getController());
 
-	buttons.push_back(new GUIButton(vec3(1050, 100, 0.0f), vec3(150, 40, 0), vec4(1.0f, 1.0f, 1.0f, 1.0f), "Spawn Cube", vec4(0.0f), "textures\\button.png", true, spawnCube));
-	buttons.push_back(new GUIButton(vec3(900, 100, 0.0f), vec3(150, 40, 0), vec4(1.0f, 1.0f, 1.0f, 1.0f), "Spawn Sphere", vec4(0.0f), "textures\\button.png", true, spawnSphere));
-	buttons.push_back(new GUIButton(vec3(750, 100, 0.0f), vec3(150, 40, 0), vec4(1.0f, 1.0f, 1.0f, 1.0f), "Sweep", vec4(0.0f), "textures\\button.png", true, sweep));
-	buttons.push_back(new GUIButton(vec3(150, 100, 0.0f), vec3(180, 64, 0), vec4(1.0f, 1.0f, 1.0f, 1.0f), "Back To Menu", vec4(0.0f), "textures\\button.png", true, backToMenu));
+	buttons.push_back(new GUIButton(vec3(1050, 100, 0.0f), vec3(150, 40, 0), vec4(1.0f, 1.0f, 1.0f, 1.0f), " Spawn Cube", vec4(0.0f), "textures\\button.png", true, spawnCube));
+	buttons.push_back(new GUIButton(vec3(900, 100, 0.0f), vec3(150, 40, 0), vec4(1.0f, 1.0f, 1.0f, 1.0f), " Spawn Sphere", vec4(0.0f), "textures\\button.png", true, spawnSphere, 20));
+	buttons.push_back(new GUIButton(vec3(750, 100, 0.0f), vec3(150, 40, 0), vec4(1.0f, 1.0f, 1.0f, 1.0f), "     Sweep", vec4(0.0f), "textures\\button.png", true, sweep));
+	buttons.push_back(new GUIButton(vec3(150, 100, 0.0f), vec3(180, 64, 0), vec4(1.0f, 1.0f, 1.0f, 1.0f), "  Back To Menu", vec4(0.0f), "textures\\button.png", true, backToMenu, 24));
 }
 
 SceneEditor::~SceneEditor()

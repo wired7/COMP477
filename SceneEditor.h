@@ -10,8 +10,9 @@ public:
 	TextRenderer textRend;
 	vec3 pos;
 	float& value;
+	std::string name;
 
-	GUIValueChanger(vec3 position, float& ValueToChange);
+	GUIValueChanger(vec3 position, float& ValueToChange, std::string Name);
 	~GUIValueChanger();
 
 	void draw();
