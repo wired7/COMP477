@@ -10,8 +10,9 @@ public:
 	TextRenderer textRend;
 	vec3 pos;
 	float& value;
+	std::string name;
 
-	GUIValueChanger(vec3 position, float& ValueToChange);
+	GUIValueChanger(vec3 position, float& ValueToChange, std::string Name);
 	~GUIValueChanger();
 
 	void draw();
@@ -38,6 +39,8 @@ public:
 
 	std::vector<GUIValueChanger*> valueChangers;
 	GUIButton* acceptButton;
+	GUIButton* cancelButton;
+	std::vector<MeshObject*> tempRigidbodies;
 	std::vector<MeshObject*> rigidbodies;
 	bool displayOptions;
 
@@ -48,6 +51,7 @@ public:
 	TextRenderer textRend;
 
 	void resetOptionsMenu();
+	void updateCurrentSpawn();
 
 private:
 	std::vector<GUIButton*> buttons;

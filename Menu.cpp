@@ -210,7 +210,7 @@ Menu::Menu(GLFWwindow* window)
 	menuButtons.push_back(new GUIButton(vec3(600, 500, 0), vec3(180, 70, 1), vec4(1.0, 1.0, 1.0, 1.0), " Run Simulation", vec4(0.0f, 0.0f, 0.0f, 1.0f), "textures\\button.png", true, runSimulation));
 	menuButtons.push_back(new GUIButton(vec3(600, 400, 0), vec3(180, 70, 1), vec4(1.0, 1.0, 1.0, 1.0), "Continue Simulation", vec4(0.0f, 0.0f, 0.0f, 1.0f), "textures\\button.png", true, continueSim, 20));
 	menuButtons.push_back(new GUIButton(vec3(600, 300, 0), vec3(180, 70, 1), vec4(1.0, 1.0, 1.0, 1.0), "   Enter Editor", vec4(0.0f, 0.0f, 0.0f, 1.0f), "textures\\button.png", true, enterEditor));
-	menuButtons.push_back(new GUIButton(vec3(600, 200, 0), vec3(180, 70, 1), vec4(1.0, 1.0, 1.0, 1.0), "  Exit Program", vec4(0.0f, 0.0f, 0.0f, 1.0f), "textures\\button.png", true, exitSim));
+	menuButtons.push_back(new GUIButton(vec3(600, 200, 0), vec3(180, 70, 1), vec4(1.0, 1.0, 1.0, 1.0), "   Exit Program", vec4(0.0f, 0.0f, 0.0f, 1.0f), "textures\\button.png", true, exitSim));
 	
 	background = new GUIBackground(vec3(0.0f, 0.0f, 0.0f), 
 								   vec3(1200, 

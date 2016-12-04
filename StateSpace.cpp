@@ -46,7 +46,7 @@ StateSpace::StateSpace(GLFWwindow* window, Skybox* skybox)
 
 	buttons.push_back(new GUIButton(vec3(1000, 100, 0.0f), vec3(64, 64, 0), vec4(1.0f, 1.0f, 1.0f, 1.0f), "", vec4(1.0f), "textures\\playButton.png", true, play));
 	buttons.push_back(new GUIButton(vec3(1100, 100, 0.0f), vec3(64, 64, 0), vec4(1.0f, 1.0f, 1.0f, 1.0f), "", vec4(1.0f), "textures\\pauseButton.png", true, pause));
-	buttons.push_back(new GUIButton(vec3(750, 100, 0.0f), vec3(180, 64, 0), vec4(1.0f, 1.0f, 1.0f, 1.0f), "Back To Menu", vec4(0.0f), "textures\\button.png", true, backToMenu));
+	buttons.push_back(new GUIButton(vec3(750, 100, 0.0f), vec3(180, 64, 0), vec4(1.0f, 1.0f, 1.0f, 1.0f), "  Back To Menu", vec4(0.0f), "textures\\button.png", true, backToMenu, 24));
 	
 }
 
