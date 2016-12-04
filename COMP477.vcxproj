@@ -20,6 +20,7 @@
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="Arrow.h" />
+    <ClInclude Include="ButtonFunctions.h" />
     <ClInclude Include="Camera.h" />
     <ClInclude Include="Context.h" />
     <ClInclude Include="Controller.h" />
@@ -33,6 +34,7 @@
     <ClInclude Include="OpenFileDialog.h" />
     <ClInclude Include="Particle.h" />
     <ClInclude Include="ParticleSystem.h" />
+    <ClInclude Include="ProgramState.h" />
     <ClInclude Include="Rigidbody.h" />
     <ClInclude Include="SaveFileDialog.h" />
     <ClInclude Include="SceneEditor.h" />
@@ -47,6 +49,7 @@
     <ClInclude Include="Terrain.h" />
     <ClInclude Include="TextRenderer.h" />
     <ClInclude Include="TextureManager.h" />
+    <ClInclude Include="Utils.h" />
     <ClInclude Include="Win32Utils.h" />
   </ItemGroup>
   <ItemGroup>
@@ -168,7 +171,7 @@
       <FunctionLevelLinking>true</FunctionLevelLinking>
       <IntrinsicFunctions>true</IntrinsicFunctions>
       <SDLCheck>true</SDLCheck>
-      <AdditionalIncludeDirectories>C:\Users\Wired\Documents\Visual Studio 2015\Projects\COMP477\Resources\Simple OpenGL Image Library\SOIL;C:\Users\Wired\Documents\Visual Studio 2015\Projects\COMP477\Resources\Freetype\include;C:\Users\Wired\Documents\Visual Studio 2015\Projects\COMP477\Resources\GLM\glm;C:\Users\Wired\Documents\Visual Studio 2015\Projects\COMP477\Resources\GLFW\include\GLFW;C:\Users\Wired\Documents\Visual Studio 2015\Projects\COMP477\Resources\GLEW\include\GL;%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
+      <AdditionalIncludeDirectories>$(SolutionDir)\Resources\Simple OpenGL Image Library\SOIL;$(SolutionDir)\Resources\Freetype\include;$(SolutionDir)\Resources\GLM\glm;$(SolutionDir)\Resources\GLFW\include\GLFW;$(SolutionDir)\Resources\GLEW\include\GL;%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
       <MultiProcessorCompilation>
       </MultiProcessorCompilation>
       <AdditionalOptions>/openmp %(AdditionalOptions)</AdditionalOptions>
@@ -177,7 +180,7 @@
     <Link>
       <EnableCOMDATFolding>true</EnableCOMDATFolding>
       <OptimizeReferences>true</OptimizeReferences>
-      <AdditionalLibraryDirectories>C:\Users\Wired\Documents\Visual Studio 2015\Projects\COMP477\Resources\Simple OpenGL Image Library\lib;C:\Users\Wired\Documents\Visual Studio 2015\Projects\COMP477\Resources\GLFW\lib-vc2015;C:\Users\Wired\Documents\Visual Studio 2015\Projects\COMP477\Resources\GLEW\lib\Release\Win32;C:\Users\Wired\Documents\Visual Studio 2015\Projects\COMP477\Resources\Freetype\2015;%(AdditionalLibraryDirectories)</AdditionalLibraryDirectories>
+      <AdditionalLibraryDirectories>$(SolutionDir)\Resources\Simple OpenGL Image Library\lib;$(SolutionDir)\Resources\GLFW\lib-vc2015;$(SolutionDir)\Resources\GLEW\lib\Release\Win32;$(SolutionDir)\Resources\Freetype\2015;%(AdditionalLibraryDirectories)</AdditionalLibraryDirectories>
       <AdditionalDependencies>opengl32.lib;glew32.lib;glfw3.lib;soil.lib;freetype27.lib;%(AdditionalDependencies)</AdditionalDependencies>
     </Link>
   </ItemDefinitionGroup>

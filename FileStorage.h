@@ -19,6 +19,7 @@ public:
 	static SystemParameters loadSysParams(string);
 	static vector<MeshObject*> loadRigidbodies(string);
 	static void serializeData(string file);
+	static string serializeScene();
 	static ProgramState deserializeData(string file);
 	static string rigidBodyFile;
 	static string getSerializedFile(string file);

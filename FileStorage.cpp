@@ -6,6 +6,7 @@
 #include <sstream>
 #include <iostream>
 #include <algorithm>
+#include "SceneManager.h"
 
 using namespace std;
 
@@ -503,6 +504,31 @@ string FileStorage::serializeStrParticle(Particle particle)
 	ret += "pressure: " + to_string(params.pressure) + ":";
 	ret += "kernel: " + to_string(params.kernel) + ":";
 	ret += "position: " + to_string(particle.position.x) + " " + to_string(particle.position.y) + " " + to_string(particle.position.z) + ":";
+
+	return ret;
+}
+
+string FileStorage::serializeScene()
+{
+
+	std::vector<MeshObject*> sceneObjects = Scenes::sceneEditor->rigidbodies;
+	string ret = "";
+
+	for (int i = 0; i < Scenes::sceneEditor->rigidbodies.size(); i++)
+	{
+		ret += Scenes::sceneEditor->rigidbodies[i]->shapeType + ": ";
+		ret += std::to_string(Scenes::sceneEditor->rigidbodies[i]->pos.x) + " ";
+		ret += std::to_string(Scenes::sceneEditor->rigidbodies[i]->pos.y) + " ";
+		ret += std::to_string(Scenes::sceneEditor->rigidbodies[i]->pos.z) + " ";
+		ret += std::to_string(Scenes::sceneEditor->rigidbodies[i]->dimensions.x) + " ";
+		ret += std::to_string(Scenes::sceneEditor->rigidbodies[i]->dimensions.y) + " ";
+		ret += std::to_string(Scenes::sceneEditor->rigidbodies[i]->dimensions.z) + " ";
+		ret += std::to_string(Scenes::sceneEditor->rigidbodies[i]->color.r) + " ";
+		ret += std::to_string(Scenes::sceneEditor->rigidbodies[i]->color.g) + " ";
+		ret += std::to_string(Scenes::sceneEditor->rigidbodies[i]->color.b) + " ";
+		ret += std::to_string(Scenes::sceneEditor->rigidbodies[i]->color.a) + " ";
+		ret += "\n";
+	}
 
 	return ret;
 }
