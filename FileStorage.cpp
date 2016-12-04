@@ -4,7 +4,6 @@
 #include "ParticleSystem.h"
 #include <string>
 #include <sstream>
-#include <fstream>
 #include <iostream>
 #include <algorithm>
 
@@ -199,8 +198,12 @@ void FileStorage::readFrames(char* file, int count, vector<vector<glm::vec3>>* f
 
 	string line;
 
+	const int size = 8192;
+	char buffer[size];
+
 		if (!hasOpen)
 		{
+			filePos.rdbuf()->pubsetbuf(buffer, size);
 			filePos.open(file, ios_base::in);
 
 			if (filePos.is_open())

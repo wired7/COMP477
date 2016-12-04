@@ -531,7 +531,7 @@ void GUIButton::draw()
 	glDrawElements(GL_TRIANGLES, indices.size(), GL_UNSIGNED_INT, 0);
 
 	//Draw text
-	textRend.RenderText(text, position.x, position.y + dimensions.y / 2.0f, 1.0f, glm::vec3(textColor.x, textColor.y, textColor.z) , Camera::activeCamera->getScreenWidth(), Camera::activeCamera->getScreenHeight(), fontSize);
+	textRend.RenderText(text, position.x, position.y + (dimensions.y / 2.0f) - 5.0f, 1.0f, glm::vec3(textColor.x, textColor.y, textColor.z) , Camera::activeCamera->getScreenWidth(), Camera::activeCamera->getScreenHeight(), fontSize);
 }
 
 glm::vec2 GUIButton::calcScale()

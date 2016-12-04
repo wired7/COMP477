@@ -8,6 +8,7 @@
 #include <thread>
 #include "SceneManager.h"
 #include "ButtonFunctions.h"
+#include <omp.h>
 
 using namespace std::chrono;
 
@@ -45,7 +46,7 @@ StateSpace::StateSpace(GLFWwindow* window, Skybox* skybox)
 
 	buttons.push_back(new GUIButton(vec3(1000, 100, 0.0f), vec3(64, 64, 0), vec4(1.0f, 1.0f, 1.0f, 1.0f), "", vec4(1.0f), "textures\\playButton.png", true, play));
 	buttons.push_back(new GUIButton(vec3(1100, 100, 0.0f), vec3(64, 64, 0), vec4(1.0f, 1.0f, 1.0f, 1.0f), "", vec4(1.0f), "textures\\pauseButton.png", true, pause));
-	buttons.push_back(new GUIButton(vec3(750, 100, 0.0f), vec3(180, 64, 0), vec4(1.0f, 1.0f, 1.0f, 1.0f), "Back To Menu", vec4(0.0f), "textures\\button.png", true, backToMenu));
+	buttons.push_back(new GUIButton(vec3(750, 100, 0.0f), vec3(180, 64, 0), vec4(1.0f, 1.0f, 1.0f, 1.0f), "  Back To Menu", vec4(0.0f), "textures\\button.png", true, backToMenu, 24));
 	
 }
 
@@ -54,14 +55,14 @@ bool StateSpace::loadAnimation()
 	milliseconds ms = duration_cast<milliseconds>(system_clock::now().time_since_epoch());
 	time = ms.count();
 
-	Controller::setController(StateSpaceController::getController());
-
 	fileName = _strdup(OpenFileDialog().SelectFile().c_str());
 	std::string str(fileName);
 
 	//User did not choose a file, return to menu without changing scene
 	if (str == "")
 		return false;
+
+	Controller::setController(StateSpaceController::getController());
 
 	clearFrameRead();
 	initializeFrameRead();
@@ -153,6 +154,7 @@ void StateSpace::draw()
 void StateSpace::loadFramesInBack()
 {	
 	_mutex.lock();
+
 	framesBack->clear();
 
 	int framesLeft = totalFrames - totalFramesLoaded;
@@ -181,8 +183,13 @@ void StateSpace::updateFrames()
 		swap(framesFront, framesBack);
 		frameCount = 0;
 
-		std::thread t1(&StateSpace::loadFramesInBack, this);
-		t1.detach();
+		//std::thread t1(&StateSpace::loadFramesInBack, this);
+		//t1.detach();
+
+		#pragma omp single nowait
+		{
+			loadFramesInBack();
+		}
 	}
 }
 
@@ -209,8 +216,14 @@ void StateSpace::initializeFrameRead()
 	totalFramesLoaded = loadSize;
 
 	FileStorage::readFrames(fileName, loadSize, framesFront, &models);
-	std::thread t1(&StateSpace::loadFramesInBack, this);
-	t1.detach();
+
+	#pragma omp single nowait
+	{
+		loadFramesInBack();
+	}
+
+	//std::thread t1(&StateSpace::loadFramesInBack, this);
+	//t1.detach();
 }
 
 void StateSpace::clearFrameRead() 
