@@ -55,8 +55,10 @@ void GUIValueChanger::draw()
 	inc->draw();
 	dec->draw();
 
-	textRend.RenderText(name, pos.x - 40.0f, pos.y - 3.0f, 1.0f, glm::vec3(0.0f, 0.0f, 0.0f), Camera::activeCamera->getScreenWidth(), Camera::activeCamera->getScreenHeight(), 14);
-	textRend.RenderText(std::to_string((int)value), pos.x - 5.0f, pos.y - 3.0f, 1.0f, glm::vec3(0.0f, 0.0f, 0.0f), Camera::activeCamera->getScreenWidth(), Camera::activeCamera->getScreenHeight(), 14);
+	vec3 white = vec3(1.0f, 1.0f, 1.0f);
+
+	textRend.RenderText(name, pos.x - 40.0f, pos.y - 3.0f, 1.0f, white, Camera::activeCamera->getScreenWidth(), Camera::activeCamera->getScreenHeight(), 14);
+	textRend.RenderText(std::to_string((int)value), pos.x - 5.0f, pos.y - 3.0f, 1.0f, white, Camera::activeCamera->getScreenWidth(), Camera::activeCamera->getScreenHeight(), 14);
 }
 
 void GUIValueChanger::checkHover()
@@ -185,7 +187,7 @@ void SceneEditor::draw()
 	glUniformMatrix4fv(CubeMapShader::shader->viewID, 1, GL_FALSE, &(observer->View[0][0]));
 	glUniform1i(CubeMapShader::shader->cubeMap, 0);
 
-	//skybox->draw();
+	skybox->draw();
 
 	LitShader::shader->Use();
 	glUniformMatrix4fv(LitShader::shader->projectionID, 1, GL_FALSE, &(observer->Projection[0][0]));
