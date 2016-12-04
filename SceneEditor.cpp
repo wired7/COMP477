@@ -3,6 +3,9 @@
 #include "Controller.h"
 #include "SceneManager.h"
 #include "ButtonFunctions.h"
+#include "FileStorage.h"
+#include "OpenFileDialog.h"
+#include "SaveFileDialog.h"
 
 void increment(float& value)
 {
@@ -24,7 +27,7 @@ void acceptChanges()
 	vec4 color(Scenes::sceneEditor->color.r / maxValue, Scenes::sceneEditor->color.g / maxValue, Scenes::sceneEditor->color.b / maxValue, Scenes::sceneEditor->color.a / maxValue);
 	vec3 dimensions(Scenes::sceneEditor->dimensions.x, Scenes::sceneEditor->dimensions.y, Scenes::sceneEditor->dimensions.z);
 
-	Scenes::sceneEditor->rigidbodies.push_back(new Cube(center, dimensions, color, true));
+	Scenes::sceneEditor->rigidbodies.push_back(new Cube(center, dimensions, color, true, "Cube"));
 
 	Scenes::sceneEditor->showRecentShape = false;
 	Scenes::sceneEditor->displayOptions = false;
@@ -80,7 +83,7 @@ void spawnCube()
 	vec4 color(Scenes::sceneEditor->color.r / maxValue, Scenes::sceneEditor->color.g / maxValue, Scenes::sceneEditor->color.b / maxValue, Scenes::sceneEditor->color.a / maxValue);
 	vec3 dimensions(Scenes::sceneEditor->dimensions.x, Scenes::sceneEditor->dimensions.y, Scenes::sceneEditor->dimensions.z);
 
-	Scenes::sceneEditor->tempRigidbodies.push_back(new Cube(center, dimensions, color, true));
+	Scenes::sceneEditor->tempRigidbodies.push_back(new Cube(center, dimensions, color, true, "Cube"));
 	Scenes::sceneEditor->displayOptions = true;	
 	Scenes::sceneEditor->showRecentShape = true;
 }
@@ -95,7 +98,7 @@ void spawnSphere()
 	vec4 color(Scenes::sceneEditor->color.r / maxValue, Scenes::sceneEditor->color.g / maxValue, Scenes::sceneEditor->color.b / maxValue, Scenes::sceneEditor->color.a / maxValue);
 	vec3 dimensions(Scenes::sceneEditor->dimensions.x, Scenes::sceneEditor->dimensions.y, Scenes::sceneEditor->dimensions.z);
 
-	Scenes::sceneEditor->tempRigidbodies.push_back(new Polyhedron(64, center, dimensions, color, true));
+	Scenes::sceneEditor->tempRigidbodies.push_back(new Polyhedron(64, center, dimensions, color, true, "Sphere"));
 	Scenes::sceneEditor->displayOptions = true;
 	Scenes::sceneEditor->showRecentShape = true;
 }
@@ -107,7 +110,19 @@ void sweep()
 
 void saveScene()
 {
+	SaveFileDialog saveDialog;
 
+	string sceneFile = saveDialog.SaveFile();
+
+	if (sceneFile == "")
+		return;
+
+	std::fstream f1(sceneFile, ios::out);
+
+	if (f1.is_open())
+	{
+		f1 << FileStorage::serializeScene();
+	}
 }
 
 void undo()
@@ -128,8 +143,6 @@ void undo()
 			Scenes::sceneEditor->rigidbodies.pop_back();
 		}
 	}
-
-
 }
 
 SceneEditor::SceneEditor(GLFWwindow* window, Skybox* skybox)
@@ -285,7 +298,7 @@ void SceneEditor::updateCurrentSpawn()
 
 	delete tempRigidbodies.back();
 	tempRigidbodies.pop_back();
-	tempRigidbodies.push_back(new Cube(pos, dimensions, color, true));
+	tempRigidbodies.push_back(new Cube(pos, dimensions, color, true, "Cube"));
 }
 
 void SceneEditor::showAllOptions()

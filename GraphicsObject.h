@@ -78,6 +78,7 @@ public:
 	vec3 pos;
 	vec3 dimensions;
 	vec4 color;
+	std::string shapeType;
 };
 
 class InstancedMeshObject : public MeshObject
@@ -114,6 +115,7 @@ public:
 	int resolution;
 	Polyhedron() {};
 	Polyhedron(int, vec3, vec3, vec4, bool);
+	Polyhedron(int, vec3, vec3, vec4, bool, std::string);
 	void draw();
 };
 
@@ -145,6 +147,7 @@ class Cube : public MeshObject
 {
 public:
 	Cube(vec3, vec3, vec4, bool);
+	Cube(vec3, vec3, vec4, bool, std::string);
 	void draw();
 };
 
