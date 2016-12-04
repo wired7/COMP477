@@ -92,6 +92,54 @@ void Grid3D::update(Particle& particle)
 	}
 }
 
+void Grid3D::getNeighborCubes(vec3 currCell, vec3 origin, vec3 direction, float angle, vector<GridCube>* neighborCubes, int depth)
+{
+	if (depth == 0)
+		return;
+
+	int x = currCell.x;
+	int y = currCell.y;
+	int z = currCell.z;
+
+	glm::vec3 incr(0, -1, 1);
+	for (int i = 0; i < 3; ++i)
+	{
+		if (x + incr[i] < 0 || x + incr[i] >= data.size()) {
+			continue;
+		}
+		for (int j = 0; j < 3; ++j)
+		{
+			if (y + incr[j] < 0 || y + incr[j] >= data[x + incr[i]].size()) {
+				continue;
+			}
+			for (int k = 0; k < 3; ++k)
+			{
+				if (z + incr[k] < 0 || z + incr[k] >= data[x + incr[i]][y + incr[j]].size()) {
+					continue;
+				}
+
+				vec3 dir = normalize(currCell - origin + vec3(incr[i], incr[j], incr[k]));
+				vec3 dir2 = normalize(vec3(incr[i], incr[j], incr[k]));
+				float newAngle = acosf(dot(dir, direction));
+				float newAngle2 = acos(dot(dir2, direction));
+
+				if (newAngle > 3.1415f)
+					newAngle = abs(2 * 3.1415f - newAngle);
+
+				if (newAngle2 > 3.1415f)
+					newAngle2 = abs(2 * 3.1415f - newAngle2);
+
+				if (newAngle < angle / 2 && newAngle2 < angle / 2)
+				{
+					getNeighborCubes(vec3(x + incr[i], y + incr[j], z + incr[k]), origin, direction, angle, neighborCubes, depth - 1);
+					GridCube temp = data[x + incr[i]][y + incr[j]][z + incr[k]];
+					neighborCubes->push_back(temp);
+				}
+			}
+		}
+	}
+}
+
 vector<GridCube> Grid3D::getNeighborCubes(Particle particle)
 {
 	//+00, 0+0, 00+

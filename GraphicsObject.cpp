@@ -1,6 +1,7 @@
 #include "GraphicsObject.h"
 #include "Camera.h"
 #include "InputState.h"
+#include "Splines.h"
 
 void GraphicsObject::loadTexture(char* filePath)
 {
@@ -137,33 +138,61 @@ Polyhedron::Polyhedron(int resolution, vec3 pos, vec3 radii, vec4 color, bool is
 	loadTexture("textures\\blank.jpg");
 	model = scale(translate(mat4(1.0f), pos), radii);
 	this->resolution = resolution;
-	double angle = 2 * 3.1415 / resolution;
+	double theta = 2 * 3.1415 / resolution;
+	double phi = 3.1415 / resolution;
 	vector<vector<vec3>> circles;
-	vec3 start(0, -1, 0);
-	for (int j = 0; j <= resolution; j++)
+	vec3 start(0, -0.5f, 0);
+	for (int j = 1; j < resolution; j++)
 	{
-		vec3 temp = rotate(start, (GLfloat)(angle * j), vec3(0, 0, 1));
+		vec3 temp = rotate(start, (GLfloat)(phi * j), vec3(0, 0, 1));
 		circles.push_back(vector<vec3>());
-		for (int i = 0; i <= resolution; i++)
-			circles[circles.size() - 1].push_back(rotate(temp, (GLfloat)(angle * i), vec3(0, 1, 0)));
+		for (int i = 0; i < resolution; i++)
+			circles[circles.size() - 1].push_back(rotate(temp, (GLfloat)(theta * i), vec3(0, 1, 0)));
 	}
 
-	for (int j = 0; j < circles.size() - 1; j++)
+	for (int j = 0; j < circles.size(); j++)
+	{
 		for (int i = 0; i < circles[j].size(); i++)
 		{
 			addVertex(circles[j][i], color, vec2(i, 1) / (GLfloat)resolution, normalize(circles[j][i]));
 
 			if (j > 0 && i > 0)
 			{
-				indices.push_back(vertices.size() - 2 - circles.size());
+				indices.push_back(vertices.size() - 2 - circles[j].size());
 				indices.push_back(vertices.size() - 2);
-				indices.push_back(vertices.size() - 1 - circles.size());
+				indices.push_back(vertices.size() - 1 - circles[j].size());
 
 				indices.push_back(vertices.size() - 2);
 				indices.push_back(vertices.size() - 1);
-				indices.push_back(vertices.size() - 1 - circles.size());
+				indices.push_back(vertices.size() - 1 - circles[j].size());
 			}
 		}
+
+		if (j > 0)
+		{
+			indices.push_back(vertices.size() - 1 - circles[j].size());
+			indices.push_back(vertices.size() - 1);
+			indices.push_back(vertices.size() - 2 * circles[j].size());
+
+			indices.push_back(vertices.size() - 1);
+			indices.push_back(vertices.size() - 2 * circles[j].size());
+			indices.push_back(vertices.size() - circles[j].size());
+		}
+	}
+
+	addVertex(start, color, vec2(0, 1) / (GLfloat)resolution, start);
+	addVertex(-start, color, vec2(0, 1) / (GLfloat)resolution, -start);
+
+	for (int i = 0; i < resolution; i++)
+	{
+		indices.push_back(i);
+		indices.push_back((i + 1) % resolution);
+		indices.push_back(vertices.size() - 2);
+
+		indices.push_back(vertices.size() - 2 - resolution + i);
+		indices.push_back(vertices.size() - resolution + (i + 1) % resolution - 2);
+		indices.push_back(vertices.size() - 1);
+	}
 
 	if(isRendered)
 		bindBuffers();
@@ -243,6 +272,169 @@ void InstancedSpheres::draw()
 	glBindTexture(GL_TEXTURE_2D, texture);
 	glDrawElementsInstanced(GL_TRIANGLE_STRIP, indices.size(), GL_UNSIGNED_INT, 0, positions.size());
 }
+
+float NewtonsMethod(float y, vec3 u, vec3 r, vec3 v, int depth)
+{
+	if (depth == 0)
+		return y;
+	
+	float x = NewtonsMethod(y, u, r, v, depth - 1);
+
+	return x - sqrt(-v.z + r.z * cos(x) + u.z * sin(x) + pow(-v.x + r.x * cos(x) + u.x * sin(x), 2) + 
+					pow(-v.y + r.y * cos(x) + u.y * sin(x), 2)) / (u.z * cos(x) - r.z * sin(x) + 2 * (u.x * cos(x) - r.x * sin(x)) *
+					(-v.x + r.x * cos(x) + u.x * sin(x)) + 2 * (u.y * cos(x) - r.y * sin(x)) * (-v.y + r.y* cos(x) + u.y * sin(x)));
+}
+
+Cylinder::Cylinder(float topRadius, bool openTop, float bottomRadius, bool openBottom, vec2 resolution, vector<vec3> samplePoints, vec4 color, bool render)
+{
+	shader = LitShader::shader;
+	loadTexture("textures\\blank.jpg");
+
+	vector<vec3> params;
+	vector<vec3> points;
+
+	if (samplePoints.size() > 2)
+	{
+		for (int i = 0; i < samplePoints.size() - 1; i++)
+		{
+			params.clear();
+			params.push_back(samplePoints[i]);
+			params.push_back(samplePoints[i + 1]);
+
+			if (i < samplePoints.size() - 2)
+			{
+				if (i > 0)
+				{
+					params.push_back((samplePoints[i + 1] - samplePoints[i - 1]) / 2.0f);
+					params.push_back((samplePoints[i + 2] - samplePoints[i]) / 2.0f);
+				}
+				else
+				{
+					params.push_back(samplePoints[i + 1] - samplePoints[i]);
+					params.push_back(samplePoints[i + 2] - samplePoints[i + 1]);
+				}
+			}
+			else if (i < samplePoints.size() - 1)
+			{
+				params.push_back((samplePoints[i + 1] - samplePoints[i - 1]) / 2.0f);
+				params.push_back((samplePoints[i + 1] - samplePoints[i - 1]) / 2.0f);
+			}
+			else
+			{
+				params.push_back(samplePoints[i] - samplePoints[i - 1]);
+				params.push_back(samplePoints[i] - samplePoints[i - 1]);
+			}
+
+			points.push_back(params[0]);
+
+			Splines::subdivide(0, 1, 0.05f, &params, &points);
+		}
+
+		points.push_back(params[1]);
+	}
+	else
+		points = samplePoints;
+
+	float radialStep = 2 * 3.1415f / resolution.x;
+
+	vec3 v;
+	vec3 diff;
+	for (int i = 0; i < points.size(); i++)
+	{
+		float currentRadius = topRadius + (bottomRadius - topRadius) * (float)i / (float)(points.size() - 1);
+
+		if (i < points.size() - 1)
+		{
+			if (i > 0)
+				diff = normalize(normalize(points[i + 1] - points[i]) + normalize(points[i] - points[i - 1]));
+			else
+				diff = normalize(points[i + 1] - points[i]);
+		}
+
+		vec3 vec[] = { { (-diff.y - diff.z) / diff.x, 1, 1 },{ 1, (-diff.x - diff.z) / diff.y, 1 },{ 1, 1, (-diff.y - diff.x) / diff.z } };
+
+		vec3 pt1;
+
+			if (diff.x != 0)
+				pt1 = normalize(vec[0]);
+			else if (diff.y != 0)
+				pt1 = normalize(vec[1]);
+			else if (diff.z != 0)
+				pt1 = normalize(vec[2]);
+			else
+				pt1 = vec3(0, 0, 0);
+		
+
+		v = pt1;
+
+		for (int j = 0; j < resolution.x; j++)
+		{
+			vec3 pos = vec3(scale(mat4(1.0f), currentRadius * vec3(1.0f, 1.0f, 1.0f)) * rotate(mat4(1.0f), radialStep * j, diff) * vec4(pt1, 1.0f)) + points[i];
+			vec3 normal = normalize(pos - points[i]);
+			addVertex(pos, color, vec2(), normal);
+
+			if (j > 0 && i > 0)
+			{
+				indices.push_back(vertices.size() - 2 - resolution.x);
+				indices.push_back(vertices.size() - 2);
+				indices.push_back(vertices.size() - 1 - resolution.x);
+
+				indices.push_back(vertices.size() - 2);
+				indices.push_back(vertices.size() - 1);
+				indices.push_back(vertices.size() - 1 - resolution.x);
+			}
+		}
+
+		if (i > 0)
+		{
+			indices.push_back(vertices.size() - 1 - resolution.x);
+			indices.push_back(vertices.size() - 1);
+			indices.push_back(vertices.size() - 2 * resolution.x);
+
+			indices.push_back(vertices.size() - 1);
+			indices.push_back(vertices.size() - 2 * resolution.x);
+			indices.push_back(vertices.size() - resolution.x);
+		}
+	}
+
+	int offset = 0;
+
+	if (openTop)
+	{
+		addVertex(samplePoints[0], color, vec2(), normalize(samplePoints[1] - samplePoints[0]));
+
+		for (int i = 0; i < resolution.x; i++)
+		{
+			indices.push_back(vertices.size() - 1);
+			indices.push_back(i);
+			indices.push_back((i + 1) % (int)resolution.x);
+		}
+
+		offset = 1;
+	}
+
+	if (openBottom)
+	{
+		addVertex(samplePoints[samplePoints.size() - 1], color, vec2(), normalize(samplePoints[samplePoints.size() - 1] - samplePoints[samplePoints.size() - 2]));
+
+		for (int i = 0; i < resolution.x; i++)
+		{
+			indices.push_back(vertices.size() - 1);
+			indices.push_back(vertices.size() - 2 - offset - (i + 1) % (int)resolution.x);
+			indices.push_back(vertices.size() - 2 - offset - i);
+		}
+	}
+
+	if (render)
+		bindBuffers();
+}
+
+void Cylinder::draw() {
+	enableBuffers();
+	glUniformMatrix4fv(((LitShader*)shader)->modelID, 1, GL_FALSE, &model[0][0]);
+	glBindTexture(GL_TEXTURE_2D, texture);
+	glDrawElements(GL_TRIANGLES, indices.size(), GL_UNSIGNED_INT, 0);
+};
 
 Rectangle::Rectangle(vec3 position, vec3 dimensions, vec4 color, bool isRendered)
 {

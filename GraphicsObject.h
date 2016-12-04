@@ -147,55 +147,8 @@ public:
 class Cylinder : public MeshObject
 {
 public:
-	Cylinder(float topRadius, float bottomRadius, vec2 resolution, vector<vec3> samplePoints, vec4 color, bool render)
-	{
-		shader = LitShader::shader;
-
-		loadTexture("textures\\blank.jpg");
-
-		float radialStep = 2 * 3.1415f / resolution.x;
-		vec3 diff;
-		for (int i = 0; i < samplePoints.size(); i++)
-		{
-			float currentRadius = topRadius * (1 - (float)i / (float)samplePoints.size()) + bottomRadius * (float)i / (float)samplePoints.size();
-			
-			if(i < samplePoints.size() - 1)
-				diff = normalize(samplePoints[i + 1] - samplePoints[i]);
-
-			vec3 pt1 = normalize(vec3(1.0f, diff.y / diff.x, 0));
-
-			cout << diff.y / diff.x << endl;
-
-			system("PAUSE");
-
-			for (int j = 0; j < resolution.x; j++)
-			{
-				vec3 pos = vec3(translate(mat4(1.0f), -samplePoints[i]) * rotate(mat4(1.0f), radialStep * j, diff) * translate(mat4(1.0f), samplePoints[i]) * vec4(pt1, 1.0f));
-				vec3 normal = normalize(pos - samplePoints[i]);
-				addVertex(pos, color, vec2(), normal);
-
-				if (j > 0 && i > 0)
-				{
-					indices.push_back(vertices.size() - 2 - resolution.x);
-					indices.push_back(vertices.size() - 2);
-					indices.push_back(vertices.size() - 1 - resolution.x);
-
-					indices.push_back(vertices.size() - 2);
-					indices.push_back(vertices.size() - 1);
-					indices.push_back(vertices.size() - 1 - resolution.x);
-				}
-			}
-		}
-
-		if (render)
-			bindBuffers();
-	}
-	void draw() {
-		enableBuffers();
-		glUniformMatrix4fv(((LitShader*)shader)->modelID, 1, GL_FALSE, &model[0][0]);
-		glBindTexture(GL_TEXTURE_2D, texture);
-		glDrawElements(GL_TRIANGLES, indices.size(), GL_UNSIGNED_INT, 0);
-	};
+	Cylinder(float topRadius, bool openTop, float bottomRadius, bool openBottom, vec2 resolution, vector<vec3> samplePoints, vec4 color, bool render);
+	void draw();
 };
 
 class GUIButton : public MeshObject
