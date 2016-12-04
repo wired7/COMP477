@@ -27,7 +27,12 @@ void acceptChanges()
 	vec4 color(Scenes::sceneEditor->color.r / maxValue, Scenes::sceneEditor->color.g / maxValue, Scenes::sceneEditor->color.b / maxValue, Scenes::sceneEditor->color.a / maxValue);
 	vec3 dimensions(Scenes::sceneEditor->dimensions.x, Scenes::sceneEditor->dimensions.y, Scenes::sceneEditor->dimensions.z);
 
-	Scenes::sceneEditor->rigidbodies.push_back(new Cube(center, dimensions, color, true, "Cube"));
+	if (Scenes::sceneEditor->tempRigidbodies.back()->shapeType == "Cube")
+		Scenes::sceneEditor->rigidbodies.push_back(new Cube(center, dimensions, color, true, "Cube"));
+
+	else if (Scenes::sceneEditor->tempRigidbodies.back()->shapeType == "Sphere")
+		Scenes::sceneEditor->rigidbodies.push_back(new Polyhedron(64, center, dimensions, color, true, "Sphere"));
+	
 
 	Scenes::sceneEditor->showRecentShape = false;
 	Scenes::sceneEditor->displayOptions = false;
@@ -298,9 +303,19 @@ void SceneEditor::updateCurrentSpawn()
 	vec4 color(color.r / maxValue, color.g / maxValue, color.b / maxValue, color.a / maxValue);
 	vec3 dimensions(dimensions.x, dimensions.y, dimensions.z);
 
-	delete tempRigidbodies.back();
+	if (Scenes::sceneEditor->tempRigidbodies.back()->shapeType == "Cube")
+		Scenes::sceneEditor->tempRigidbodies.push_back(new Cube(center, dimensions, color, true, "Cube"));
+
+	else if (Scenes::sceneEditor->tempRigidbodies.back()->shapeType == "Sphere")
+		Scenes::sceneEditor->tempRigidbodies.push_back(new Polyhedron(64, center, dimensions, color, true, "Sphere"));
+
+	if (tempRigidbodies.size() > 1)
+	{
+		delete tempRigidbodies.end()[-2];
+		tempRigidbodies[tempRigidbodies.size()-2] = tempRigidbodies.back();
+	}
+
 	tempRigidbodies.pop_back();
-	tempRigidbodies.push_back(new Cube(pos, dimensions, color, true, "Cube"));
 }
 
 void SceneEditor::showAllOptions()
@@ -327,6 +342,9 @@ void SceneEditor::showAllOptions()
 	Scenes::sceneEditor->dimensions.y = 1.0f;
 	Scenes::sceneEditor->dimensions.z = 1.0f;
 	Scenes::sceneEditor->color.a = 8.0f;
+	Scenes::sceneEditor->color.r = 8.0f;
+	Scenes::sceneEditor->color.g = 8.0f;
+	Scenes::sceneEditor->color.b = 8.0f;
 
 	Scenes::sceneEditor->acceptButton = new GUIButton(vec3(50, 550, 0), vec3(40, 32, 1), vec4(1.0, 1.0, 1.0, 1.0), "Done", vec4(0.0f, 0.0f, 0.0f, 1.0f), "textures\\button.png", true, acceptChanges, 14);
 	Scenes::sceneEditor->cancelButton = new GUIButton(vec3(150, 550, 0), vec3(40, 32, 1), vec4(1.0, 1.0, 1.0, 1.0), "Cancel", vec4(0.0f, 0.0f, 0.0f, 1.0f), "textures\\button.png", true, cancelChanges, 12);
