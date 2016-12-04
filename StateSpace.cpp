@@ -8,6 +8,7 @@
 #include <thread>
 #include "SceneManager.h"
 #include "ButtonFunctions.h"
+#include <omp.h>
 
 using namespace std::chrono;
 
@@ -152,6 +153,7 @@ void StateSpace::draw()
 void StateSpace::loadFramesInBack()
 {	
 	_mutex.lock();
+
 	framesBack->clear();
 
 	int framesLeft = totalFrames - totalFramesLoaded;
@@ -180,8 +182,13 @@ void StateSpace::updateFrames()
 		swap(framesFront, framesBack);
 		frameCount = 0;
 
-		std::thread t1(&StateSpace::loadFramesInBack, this);
-		t1.detach();
+		//std::thread t1(&StateSpace::loadFramesInBack, this);
+		//t1.detach();
+
+		#pragma omp single nowait
+		{
+			loadFramesInBack();
+		}
 	}
 }
 
@@ -208,8 +215,14 @@ void StateSpace::initializeFrameRead()
 	totalFramesLoaded = loadSize;
 
 	FileStorage::readFrames(fileName, loadSize, framesFront, &models);
-	std::thread t1(&StateSpace::loadFramesInBack, this);
-	t1.detach();
+
+	#pragma omp single nowait
+	{
+		loadFramesInBack();
+	}
+
+	//std::thread t1(&StateSpace::loadFramesInBack, this);
+	//t1.detach();
 }
 
 void StateSpace::clearFrameRead() 
