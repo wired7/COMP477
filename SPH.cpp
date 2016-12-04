@@ -46,7 +46,7 @@ void collisionsSubFunction(ParticleSystem* pS, int n)
 			if (currParticle->collisionNormal != direction)
 			{
 				// get the negative velocity
-				vec3 velDir = normalize((-1.0f) * currParticle->params.velocity);
+				vec3 velDir = normalize(currParticle->params.velocity);
 
 				if (distance < pS->sysParams.particleRadius)
 				{
@@ -67,18 +67,19 @@ void collisionsSubFunction(ParticleSystem* pS, int n)
 						}
 						else if (d1 > 0)
 						{
+							backwardsDisplacement = distance * (pS->sysParams.particleRadius + distance) / d1;
 							backwardsDisplacement = d1 * pS->sysParams.particleRadius / distance - d1; // using law of sines
 						}
 						else
 						{
 							d1 *= -1;
-							backwardsDisplacement = d1 * pS->sysParams.particleRadius / distance; // using law of sines
+							backwardsDisplacement = d1 * pS->sysParams.particleRadius / distance - d1; // using law of sines
 						}
 
-						float dT = backwardsDisplacement / length(currParticle->params.velocity);
+						// float dT = backwardsDisplacement / length(currParticle->params.velocity);
 
-						currParticle->params.velocity = 0.8f * glm::reflect(currParticle->params.velocity, direction);
-						currParticle->nextPosition += (velDir * abs(backwardsDisplacement)); //+ (currParticle->params.velocity * dT); //currParticle->position + (currParticle->nextPosition - currParticle->position) * dT / pS->sysParams.maxTStep;
+						currParticle->params.velocity = 0.9f * glm::reflect(currParticle->params.velocity, direction);
+						currParticle->nextPosition -= (velDir * backwardsDisplacement); //+ (currParticle->params.velocity * dT); //currParticle->position + (currParticle->nextPosition - currParticle->position) * dT / pS->sysParams.maxTStep;
 
 /*						if (pS->sysParams.maxTStep - dT < pS->sysParams.tStep)
 						{
@@ -105,11 +106,11 @@ void collisionsSubFunction(ParticleSystem* pS, int n)
 					if (abs(d1) < length(difference) && d1 > 0)
 					{
 //						vec3 velDir = normalize(currParticle->params.velocity);
-						float backwardsDisplacement = d1 * pS->sysParams.particleRadius / distance; // using law of sines
+						float backwardsDisplacement = distance * (pS->sysParams.particleRadius + distance) / d1; // using law of sines
 
 //						float dT = pS->sysParams.maxTStep - backwardsDisplacement / length(currParticle->params.velocity);
 
-						currParticle->params.velocity = 0.3f * glm::reflect(currParticle->params.velocity, direction);
+						currParticle->params.velocity = 0.9f * glm::reflect(currParticle->params.velocity, direction);
 						currParticle->nextPosition -= velDir * abs(backwardsDisplacement);//currParticle->position + (currParticle->nextPosition - currParticle->position) * dT / pS->sysParams.maxTStep;
 
 /*						float dT = backwardsDisplacement / length(currParticle->params.velocity);
