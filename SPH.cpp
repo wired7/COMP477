@@ -77,7 +77,7 @@ void collisionsSubFunction(ParticleSystem* pS, int n)
 
 						// float dT = backwardsDisplacement / length(currParticle->params.velocity);
 
-						currParticle->params.velocity = 0.9f * glm::reflect(currParticle->params.velocity, direction);
+						currParticle->params.velocity = 0.75f * glm::reflect(currParticle->params.velocity, direction);
 						currParticle->nextPosition -= (velDir * backwardsDisplacement); //+ (currParticle->params.velocity * dT); //currParticle->position + (currParticle->nextPosition - currParticle->position) * dT / pS->sysParams.maxTStep;
 
 /*						if (pS->sysParams.maxTStep - dT < pS->sysParams.tStep)
@@ -109,7 +109,7 @@ void collisionsSubFunction(ParticleSystem* pS, int n)
 
 //						float dT = pS->sysParams.maxTStep - backwardsDisplacement / length(currParticle->params.velocity);
 
-						currParticle->params.velocity = 0.9f * glm::reflect(currParticle->params.velocity, direction);
+						currParticle->params.velocity = 0.75f * glm::reflect(currParticle->params.velocity, direction);
 						currParticle->nextPosition -= velDir * abs(backwardsDisplacement);//currParticle->position + (currParticle->nextPosition - currParticle->position) * dT / pS->sysParams.maxTStep;
 
 /*						float dT = backwardsDisplacement / length(currParticle->params.velocity);
