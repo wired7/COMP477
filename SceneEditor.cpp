@@ -105,6 +105,33 @@ void sweep()
 
 }
 
+void saveScene()
+{
+
+}
+
+void undo()
+{
+	// undo button only works when u aren't creating a shape
+	if (!Scenes::sceneEditor->displayOptions)
+	{
+		if (Scenes::sceneEditor->tempRigidbodies.size() > 0)
+		{
+			delete Scenes::sceneEditor->tempRigidbodies.back();
+			Scenes::sceneEditor->tempRigidbodies.pop_back();
+		}
+
+
+		if (Scenes::sceneEditor->rigidbodies.size() > 0)
+		{
+			delete Scenes::sceneEditor->rigidbodies.back();
+			Scenes::sceneEditor->rigidbodies.pop_back();
+		}
+	}
+
+
+}
+
 SceneEditor::SceneEditor(GLFWwindow* window, Skybox* skybox)
 {
 	this->skybox = skybox;
@@ -122,6 +149,8 @@ SceneEditor::SceneEditor(GLFWwindow* window, Skybox* skybox)
 	buttons.push_back(new GUIButton(vec3(900, 100, 0.0f), vec3(150, 40, 0), vec4(1.0f, 1.0f, 1.0f, 1.0f), " Spawn Sphere", vec4(0.0f), "textures\\button.png", true, spawnSphere, 20));
 	buttons.push_back(new GUIButton(vec3(750, 100, 0.0f), vec3(150, 40, 0), vec4(1.0f, 1.0f, 1.0f, 1.0f), "     Sweep", vec4(0.0f), "textures\\button.png", true, sweep));
 	buttons.push_back(new GUIButton(vec3(150, 100, 0.0f), vec3(180, 64, 0), vec4(1.0f, 1.0f, 1.0f, 1.0f), "  Back To Menu", vec4(0.0f), "textures\\button.png", true, backToMenu, 24));
+	buttons.push_back(new GUIButton(vec3(150, 180, 0.0f), vec3(180, 64, 0), vec4(1.0f, 1.0f, 1.0f, 1.0f), "   Save Scene", vec4(0.0f), "textures\\button.png", true, saveScene, 24));
+	buttons.push_back(new GUIButton(vec3(650, 100, 0.0f), vec3(40, 40, 0), vec4(1.0f, 1.0f, 1.0f, 1.0f), "Undo", vec4(0.0f), "textures\\button.png", true, undo, 16));
 }
 
 SceneEditor::~SceneEditor()
@@ -150,7 +179,9 @@ void SceneEditor::draw()
 	glUniformMatrix4fv(LitShader::shader->viewID, 1, GL_FALSE, &(observer->View[0][0]));
 
 	for (int i = 0; i < rigidbodies.size(); i++)
+	{
 		rigidbodies[i]->draw();
+	}
 
 	if (tempRigidbodies.size() > 0 && showRecentShape)
 	{
@@ -253,6 +284,7 @@ void SceneEditor::updateCurrentSpawn()
 	vec3 dimensions(dimensions.x, dimensions.y, dimensions.z);
 
 	delete tempRigidbodies.back();
+	tempRigidbodies.pop_back();
 	tempRigidbodies.push_back(new Cube(pos, dimensions, color, true));
 }
 
