@@ -54,14 +54,14 @@ bool StateSpace::loadAnimation()
 	milliseconds ms = duration_cast<milliseconds>(system_clock::now().time_since_epoch());
 	time = ms.count();
 
-	Controller::setController(StateSpaceController::getController());
-
 	fileName = _strdup(OpenFileDialog().SelectFile().c_str());
 	std::string str(fileName);
 
 	//User did not choose a file, return to menu without changing scene
 	if (str == "")
 		return false;
+
+	Controller::setController(StateSpaceController::getController());
 
 	clearFrameRead();
 	initializeFrameRead();

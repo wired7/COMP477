@@ -15,9 +15,15 @@ void newSimulation()
 
 	string sysParamsFile = dialog.SelectFile();
 
+	if (sysParamsFile == "")
+		return;
+
 	auto sysParams = FileStorage::loadSysParams(sysParamsFile);
 
 	string rigidBodiesFile = dialog.SelectFile();
+
+	if (rigidBodiesFile == "")
+		return;
 
 	auto rigidBodies = FileStorage::loadRigidbodies(rigidBodiesFile);
 
