@@ -67,8 +67,7 @@ void collisionsSubFunction(ParticleSystem* pS, int n)
 						}
 						else if (d1 > 0)
 						{
-							backwardsDisplacement = distance * (pS->sysParams.particleRadius + distance) / d1;
-							backwardsDisplacement = d1 * pS->sysParams.particleRadius / distance - d1; // using law of sines
+							backwardsDisplacement = distance * (pS->sysParams.particleRadius + distance) / d1; // using law of sines
 						}
 						else
 						{
