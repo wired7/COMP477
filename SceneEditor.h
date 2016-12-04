@@ -39,6 +39,8 @@ public:
 
 	std::vector<GUIValueChanger*> valueChangers;
 	GUIButton* acceptButton;
+	GUIButton* cancelButton;
+	std::vector<MeshObject*> tempRigidbodies;
 	std::vector<MeshObject*> rigidbodies;
 	bool displayOptions;
 
@@ -49,6 +51,7 @@ public:
 	TextRenderer textRend;
 
 	void resetOptionsMenu();
+	void updateCurrentSpawn();
 
 private:
 	std::vector<GUIButton*> buttons;
