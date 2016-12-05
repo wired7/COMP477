@@ -58,6 +58,7 @@ void collisionsSubFunction(ParticleSystem* pS, int n)
 						float d1 = plane.intersection(origin, velDir);
 						float backwardsDisplacement;
 
+						// displace the particle right before it collides with the surface
 						if (distance == 0.0f)
 						{
 							//sin(theta) = radius / backwardsDisplacement -> bD = radius / sin(theta)
@@ -229,6 +230,8 @@ float SPH::calcDensity(Particle particle)
 			vec3 distance = particle.position - currParticle->position;
 			float kernel = calcKernel(distance, sys->sysParams.searchRadius);
 
+			// particle - particle, both are being influenced by each other
+			// update density of both particles
 			density += sys->sysParams.mass * kernel;
 
 			#pragma omp critical
@@ -252,6 +255,7 @@ return sys->sysParams.stiffness * (particle.params.density - sys->sysParams.rest
 float SPH::calcPressure(const Particle& particle)
 {
 	ParticleSystem* sys = ParticleSystem::getInstance();
+	// using Tait's equation which is an equation of state --> describes the state of mmatter under a given set of physical conditions
 	return sys->sysParams.stiffness * (pow(particle.params.density / sys->sysParams.restDensity, sys->sysParams.pressureGamma) - 1);
 }
 
@@ -306,6 +310,7 @@ float SPH::calcLaplacianKernel(vec3 distance, float h)
 	return coefficient * derivedFirstValue;
 }
 
+// calculate the pressure gradient to determine the forces
 vec3 SPH::calcGradientPressure(Particle particle)
 {
 	ParticleSystem* sys = ParticleSystem::getInstance();
@@ -339,6 +344,7 @@ vec3 SPH::calcGradientPressure(Particle particle)
 	return ret; // return the negated vector
 }
 
+// used for surface tension
 vec3 SPH::calcGradientColor(Particle particle)
 {
 	ParticleSystem* sys = ParticleSystem::getInstance();
@@ -356,6 +362,7 @@ vec3 SPH::calcGradientColor(Particle particle)
 
 			vec3 kernel = calcGradientKernel(distance, h);
 
+			// color field is always 1 on particle and 0 otherwise, hence we only need to do (p/d) * kernel
 			ret += (sys->sysParams.mass / sys->particles[index]->params.density) * kernel;
 
 			#pragma omp critical
@@ -368,6 +375,7 @@ vec3 SPH::calcGradientColor(Particle particle)
 	return ret; // return the negated vector
 }
 
+// used for surface tension calculation
 vec3 SPH::calcLaplacianColor(Particle particle) {
 	ParticleSystem* sys = ParticleSystem::getInstance();
 	vec3 ret;
@@ -425,6 +433,7 @@ vec3 SPH::calcLaplacianVelocity(Particle particle)
 	return ret;
 }
 
+// calculating the acceleration of the particle in order to determine the velocity
 vec3 SPH::calcAcceleration(Particle particle)
 {
 	ParticleSystem* sys = ParticleSystem::getInstance();
@@ -462,6 +471,7 @@ vec3 SPH::calcAcceleration(Particle particle)
 
 	glm::vec3 surfaceForce = glm::vec3(0, 0, 0);
 
+	// needed this condition in order to avoid division by 0
 	if (glm::length(particle.params.gradientSmoothColor) != 0) {
 		surfaceForce = (-1.0f) * particle.params.laplacianSmoothColor * sys->sysParams.tensionCoefficient * (particle.params.gradientSmoothColor / glm::length(particle.params.gradientSmoothColor));
 	}
