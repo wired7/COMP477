@@ -124,6 +124,7 @@ void newSimulation()
 
 void runSimulation()
 {
+	// Create state space and change scene to it
 	Skybox* skybox = new Skybox("skyboxes\\ame_nebula\\");
 	Scenes::stateSpace = new StateSpace(windowHandle, skybox);
 	StateSpace::activeStateSpace = Scenes::stateSpace;
@@ -138,6 +139,7 @@ void exitSim()
 
 void enterEditor()
 {
+	// Create editor and change scenes
 	Skybox* skybox = new Skybox("skyboxes\\ame_nebula\\");
 	Scenes::sceneEditor = new SceneEditor(Camera::activeCamera->getWindow(), skybox);
 	Scenes::sceneEditor->setup();
@@ -210,6 +212,8 @@ Menu::Menu(GLFWwindow* window)
 	observer = new MenuCamera(window, vec2(0, 0), vec2(1, 1), vec3(0, 0, 0), vec3(0, 0, -1), vec3(0, 1, 0), perspective(45.0f, 1.0f, 0.1f, 100.0f));
 	Camera::activeCamera = observer;
 	Controller::setController(MenuController::getController());
+
+	// Create menu buttons
 	menuButtons.push_back(new GUIButton(vec3(600, 600, 0), vec3(180, 70, 1), vec4(1.0, 1.0, 1.0, 1.0), "Create Simulation", vec4(0.0f, 0.0f, 0.0f, 1.0f), "textures\\button.png", true, newSimulation, 22));
 	menuButtons.push_back(new GUIButton(vec3(600, 500, 0), vec3(180, 70, 1), vec4(1.0, 1.0, 1.0, 1.0), " Run Simulation", vec4(0.0f, 0.0f, 0.0f, 1.0f), "textures\\button.png", true, runSimulation));
 	menuButtons.push_back(new GUIButton(vec3(600, 400, 0), vec3(180, 70, 1), vec4(1.0, 1.0, 1.0, 1.0), "Continue Simulation", vec4(0.0f, 0.0f, 0.0f, 1.0f), "textures\\button.png", true, continueSim, 20));

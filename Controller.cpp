@@ -13,6 +13,7 @@ void Controller::setController(Controller* controller)
 	glfwSetWindowSizeCallback(Camera::activeCamera->window, activeController->windowResize_callback);
 }
 
+// Convert mouse screen coordinates to GUI coordinates
 glm::vec2 Controller::mouseScreenToGUICoords(GLFWwindow* window, double x, double y)
 {
 	glm::vec2 coords;

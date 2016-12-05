@@ -11,6 +11,7 @@ static struct Scenes
 	static SceneEditor* sceneEditor;
 };
 
+// Class that manages which scene is currently active and being rendered
 class SceneManager
 {
 public:
