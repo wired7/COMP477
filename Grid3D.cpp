@@ -51,11 +51,12 @@ float Grid3D::getCellSize()
 	return cellSize;
 }
 
-//updates a particle to the correct
+//updates a particle to the correct grid cube
 void Grid3D::update(Particle& particle)
 {
 	//TODO: particle remove itself from previous cell it was in?
 
+	// dividing the position by the cell size will determine the spatial cell of the particle
 	int gridX = particle.position.x / cellSize;
 	int gridY = particle.position.y / cellSize;
 	int gridZ = particle.position.z / cellSize;
@@ -88,10 +89,11 @@ void Grid3D::update(Particle& particle)
 	}
 	else
 	{
-		//TODO
+		//TODO: in case particle is off the grid, what should happen
 	}
 }
 
+// potential function to only get the cubes with rigidbodies
 void Grid3D::getNeighborCubes(vec3 currCell, vec3 origin, vec3 direction, float angle, vector<GridCube>* neighborCubes, int depth)
 {
 	if (depth == 0)
@@ -152,6 +154,7 @@ vector<GridCube> Grid3D::getNeighborCubes(Particle particle)
 	//+++
 	//---
 
+	// get the grid cell coordinates
 	glm::vec3 currCell = particle.getGridCellCoord();
 	int x = currCell.x;
 	int y = currCell.y;
@@ -179,17 +182,20 @@ vector<GridCube> Grid3D::getNeighborCubes(Particle particle)
 			}
 		}
 	}
+	// return the 27 neighbouring cubes
 	return neighborCubes;
 }
 
 vector<int> Grid3D::getNeighbors(Particle particle)
 {
+	// grid is sectioned into individual cubes, get the neighbouring cubes of each particle
+	// neighboring cubes contain particles
 	vector<GridCube> neighborCubes = getNeighborCubes(particle);
 	
 	vector<int> ret;
 	
 	ParticleSystem* ps = ParticleSystem::getInstance();
-	
+	// for each particle, check if the neighboring cubes have any particles within the search radius of the particle
 	for (int i = 0; i < neighborCubes.size(); ++i)
 	{
 		int particlesSize = neighborCubes[i].particles.size();
@@ -201,6 +207,7 @@ vector<int> Grid3D::getNeighbors(Particle particle)
 
 			if (particleIndex > particle.getIndex() && inRadius(particle.position, ps->particles[particleIndex]->position))
 			{
+				// push the particle into the list of neighbors
 				ret.push_back(particleIndex);
 			}
 		}
@@ -208,7 +215,7 @@ vector<int> Grid3D::getNeighbors(Particle particle)
 
 	return ret;
 }
-
+// function to determine whether a position is within a certain radius
 bool Grid3D::inRadius(glm::vec3 pos1, glm::vec3 pos2)
 {
 	return (glm::length(pos1 - pos2) <= ParticleSystem::getInstance()->sysParams.searchRadius);

@@ -204,7 +204,7 @@ void ParticleSystem::goNuts(float playbackTime, float frameRate, string filePath
 		t += sysParams.tStep;
 	}
 }
-
+// add particles to the system
 void ParticleSystem::addParticles(vector<Particle*> part)
 {
 	particles = part;
@@ -226,7 +226,7 @@ void ParticleSystem::addParticles(vector<Particle*> part)
 		}
 	}
 }
-
+// add rigidbodies for collision interactions in the system
 void ParticleSystem::addRigidbodies(vector<Rigidbody*> rigid)
 {
 	rigidbodies = rigid;
@@ -243,7 +243,7 @@ void ParticleSystem::addRigidbodies(vector<Rigidbody*> rigid)
 	for(int i = 0; i < grid.data.size(); ++i)
 		rigidbodyIntersections(i);
 }
-
+// update the position of each particle
 void ParticleSystem::updateList() {
 	float ratio = sysParams.tStep / sysParams.maxTStep;
 	for (int i = 0; i < particles.size(); ++i) {
@@ -266,7 +266,7 @@ void ParticleSystem::updateList() {
 		grid.update(*particles[i]);
 	}	
 }
-
+// find all neighbors of particle
 void ParticleSystem::calcNeighbors(Particle* particle)
 {
 	particle->neighbors.clear();
