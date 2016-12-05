@@ -1,6 +1,6 @@
 volume: 6
-particle radius: 0.0588
-search radius: 0.176
+particle radius: 0.04
+search radius: 0.09
 viscocity:  8.9
 stiffness: 4.427
 rest density: 1000
