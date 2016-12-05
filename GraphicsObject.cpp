@@ -138,6 +138,9 @@ Polyhedron::Polyhedron(int resolution, vec3 pos, vec3 radii, vec4 color, bool is
 	loadTexture("textures\\blank.jpg");
 	model = scale(translate(mat4(1.0f), pos), radii);
 	this->resolution = resolution;
+	this->pos = pos;
+	this->dimensions = radii;
+	this->color = color;
 	double theta = 2 * 3.1415 / resolution;
 	double phi = 3.1415 / resolution;
 	vector<vector<vec3>> circles;
@@ -195,6 +198,77 @@ Polyhedron::Polyhedron(int resolution, vec3 pos, vec3 radii, vec4 color, bool is
 	}
 
 	if(isRendered)
+		bindBuffers();
+}
+
+Polyhedron::Polyhedron(int resolution, vec3 pos, vec3 radii, vec4 color, bool isRendered, std::string shapeType)
+{
+	shader = LitShader::shader;
+
+	loadTexture("textures\\blank.jpg");
+	model = scale(translate(mat4(1.0f), pos), radii);
+	this->resolution = resolution;
+	this->pos = pos;
+	this->dimensions = radii;
+	this->color = color;
+	this->shapeType = shapeType;
+	double theta = 2 * 3.1415 / resolution;
+	double phi = 3.1415 / resolution;
+	vector<vector<vec3>> circles;
+	vec3 start(0, -0.5f, 0);
+	for (int j = 1; j < resolution; j++)
+	{
+		vec3 temp = rotate(start, (GLfloat)(phi * j), vec3(0, 0, 1));
+		circles.push_back(vector<vec3>());
+		for (int i = 0; i < resolution; i++)
+			circles[circles.size() - 1].push_back(rotate(temp, (GLfloat)(theta * i), vec3(0, 1, 0)));
+	}
+
+	for (int j = 0; j < circles.size(); j++)
+	{
+		for (int i = 0; i < circles[j].size(); i++)
+		{
+			addVertex(circles[j][i], color, vec2(i, 1) / (GLfloat)resolution, normalize(circles[j][i]));
+
+			if (j > 0 && i > 0)
+			{
+				indices.push_back(vertices.size() - 2 - circles[j].size());
+				indices.push_back(vertices.size() - 2);
+				indices.push_back(vertices.size() - 1 - circles[j].size());
+
+				indices.push_back(vertices.size() - 2);
+				indices.push_back(vertices.size() - 1);
+				indices.push_back(vertices.size() - 1 - circles[j].size());
+			}
+		}
+
+		if (j > 0)
+		{
+			indices.push_back(vertices.size() - 1 - circles[j].size());
+			indices.push_back(vertices.size() - 1);
+			indices.push_back(vertices.size() - 2 * circles[j].size());
+
+			indices.push_back(vertices.size() - 1);
+			indices.push_back(vertices.size() - 2 * circles[j].size());
+			indices.push_back(vertices.size() - circles[j].size());
+		}
+	}
+
+	addVertex(start, color, vec2(0, 1) / (GLfloat)resolution, start);
+	addVertex(-start, color, vec2(0, 1) / (GLfloat)resolution, -start);
+
+	for (int i = 0; i < resolution; i++)
+	{
+		indices.push_back(i);
+		indices.push_back((i + 1) % resolution);
+		indices.push_back(vertices.size() - 2);
+
+		indices.push_back(vertices.size() - 2 - resolution + i);
+		indices.push_back(vertices.size() - resolution + (i + 1) % resolution - 2);
+		indices.push_back(vertices.size() - 1);
+	}
+
+	if (isRendered)
 		bindBuffers();
 }
 
@@ -464,6 +538,10 @@ void Rectangle::draw()
 
 Cube::Cube(vec3 center, vec3 dimensions, vec4 color, bool isRendered)
 {
+	this->pos = center;
+	this->dimensions = dimensions;
+	this->color = color;
+
 	shader = LitShader::shader;
 	loadTexture("textures\\blank.jpg");
 
@@ -477,6 +555,29 @@ Cube::Cube(vec3 center, vec3 dimensions, vec4 color, bool isRendered)
 	model = translate(mat4(1.0f), center) * scale(mat4(1.0f), dimensions);
 
 	if(isRendered)
+		bindBuffers();
+}
+
+Cube::Cube(vec3 center, vec3 dimensions, vec4 color, bool isRendered, std::string shapeType)
+{
+	this->pos = center;
+	this->dimensions = dimensions;
+	this->color = color;
+	this->shapeType = shapeType;
+
+	shader = LitShader::shader;
+	loadTexture("textures\\blank.jpg");
+
+	for (int i = 0; i < 2; i++)
+		for (int j = 0; j < 2; j++)
+			for (int k = 0; k < 2; k++)
+				addVertex(0.5f * vec3(i * 2 - 1, j * 2 - 1, k * 2 - 1), color, vec2(), normalize(0.5f * vec3(i * 2 - 1, j * 2 - 1, k * 2 - 1) - center));
+
+	indices = { 0, 1, 2, 1, 3, 2, 0, 2, 4, 2, 6, 4, 4, 6, 5, 6, 7, 5, 5, 7, 1, 7, 3, 1, 1, 0, 4, 1, 4, 5, 2, 3, 6, 3, 7, 6 };
+
+	model = translate(mat4(1.0f), center) * scale(mat4(1.0f), dimensions);
+
+	if (isRendered)
 		bindBuffers();
 }
 

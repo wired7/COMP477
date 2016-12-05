@@ -45,7 +45,9 @@ void collisionsSubFunction(ParticleSystem* pS, int n)
 			
 			if (currParticle->collisionNormal != direction)
 			{
+				// get the negative velocity
 				vec3 velDir = normalize(currParticle->params.velocity);
+
 				if (distance < pS->sysParams.particleRadius)
 				{
 					if (triangle.intersects(origin, direction) && abs(plane.intersects(origin, velDir)))
@@ -61,22 +63,22 @@ void collisionsSubFunction(ParticleSystem* pS, int n)
 							//sin(theta) = radius / backwardsDisplacement -> bD = radius / sin(theta)
 							// theta = angle between velocity vector and plane -> dot(v, normal) = cos(phi) -> phi = arccos(dot(v, normal))
 							// theta = 90 - phi -> bD = radius / sin(90 - arccos(dot(v, normal)))
-							backwardsDisplacement = pS->sysParams.particleRadius / abs(dot(-velDir, direction));
+							backwardsDisplacement = pS->sysParams.particleRadius / abs(dot(velDir, direction));
 						}
 						else if (d1 > 0)
 						{
-							backwardsDisplacement = d1 * pS->sysParams.particleRadius / distance - d1; // using law of sines
+							backwardsDisplacement = distance * (pS->sysParams.particleRadius + distance) / d1; // using law of sines
 						}
 						else
 						{
 							d1 *= -1;
-							backwardsDisplacement = d1 * pS->sysParams.particleRadius / distance; // using law of sines
+							backwardsDisplacement = d1 * pS->sysParams.particleRadius / distance - d1; // using law of sines
 						}
 
-//						float dT = pS->sysParams.maxTStep - backwardsDisplacement / length(currParticle->params.velocity);
+						// float dT = backwardsDisplacement / length(currParticle->params.velocity);
 
-						currParticle->params.velocity = 0.8f * glm::reflect(currParticle->params.velocity, direction);
-						currParticle->nextPosition -= velDir * backwardsDisplacement; //currParticle->position + (currParticle->nextPosition - currParticle->position) * dT / pS->sysParams.maxTStep;
+						currParticle->params.velocity = 0.75f * glm::reflect(currParticle->params.velocity, direction);
+						currParticle->nextPosition -= (velDir * backwardsDisplacement); //+ (currParticle->params.velocity * dT); //currParticle->position + (currParticle->nextPosition - currParticle->position) * dT / pS->sysParams.maxTStep;
 
 /*						if (pS->sysParams.maxTStep - dT < pS->sysParams.tStep)
 						{
@@ -103,12 +105,12 @@ void collisionsSubFunction(ParticleSystem* pS, int n)
 					if (abs(d1) < length(difference) && d1 > 0)
 					{
 //						vec3 velDir = normalize(currParticle->params.velocity);
-						float backwardsDisplacement = d1 * pS->sysParams.particleRadius / distance; // using law of sines
+						float backwardsDisplacement = distance * (pS->sysParams.particleRadius + distance) / d1; // using law of sines
 
 //						float dT = pS->sysParams.maxTStep - backwardsDisplacement / length(currParticle->params.velocity);
 
-						currParticle->params.velocity = 0.8f * glm::reflect(currParticle->params.velocity, direction);
-						currParticle->nextPosition -= velDir * backwardsDisplacement;//currParticle->position + (currParticle->nextPosition - currParticle->position) * dT / pS->sysParams.maxTStep;
+						currParticle->params.velocity = 0.75f * glm::reflect(currParticle->params.velocity, direction);
+						currParticle->nextPosition -= velDir * abs(backwardsDisplacement);//currParticle->position + (currParticle->nextPosition - currParticle->position) * dT / pS->sysParams.maxTStep;
 
 /*						float dT = backwardsDisplacement / length(currParticle->params.velocity);
 

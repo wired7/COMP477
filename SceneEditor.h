@@ -43,6 +43,7 @@ public:
 	std::vector<MeshObject*> tempRigidbodies;
 	std::vector<MeshObject*> rigidbodies;
 	bool displayOptions;
+	bool showRecentShape;
 
 	vec3 pos;
 	vec3 dimensions;
@@ -52,6 +53,7 @@ public:
 
 	void resetOptionsMenu();
 	void updateCurrentSpawn();
+	void showAllOptions();
 
 private:
 	std::vector<GUIButton*> buttons;

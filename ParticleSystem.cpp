@@ -301,7 +301,11 @@ void ParticleSystem::setStiffnessOfParticleSystem() {
 	particleSystem->sysParams.stiffness = (speedOfSoundSquared * particleSystem->sysParams.restDensity / particleSystem->sysParams.pressureGamma) / 1000;
 }
 
-vector<MeshObject*> ParticleSystem::rayTrace(vector<vec3>* points, float radius, int resolution) {
+void resolveMesh(NodeInfo** vertices, int size, Rigidbody* rigidbody, vec2 coordinates, float distanceCutOff);
+
+Rigidbody* ParticleSystem::rayTrace(vector<vec3>* points, float radius, int resolution) {
+	Rigidbody* rigidbody = new Rigidbody(vector<Vertex2>(), vector<GLuint>(), mat4(1.0f), 1, false);
+	
 	vector<Sphere*> spheres;
 	vec3 max = {-INFINITY, -INFINITY, -INFINITY};
 	vec3 min = {INFINITY, INFINITY, INFINITY};
@@ -319,8 +323,6 @@ vector<MeshObject*> ParticleSystem::rayTrace(vector<vec3>* points, float radius,
 		spheres.push_back(new Sphere(points->at(i), radius));
 	}
 
-
-
 	vec3 pt1 = min;
 	vec3 pt2 = min + vec3(max.x, 0, 0);
 	vec3 pt3 = min + vec3(max.x, max.y, 0);
@@ -332,6 +334,8 @@ vector<MeshObject*> ParticleSystem::rayTrace(vector<vec3>* points, float radius,
 
 	vec3 normal = cross(normalize(pt2 - pt1), normalize(pt3 - pt1));
 
+	pt1 += normal;
+
 	vec3 camOrigin = midPoint + normal;
 
 	vec3 camDir = -normal;
@@ -340,29 +344,107 @@ vector<MeshObject*> ParticleSystem::rayTrace(vector<vec3>* points, float radius,
 
 	vec3 right = cross(camDir, up);
 
-	Vertex2*** vertices = new Vertex2**[resolution];
+	NodeInfo** vertices = new NodeInfo*[resolution];
 	float stepX = range.x / resolution;
 	float stepY = range.y / resolution;
 
 	for (int i = 0; i < resolution; i++)
 	{
-		vertices[i] = new Vertex2*[resolution];
+		vertices[i] = new NodeInfo[resolution];
 		for (int j = 0; j < resolution; j++)
 		{
 			vec3 o = pt1 + right * (float)i * stepX  + up * (float)j * stepY;
 
+			float closestIntersection = INFINITY;
+			Sphere* closestObject = NULL;
 			for (int k = 0; k < spheres.size(); k++)
 			{
-				spheres[k]->intersection(o, camDir);
-			}
-//			c.direction = normalize(vec3(origin.x, origin.y, -1));
-	//		origin += c.origin;
 
-//			buffer[i][j] = clamp(rayTrace(origin, c.direction, 1), 0.0f, 1.0f);
+				float t = spheres[k]->intersection(o, camDir);
+
+				if (t > 0 && t < closestIntersection)
+				{
+					closestIntersection = t;
+					closestObject = spheres[k];
+				}
+			}
+
+			if (closestObject != NULL)
+			{
+				vertices[i][j].vertex = new Vertex2(o + camDir * closestIntersection, normalize(o + camDir * closestIntersection - closestObject->center), vec4(0.5f, 0.5, 0.8f, 1.0f), vec2());
+			
+			}
 		}
 	}
-	
-	return vector<MeshObject*>();
+
+	for (int i = 0; i < resolution; i++)
+		for (int j = 0; j < resolution; j++)
+			if (vertices[i][j].vertex != NULL && vertices[i][j].index > -1)
+			{
+				resolveMesh(vertices, resolution, rigidbody, vec2(i, j), 0.1f);
+			}
+
+	return rigidbody;
+}
+
+void resolveMesh(NodeInfo** vertices, int size, Rigidbody* rigidbody, vec2 coordinates, float distanceCutOff)
+{
+	if (vertices[(int)coordinates.x][(int)coordinates.y].visited)
+		return;
+
+	vertices[(int)coordinates.x][(int)coordinates.y].visited = true;
+
+	if (vertices[(int)coordinates.x][(int)coordinates.y].index < 0)
+	{
+		rigidbody->vertices.push_back(*vertices[(int)coordinates.x][(int)coordinates.y].vertex);
+		vertices[(int)coordinates.x][(int)coordinates.y].index = rigidbody->vertices.size() - 1;
+	}
+
+	vector<vec2> availableCoords;
+
+	for (int i = 0; i < 8; i++)
+	{
+		float theta = (3.1415f * 2.0f / 8.0f) * i;
+		vec2 dir(round(cos(theta)), round(sin(theta)));
+
+		float nextTheta = (3.1415f * 2.0f / 8.0f) * ((i + 1) % 8);
+		vec2 nextDir(round(cos(theta)), round(sin(theta)));
+
+		vec2 newCoord = coordinates + dir;
+		vec2 newNewCoord = coordinates + nextDir;
+
+		if (newCoord.x > 0 && newCoord.x < size && newCoord.y > 0 && newCoord.y < size)
+			if (newNewCoord.x > 0 && newNewCoord.x < size && newNewCoord.y > 0 && newNewCoord.y < size)
+				if (vertices[(int)newCoord.x][(int)newCoord.y].vertex != NULL)
+				{
+					if (!vertices[(int)newCoord.x][(int)newCoord.y].visited)
+					{
+						resolveMesh(vertices, size, rigidbody, newCoord, distanceCutOff);
+
+						if (vertices[(int)newNewCoord.x][(int)newNewCoord.y].vertex != NULL)
+							if (length(vertices[(int)newCoord.x][(int)newCoord.y].vertex->position - vertices[(int)coordinates.x][(int)coordinates.y].vertex->position) < distanceCutOff)
+								if (length(vertices[(int)newNewCoord.x][(int)newNewCoord.y].vertex->position - vertices[(int)coordinates.x][(int)coordinates.y].vertex->position) < distanceCutOff)
+									if (length(vertices[(int)newCoord.x][(int)newCoord.y].vertex->position - vertices[(int)newNewCoord.x][(int)newNewCoord.y].vertex->position) < distanceCutOff)
+									{
+										if (vertices[(int)newCoord.x][(int)newCoord.y].index < 0)
+										{
+											rigidbody->vertices.push_back(*vertices[(int)newCoord.x][(int)newCoord.y].vertex);
+											vertices[(int)newCoord.x][(int)newCoord.y].index = rigidbody->vertices.size() - 1;
+										}
+
+										if (vertices[(int)newNewCoord.x][(int)newNewCoord.y].index < 0)
+										{
+											rigidbody->vertices.push_back(*vertices[(int)newNewCoord.x][(int)newNewCoord.y].vertex);
+											vertices[(int)newNewCoord.x][(int)newNewCoord.y].index = rigidbody->vertices.size() - 1;
+										}
+
+										rigidbody->indices.push_back(vertices[(int)coordinates.x][(int)coordinates.y].index);
+										rigidbody->indices.push_back(vertices[(int)newNewCoord.x][(int)newNewCoord.y].index);
+										rigidbody->indices.push_back(vertices[(int)newCoord.x][(int)newCoord.y].index);
+									}
+					}
+				}
+	}
 }
 
 
