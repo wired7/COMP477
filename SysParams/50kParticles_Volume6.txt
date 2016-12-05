@@ -1,0 +1,9 @@
+volume: 6
+particle radius: 0.0493
+search radius: 0.0987
+viscocity:  6.0
+stiffness: 4.427
+rest density: 1000
+gravity: -9.81
+time step: 0.001
+max time step: 0.001
