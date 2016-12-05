@@ -149,6 +149,10 @@ void continueSim()
 	cout << "Load animation file to continue..." << endl;
 	OpenFileDialog dialog;
 	string animFile = dialog.SelectFile();
+
+	if (animFile == "")
+		return;
+
 	string serializedFile = FileStorage::getSerializedFile(animFile);
 	ProgramState programState = FileStorage::deserializeData(serializedFile);
 
@@ -215,7 +219,7 @@ Menu::Menu(GLFWwindow* window)
 	background = new GUIBackground(vec3(0.0f, 0.0f, 0.0f), 
 								   vec3(1200, 
 								   800, 1.0f), 
-								   vec4(1.0f, 1.0f, 1.0f, 1.0f), "textures\\menuBack.jpg", true);
+								   vec4(1.0f, 1.0f, 1.0f, 1.0f), "textures\\menu.jpg", true);
 }
 
 
