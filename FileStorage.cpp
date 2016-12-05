@@ -25,7 +25,7 @@ vector<string> split(const string &s, char delim) {
 	}
 	return tokens;
 }
-
+// open the system params file
 SystemParameters FileStorage::loadSysParams(string filePath)
 {
 	vector<pair<string, float>> sysParams;
@@ -52,7 +52,7 @@ SystemParameters FileStorage::loadSysParams(string filePath)
 
 	return matchSysParams(sysParams);
 }
-
+// instantiate a particle system by using the values imported from the file
 SystemParameters FileStorage::matchSysParams(vector<pair<string, float>> values)
 {
 	float volume = 0;
@@ -89,7 +89,7 @@ SystemParameters FileStorage::matchSysParams(vector<pair<string, float>> values)
 
 	return SystemParameters(volume, radius, searchRadius, viscocity, stiffness, density, gravity, timeStep, maxTimeStep);
 }
-
+// get the params of the rigidbodies from a particular file path
 vector<MeshObject*> FileStorage::loadRigidbodies(string filePath)
 {
 	rigidBodyFile = filePath;
@@ -135,7 +135,7 @@ vector<MeshObject*> FileStorage::loadRigidbodies(string filePath)
 
 	return matchRigidbodies(rigidbodies);
 }
-
+// instantiate the rigidbodies in the scene from a specific file
 vector<MeshObject*> FileStorage::matchRigidbodies(vector<pair<string, vector<float>>> values)
 {
 	vector<MeshObject*> rigidbodies;
@@ -190,7 +190,7 @@ vector<MeshObject*> FileStorage::matchRigidbodies(vector<pair<string, vector<flo
 
 	return rigidbodies;
 }
-
+// function to read frames from a file and output it in the scene player
 void FileStorage::readFrames(char* file, int count, vector<vector<glm::vec3>>* frames, vector<MeshObject*>* rigidbodies)
 {
 	float x, y, z;
@@ -323,7 +323,7 @@ void FileStorage::readFrames(char* file, int count, vector<vector<glm::vec3>>* f
 				}
 			}
 }
-
+// function to enable looping of a scene
 void FileStorage::resetReadFrames(char* file)
 {
 	filePos.close();
@@ -336,7 +336,7 @@ void FileStorage::resetReadFrames(char* file)
 	}
 
 }
-
+// get the size of the file
 int FileStorage::getFramesTotal(char* file)
 {
 	std::ifstream f(file);
@@ -361,7 +361,7 @@ int FileStorage::getFramesTotal(char* file)
 	f.close();
 	return count; //we dont count the first line
 }
-
+// serialize the data on keyboard press or after the final simulation in order to enable further continuation of the simulation if required
 void FileStorage::serializeData(string file)
 {
 	/*
@@ -404,7 +404,7 @@ void FileStorage::serializeData(string file)
 		cout << "SERIALIZATION FAILED" << endl;
 	}
 }
-
+// deserialize the data in order to instantiate the objects
 ProgramState FileStorage::deserializeData(string file)
 {
 	fstream fs(file);
@@ -465,7 +465,7 @@ ProgramState FileStorage::deserializeData(string file)
 	return programState;
 }
 
-
+// serialize the particle system data of the scene into a file
 using namespace std;
 string FileStorage::serializeStrPS()
 {
@@ -488,7 +488,7 @@ string FileStorage::serializeStrPS()
 
 	return ret;
 }
-
+// serialize the particle data of the scene into a file
 string FileStorage::serializeStrParticle(Particle particle)
 {
 	ParticleParameters params = particle.params;
@@ -507,7 +507,7 @@ string FileStorage::serializeStrParticle(Particle particle)
 
 	return ret;
 }
-
+// serialize all objects within a scene
 string FileStorage::serializeScene()
 {
 
