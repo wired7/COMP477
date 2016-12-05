@@ -298,7 +298,7 @@ void ParticleSystem::setStiffnessOfParticleSystem() {
 	float speedOfSoundSquared = maxVelocitySquared / 0.01f;
 
 	// Stiffness can be calculated by multiplying the velocity with the restDensity then dividing it with Tait's constant, gamma
-	particleSystem->sysParams.stiffness = (speedOfSoundSquared * particleSystem->sysParams.restDensity / particleSystem->sysParams.pressureGamma) / 1000;
+	particleSystem->sysParams.stiffness = (speedOfSoundSquared * particleSystem->sysParams.restDensity / particleSystem->sysParams.pressureGamma) / 1000; // Pa to kPa
 }
 
 void resolveMesh(NodeInfo** vertices, int size, Rigidbody* rigidbody, vec2 coordinates, float distanceCutOff);
