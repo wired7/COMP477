@@ -57,9 +57,6 @@
                     <li>
                         <a href="resources.html">Resources</a>
                     </li>
-                    <li>
-                        <a href="contact.html">Contact us</a>
-                    </li>
                 </ul>
             </div>
             <!-- /.navbar-collapse -->
@@ -103,26 +100,40 @@
 						<li>Ray Tracing for rendering the surface</li>
 						<li>Parallel Programming</li>
 						<li>Scene player and Scene editor</li>
-						<li>Import and Export of .anim files</li>	
+						<li>Import and Export of .anim files</li>
+						<li>Frame capturing</li>
 					</ul>					
 					
-					<h3 class="section-heading">Goals</h3>
+					<h3 class="section-heading">Challenges</h3>
 					
-					<p></p>
+					<p>One of the main difficulties involved in our project were figuring out how to implement SPH and tweaking the parameters to get a nice simulation. We also had difficulty optimizing the code. We did the following to optimize our SPH code:</p>
+					<ul>
+						<li>Parallelize SPH loops using OpenMP</li>
+						<li>Applying symmetry to particle-particle interactions (e.g. pressure, density, gradient, …)</li>
+					</ul>	
+					<p>In the end, between the first iteration of our program and the current iteration, we had a speedup factor of 12.</p>
 					
-                    <h2 class="section-heading">The Final Result</h2>
+                    <h2 class="section-heading">Design and Algorithms</h2>
 
-                    <p>Review what we did</p>
+					<ul>
+						<li>SPH</li>
+						<li>Rigidbody physics - Collision Detection and Handling</li>
+						<li>Ray Tracing for rendering the surface (Near completion)</li>
+						<li>Parallel Programming</li>
+						<li>Scene player and Scene editor</li>
+						<li>Import and Export of .anim files</li>
+						<li>Pixel capturing</li>
+					</ul>
 
+					<h2 class="section-heading">Images</h2>
+					
                     <a href="#">
                         <img class="img-responsive" src="img/post-sample-image.jpg" alt="">
                     </a>
 					
                     <span class="caption text-muted">Describe the picture</span>
 
-                    <p>Describe more stuff</p>
-
-                    <p>Visit <a href="#">Our webpage</a>. Images taken from our simulator.</p>
+                    <p>Planning to continue this project as we continue in our academic or professional career. Hopefully, we can make the simulation happen in real-time!</p>
                 </div>
             </div>
         </div>
