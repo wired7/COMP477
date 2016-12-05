@@ -105,6 +105,7 @@ void StateSpaceCamera::translate(vec2 offset)
 		camPosVector += diff * vec3(offset.x, 0, offset.y);
 }
 
+// Method to call if the camera needs to update its matrix
 void StateSpaceCamera::update()
 {
 	if (camPhi > maxCamPhi)
