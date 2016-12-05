@@ -113,26 +113,39 @@
 					</ul>	
 					<p>In the end, between the first iteration of our program and the current iteration, we had a speedup factor of 12.</p>
 					
-                    <h2 class="section-heading">Design and Algorithms</h2>
+ 					<h2 class="section-heading">Images of our Engine</h2>				
 
-					<ul>
-						<li>SPH</li>
-						<li>Rigidbody physics - Collision Detection and Handling</li>
-						<li>Ray Tracing for rendering the surface (In progress)</li>
-						<li>Parallel Programming</li>
-						<li>Scene player and Scene editor</li>
-						<li>Import and Export of .anim files</li>
-						<li>Frame capturing</li>
-					</ul>
-
-					<h2 class="section-heading">Images</h2>
+                    <img class="img-responsive" src="img/main-menu.png" alt="">					
+                    <span class="caption text-muted">The engine allows the user to choose between a selection of modes: Create, Run, or Continue a simulation or Create your own scene</span>
+					
+					<img class="img-responsive" src="img/simulation.png" alt="">					
+                    <span class="caption text-muted">Running a simulation of 100k particles</span>
 					
                     <a href="https://cdn.discordapp.com/attachments/232193817774784513/255230415726444545/unknown.png">
                         <img class="img-responsive" src="img/particle-menu.png" alt="">
                     </a>
+					<span class="caption text-muted">The engine allows the user to pause and play the rendered simulation</span>					
 					
-                    <span class="caption text-muted">The engine allows the user to pause and play the rendered simulation</span>
-
+					<h2 class="section-heading">Videos</h2>
+					
+					<p>Here was our first 100k particle simulation,</p>
+					
+					<video width="800" controls>
+						<source src="vid/100kParticlesRenderedVideo.mp4">
+						Your browser does not support HTML5 video.					
+					</video>
+					<span class="caption text-muted">100k particles, with viscosity of 8 with a minor collision handling bug</span>
+					
+					<p>As you can see in the video, we saw that particles were flying out of the bounds. Hence we tried to fix our collision detection and handling.</p>
+					
+					<video width="800" controls>
+						<source src="vid/100kParticlesRenderedVideo_BadCollision.mp4">
+						Your browser does not support HTML5 video.					
+					</video>
+					<span class="caption text-muted">100k particles, with viscosity of 6 with a partial fix to the collision detection</span>
+					
+					<p>We made a partial fix to the collision detection and handling. We liked the wave formation in the first video but the second video shows a more stable result.</p>
+					
                     <p>Planning to continue this project as we continue in our academic or professional career. Hopefully, we can make the simulation happen in real-time!</p>
                 </div>
             </div>
