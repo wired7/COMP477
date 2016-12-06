@@ -1,7 +1,7 @@
 volume: 1
 particle radius: 0.1
 search radius: 0.2
-viscocity: 6.0
+viscocity: 15.0
 stiffness: 4.427
 rest density: 1000
 gravity: -9.81
