@@ -146,10 +146,13 @@
       <SDLCheck>true</SDLCheck>
       <AdditionalIncludeDirectories>C:\Users\Wired\Documents\Visual Studio 2015\Projects\COMP477\Resources\Simple OpenGL Image Library\SOIL;C:\Users\Wired\Documents\Visual Studio 2015\Projects\COMP477\Resources\Freetype\include;C:\Users\Wired\Documents\Visual Studio 2015\Projects\COMP477\Resources\GLM\glm;C:\Users\Wired\Documents\Visual Studio 2015\Projects\COMP477\Resources\GLFW\include\GLFW;C:\Users\Wired\Documents\Visual Studio 2015\Projects\COMP477\Resources\GLEW\include\GL;%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
       <DebugInformationFormat />
+      <AdditionalOptions>/openmp %(AdditionalOptions)</AdditionalOptions>
     </ClCompile>
     <Link>
       <AdditionalLibraryDirectories>C:\Users\Wired\Documents\Visual Studio 2015\Projects\COMP477\Resources\Simple OpenGL Image Library\lib;C:\Users\Wired\Documents\Visual Studio 2015\Projects\COMP477\Resources\GLFW\lib-vc2015;C:\Users\Wired\Documents\Visual Studio 2015\Projects\COMP477\Resources\GLEW\lib\Release\Win32;C:\Users\Wired\Documents\Visual Studio 2015\Projects\COMP477\Resources\Freetype\2015;%(AdditionalLibraryDirectories)</AdditionalLibraryDirectories>
       <AdditionalDependencies>opengl32.lib;glew32.lib;glfw3.lib;soil.lib;freetype27.lib;%(AdditionalDependencies)</AdditionalDependencies>
+      <StackReserveSize>10000000</StackReserveSize>
+      <StackCommitSize>10000000</StackCommitSize>
     </Link>
   </ItemDefinitionGroup>
   <ItemDefinitionGroup Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">
@@ -182,6 +185,8 @@
       <OptimizeReferences>true</OptimizeReferences>
       <AdditionalLibraryDirectories>$(SolutionDir)\Resources\Simple OpenGL Image Library\lib;$(SolutionDir)\Resources\GLFW\lib-vc2015;$(SolutionDir)\Resources\GLEW\lib\Release\Win32;$(SolutionDir)\Resources\Freetype\2015;%(AdditionalLibraryDirectories)</AdditionalLibraryDirectories>
       <AdditionalDependencies>opengl32.lib;glew32.lib;glfw3.lib;soil.lib;freetype27.lib;%(AdditionalDependencies)</AdditionalDependencies>
+      <StackReserveSize>10000000</StackReserveSize>
+      <StackCommitSize>10000000</StackCommitSize>
     </Link>
   </ItemDefinitionGroup>
   <ItemDefinitionGroup Condition="'$(Configuration)|$(Platform)'=='Release|x64'">

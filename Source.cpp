@@ -19,13 +19,13 @@
 #include <omp.h>
 #include "SceneManager.h"
 #include "OpenFileDialog.h"
+#include "SaveFileDialog.h"
 
 using namespace std;
 using namespace glm;
 
 GLFWwindow* window;
 Skybox* skybox;
-Rigidbody* chinchilla;
 
 //Nvidia GPU support
 extern "C" {
@@ -104,48 +104,69 @@ int init() {
 
 /*	string anotherChinchilla = OpenFileDialog::SelectFile();
 
-	fstream myFile(anotherChinchilla);
-
+	ifstream myFile(anotherChinchilla);
+	vector<vec3> positions;
+	
 	if (myFile.is_open())
 	{
 		string yetAThirdChinchilla;
 		for(int i = 0; i < 5; i++)
 			getline(myFile, yetAThirdChinchilla);
 
-		myFile >> yetAThirdChinchilla;
+		getline(myFile, yetAThirdChinchilla);
 
-		vector<vec3> positions;
+		stringstream ss(yetAThirdChinchilla);
 
-		for (int i = 0; i < 30000; i += 3)
+		ss >> yetAThirdChinchilla;
+
+		while (ss.rdbuf()->in_avail())
 		{
 			vec3 pos;
 
 			for (int j = 0; j < 3; j++)
 			{
-				myFile >> pos[j];
+				ss >> pos[j];
 			}
 			positions.push_back(pos);
 		}
 		myFile.close();
+	}
 
-		chinchilla = ParticleSystem::rayTrace(&positions, 0.05f, 400);
+	Rigidbody* chinchilla = ParticleSystem::rayTrace(&positions, 0.05f, 100);
 
-		ofstream mFile("\\Animation\\chinchilla.anim");
+	string c = SaveFileDialog::SaveFile();
 
-		for (int i = 0; i < positions.size(); i++)
+	ofstream mS(c);
+
+	if (mS.is_open())
+	{
+		for (int i = 0; i < chinchilla->vertices.size(); i++)
 		{
 			for (int j = 0; j < 3; j++)
-				myFile << positions[i][j] << " ";
+			{
+				mS << chinchilla->vertices[i].position[j] << " ";
+			}
+
+			for (int j = 0; j < 3; j++)
+			{
+				mS << chinchilla->vertices[i].normal[j] << " ";
+			}
+
+			for (int j = 0; j < 4; j++)
+			{
+				mS << chinchilla->vertices[i].color[j] << " ";
+			}
 		}
 
-		myFile.close();
+		mS << endl;
 
-		int width, height;
-		glfwGetWindowSize(window, &width, &height);
-		Camera::activeCamera = new StateSpaceCamera(window, vec2(0, 0), vec2(1, 1), vec3(3, 3, 0), vec3(3, 3, 3), vec3(0, 1, 0), perspective(45.0f, (float)width / height, 0.1f, 1000.0f), NULL);
-		Controller::setController(StateSpaceController::getController());
-	}
-	*/
+		for (int i = 0; i < chinchilla->indices.size(); i++)
+		{
+			mS << chinchilla->indices[i] << " ";
+		}
+
+		mS.close();
+	}*/
 }
 
 int main()
@@ -158,10 +179,7 @@ int main()
 		glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
 
 		SceneManager::getInstance()->getActiveState()->execute();
-/*		LitShader::shader->Use();
-		glUniformMatrix4fv(LitShader::shader->projectionID, 1, GL_FALSE, &(Camera::activeCamera->Projection[0][0]));
-		glUniformMatrix4fv(LitShader::shader->viewID, 1, GL_FALSE, &(Camera::activeCamera->View[0][0]));
-		chinchilla->draw();*/
+
 		// Swap buffers
 		glfwSwapBuffers(window);
 		glfwPollEvents();

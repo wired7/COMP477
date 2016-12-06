@@ -40,7 +40,7 @@ class ParticleSystem
 public:
 	~ParticleSystem();
 	static ParticleSystem* getInstance();
-	void goNuts(float, float, string, bool continueFlag);
+	void startSimulation(float, float, string, bool continueFlag);
 	vector<glm::vec3>* getParticlePositions();
 	SystemParameters sysParams;
 	vector<Particle*> particles;

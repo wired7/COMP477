@@ -69,7 +69,7 @@ bool StateSpace::loadAnimation()
 
 	//	cout << framesFront->at(0)[0].x << " " << framesFront->at(0)[0].y << " " << framesFront->at(0)[0].z << endl;
 
-	instancedModels.push_back(new InstancedSpheres(ParticleSystem::getInstance()->sysParams.particleRadius, 32, vec4(0.5, 0.5, 1, 1.0f), framesFront->at(0)));
+	instancedModels.push_back(new InstancedSpheres(ParticleSystem::getInstance()->sysParams.particleRadius, 6, vec4(0.5, 0.5, 1, 0.3f), framesFront->at(0)));
 
 	for (int i = 0; i < models.size(); i++)
 		models[i]->bindBuffers();
@@ -95,12 +95,7 @@ void StateSpace::draw()
 	{
 		observers[i]->setViewport();
 
-		CubeMapShader::shader->Use();
-		glUniformMatrix4fv(CubeMapShader::shader->projectionID, 1, GL_FALSE, &(observers[i]->Projection[0][0]));
-		glUniformMatrix4fv(CubeMapShader::shader->viewID, 1, GL_FALSE, &(observers[i]->View[0][0]));
-		glUniform1i(CubeMapShader::shader->cubeMap, 0);
-
-		skybox->draw();
+		glBlendFunc(GL_SRC_ALPHA, GL_ZERO);
 
 		InstancedLitShader::shader->Use();
 		glUniformMatrix4fv(InstancedLitShader::shader->projectionID, 1, GL_FALSE, &(observers[i]->Projection[0][0]));
@@ -108,6 +103,17 @@ void StateSpace::draw()
 
 		for (int i = 0; i < instancedModels.size(); i++)
 			instancedModels[i]->draw();
+
+//		glEnable(GL_ALPHA_TEST);
+
+		glBlendFunc(GL_SRC_ALPHA, GL_ONE_MINUS_SRC_ALPHA);
+
+		CubeMapShader::shader->Use();
+		glUniformMatrix4fv(CubeMapShader::shader->projectionID, 1, GL_FALSE, &(observers[i]->Projection[0][0]));
+		glUniformMatrix4fv(CubeMapShader::shader->viewID, 1, GL_FALSE, &(observers[i]->View[0][0]));
+		glUniform1i(CubeMapShader::shader->cubeMap, 0);
+
+		skybox->draw();
 
 		LitShader::shader->Use();
 		glUniformMatrix4fv(LitShader::shader->projectionID, 1, GL_FALSE, &(observers[i]->Projection[0][0]));
@@ -118,7 +124,7 @@ void StateSpace::draw()
 
 		for (int i = 0; i < models.size(); i++)
 			models[i]->draw();
-
+		
 		milliseconds ms = duration_cast<milliseconds>(system_clock::now().time_since_epoch());
 
 		if (ms.count() - time >= 16 && playModeOn)

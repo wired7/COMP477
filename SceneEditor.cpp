@@ -160,7 +160,7 @@ SceneEditor::SceneEditor(GLFWwindow* window, Skybox* skybox)
 	int width, height;
 	glfwGetWindowSize(window, &width, &height);
 
-	Camera::activeCamera = new StateSpaceCamera(window, vec2(0, 0), vec2(1, 1), vec3(-10, 0, 0), vec3(0,0,0), vec3(0, 1, 0), perspective(45.0f, (float)width / height, 0.1f, 1000.0f));
+	Camera::activeCamera = new StateSpaceCamera(window, vec2(0, 0), vec2(1, 1), vec3(3, 3.5, 0), vec3(0,0,0), vec3(0, 1, 0), perspective(45.0f, (float)width / height, 0.1f, 1000.0f));
 	observer = Camera::activeCamera;
 
 	Controller::setController(StateSpaceController::getController());
@@ -171,6 +171,62 @@ SceneEditor::SceneEditor(GLFWwindow* window, Skybox* skybox)
 	buttons.push_back(new GUIButton(vec3(150, 100, 0.0f), vec3(180, 64, 0), vec4(1.0f, 1.0f, 1.0f, 1.0f), "  Back To Menu", vec4(0.0f), "textures\\button.png", true, backToMenu, 24));
 	buttons.push_back(new GUIButton(vec3(150, 180, 0.0f), vec3(180, 64, 0), vec4(1.0f, 1.0f, 1.0f, 1.0f), "   Save Scene", vec4(0.0f), "textures\\button.png", true, saveScene, 24));
 	buttons.push_back(new GUIButton(vec3(650, 100, 0.0f), vec3(40, 40, 0), vec4(1.0f, 1.0f, 1.0f, 1.0f), "Undo", vec4(0.0f), "textures\\button.png", true, undo, 16));
+
+/*	string anotherChinchilla = OpenFileDialog::SelectFile();
+
+	ifstream myFile(anotherChinchilla);
+	vector<Vertex2> positions;
+	vector<GLuint> indices;
+
+	if (myFile.is_open())
+	{
+		string yetAThirdChinchilla;
+
+		getline(myFile, yetAThirdChinchilla);
+
+		stringstream ss(yetAThirdChinchilla);
+
+		while(ss.rdbuf()->in_avail())
+		{
+			vec3 pos;
+
+			for (int j = 0; j < 3; j++)
+			{
+				ss >> pos[j];
+			}
+
+			vec3 normal;
+
+			for (int j = 0; j < 3; j++)
+			{
+				ss >> normal[j];
+			}
+
+			vec4 color;
+
+			for (int j = 0; j < 4; j++)
+			{
+				ss >> color[j];
+			}
+
+			positions.push_back(Vertex2(pos, normal, color, vec2()));
+		}
+
+		getline(myFile, yetAThirdChinchilla);
+
+		ss = stringstream(yetAThirdChinchilla);
+
+		while (ss.rdbuf()->in_avail())
+		{
+			int index;
+			ss >> index;
+			indices.push_back(index);
+		}
+
+		myFile.close();
+	}
+
+	rigidbodies.push_back(new Rigidbody(positions, indices, mat4(1.0f), 10, true));*/
 }
 
 SceneEditor::~SceneEditor()

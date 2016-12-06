@@ -114,7 +114,7 @@ void newSimulation()
 	ParticleSystem::getInstance()->setStiffnessOfParticleSystem(); // calculating the stiffness of the system by using the height of water * particleRadius to get the height of the water
 	ParticleSystem::getInstance()->calculateMassOfParticles();
 
-	ParticleSystem::getInstance()->goNuts(animationTime, 0.016f, animFile, false);
+	ParticleSystem::getInstance()->startSimulation(animationTime, 0.016f, animFile, false);
 
 	cout << "Animation complete!" << std::endl;
 
@@ -197,7 +197,7 @@ void continueSim()
 	//ParticleSystem::getInstance()->setStiffnessOfParticleSystem(); // calculating the stiffness of the system by using the height of water * particleRadius to get the height of the water
 	//ParticleSystem::getInstance()->calculateMassOfParticles();
 
-	ParticleSystem::getInstance()->goNuts(animationTime, 0.016f, animFile, true);
+	ParticleSystem::getInstance()->startSimulation(animationTime, 0.016f, animFile, true);
 
 	cout << "Animation complete!" << std::endl;
 

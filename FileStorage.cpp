@@ -241,7 +241,7 @@ void FileStorage::readFrames(char* file, int count, vector<vector<glm::vec3>>* f
 
 						vector<Vertex2> vertices;
 
-						while (stringLen > 0) {
+						while (ss.rdbuf()->in_avail()) {
 							vec3 pos;
 
 							for (int i = 0; i < 3; i++)
@@ -258,15 +258,11 @@ void FileStorage::readFrames(char* file, int count, vector<vector<glm::vec3>>* f
 								ss >> color[i];
 
 							vertices.push_back(Vertex2(pos, normal, color, vec2(0, 0)));
-
-							stringLen -= 10;
 						}
 
 						getline(filePos, line);
 
 						ss = stringstream(line);
-
-						stringLen = line.length();
 
 						vector<GLuint> indices;
 

@@ -107,7 +107,7 @@ void ParticleSystem::watchCIN()
 	ParticleSystem::SerializeData = true;
 }
 
-void ParticleSystem::goNuts(float playbackTime, float frameRate, string filePath, bool continueFlag)
+void ParticleSystem::startSimulation(float playbackTime, float frameRate, string filePath, bool continueFlag)
 {
 	std::thread t1(&ParticleSystem::watchCIN, this);
 	t1.detach();
@@ -323,66 +323,101 @@ Rigidbody* ParticleSystem::rayTrace(vector<vec3>* points, float radius, int reso
 		spheres.push_back(new Sphere(points->at(i), radius));
 	}
 
-	vec3 pt1 = min;
-	vec3 pt2 = min + vec3(max.x, 0, 0);
-	vec3 pt3 = min + vec3(max.x, max.y, 0);
-	vec3 pt4 = min + vec3(0, max.y, 0);
+	vec3 boxCenter = (max + min) / 2.0f;
 
-	vec3 range(max.x - pt1.x, max.y - pt1.y, 0);
-
-	vec3 midPoint = (pt1 + range) / 2.0f;
-
-	vec3 normal = cross(normalize(pt2 - pt1), normalize(pt3 - pt1));
-
-	pt1 += normal;
-
-	vec3 camOrigin = midPoint + normal;
-
-	vec3 camDir = -normal;
-
-	vec3 up = vec3(0, 1, 0);
-
-	vec3 right = cross(camDir, up);
-
-	NodeInfo** vertices = new NodeInfo*[resolution];
-	float stepX = range.x / resolution;
-	float stepY = range.y / resolution;
-
-	for (int i = 0; i < resolution; i++)
+	vec3 faces[] = { min, min + vec3(max.x, 0, 0), min + vec3(max.x, max.y, 0), min + vec3(0, max.y, 0),
+					min, min + vec3(0, 0, max.z), min + vec3(0, max.y, max.z), min + vec3(0, max.y, 0),
+					min, min + vec3(0, 0, max.z), min + vec3(max.x, 0, max.z), min + vec3(max.x, 0, 0)};
+	
+	for (int side = 0; side < 1; side++)
 	{
-		vertices[i] = new NodeInfo[resolution];
-		for (int j = 0; j < resolution; j++)
+		vec3 pts[] = { faces[side * 4], faces[side * 4 + 1], faces[side * 4 + 2], faces[side * 4 + 3] };
+
+		vec3 range = vec3(0, 0, 0);
+
+		for (int i = 1; i < 4; i++)
 		{
-			vec3 o = pt1 + right * (float)i * stepX  + up * (float)j * stepY;
-
-			float closestIntersection = INFINITY;
-			Sphere* closestObject = NULL;
-			for (int k = 0; k < spheres.size(); k++)
+			range += pts[i] - pts[0];
+			cout << "POINTS:" << endl;
+			for (int j = 0; j < 3; j++)
 			{
+				cout << pts[i][j] << " ";
+				if (abs(pts[i][j] - pts[0][j]) > range[j])
+					range[j] = pts[i][j] - pts[0][j];
+			}
+			cout << endl;
+		}
 
-				float t = spheres[k]->intersection(o, camDir);
+		range /= 4;
 
-				if (t > 0 && t < closestIntersection)
+		vec3 midPoint = (pts[0] + range) / 2.0f;
+
+		cout << "MIDPOINT: " << midPoint.x << " " << midPoint.y << " " << midPoint.z << endl;
+
+		vec3 normal = midPoint - boxCenter;
+
+		vec3 camDir = -normalize(normal);
+
+		vec3 camOrigin = pts[0] + normal * 1.5f;
+
+		pair<float, float> twoGreatest(-INFINITY, -INFINITY);
+
+		for (int i = 0; i < 3; i++)
+		{
+			if (range[i] > twoGreatest.first)
+				twoGreatest.first = range[i];
+			else if (range[i] == twoGreatest.first || range[i] > twoGreatest.second)
+				twoGreatest.second = range[i];
+		}
+
+		vec3 up = normalize(pts[3] - pts[0]);
+
+		vec3 right = normalize(pts[1] - pts[0]);
+
+		NodeInfo** vertices = new NodeInfo*[resolution];
+
+		float stepX = twoGreatest.first / resolution;
+		float stepY = twoGreatest.second / resolution;
+
+		for (int i = 0; i < resolution; i++)
+		{
+			vertices[i] = new NodeInfo[resolution];
+			for (int j = 0; j < resolution; j++)
+			{
+				vec3 o = camOrigin + right * (float)i * stepX + up * (float)j * stepY;
+
+				float closestIntersection = INFINITY;
+				Sphere* closestObject = NULL;
+				for (int k = 0; k < spheres.size(); k++)
 				{
-					closestIntersection = t;
-					closestObject = spheres[k];
+					float t = spheres[k]->intersection(o, camDir);
+
+					if (t > 0 && t < closestIntersection)
+					{
+						closestIntersection = t;
+						closestObject = spheres[k];
+					}
+				}
+
+				if (closestObject != NULL)
+				{
+					vertices[i][j].vertex = new Vertex2(o + camDir * closestIntersection, normalize(o + camDir * closestIntersection - closestObject->center), vec4(0.5f, 0.5, 0.8f, 1.0f), vec2());
 				}
 			}
-
-			if (closestObject != NULL)
-			{
-				vertices[i][j].vertex = new Vertex2(o + camDir * closestIntersection, normalize(o + camDir * closestIntersection - closestObject->center), vec4(0.5f, 0.5, 0.8f, 1.0f), vec2());
-			
-			}
 		}
-	}
 
-	for (int i = 0; i < resolution; i++)
-		for (int j = 0; j < resolution; j++)
-			if (vertices[i][j].vertex != NULL && vertices[i][j].index > -1)
-			{
-				resolveMesh(vertices, resolution, rigidbody, vec2(i, j), 0.1f);
-			}
+		for (int i = 0; i < resolution; i++)
+			for (int j = 0; j < resolution; j++)
+				if (vertices[i][j].vertex != NULL)
+				{
+					resolveMesh(vertices, resolution, rigidbody, vec2(i, j), radius);
+				}
+		
+		for (int i = 0; i < resolution; i++)
+			for (int j = 0; j < resolution; j++)
+				if(vertices[i][j].vertex != NULL)
+					delete vertices[i][j].vertex;
+	}
 
 	return rigidbody;
 }
@@ -400,27 +435,25 @@ void resolveMesh(NodeInfo** vertices, int size, Rigidbody* rigidbody, vec2 coord
 		vertices[(int)coordinates.x][(int)coordinates.y].index = rigidbody->vertices.size() - 1;
 	}
 
-	vector<vec2> availableCoords;
+	vec2 dirs[] = { vec2(1, 0), vec2(1, 1), vec2(0, 1), vec2(-1, 1), vec2(-1, 0), vec2(-1, -1), vec2(0, -1), vec2(1, -1) };
+
+	vector<vec2> visitNext;
 
 	for (int i = 0; i < 8; i++)
 	{
-		float theta = (3.1415f * 2.0f / 8.0f) * i;
-		vec2 dir(round(cos(theta)), round(sin(theta)));
-
-		float nextTheta = (3.1415f * 2.0f / 8.0f) * ((i + 1) % 8);
-		vec2 nextDir(round(cos(theta)), round(sin(theta)));
+		vec2 dir = dirs[i];
+		vec2 nextDir = dirs[(i + 1) % 8];
 
 		vec2 newCoord = coordinates + dir;
 		vec2 newNewCoord = coordinates + nextDir;
 
 		if (newCoord.x > 0 && newCoord.x < size && newCoord.y > 0 && newCoord.y < size)
-			if (newNewCoord.x > 0 && newNewCoord.x < size && newNewCoord.y > 0 && newNewCoord.y < size)
-				if (vertices[(int)newCoord.x][(int)newCoord.y].vertex != NULL)
-				{
-					if (!vertices[(int)newCoord.x][(int)newCoord.y].visited)
-					{
-						resolveMesh(vertices, size, rigidbody, newCoord, distanceCutOff);
+			if (vertices[(int)newCoord.x][(int)newCoord.y].vertex != NULL)
+			{
+				visitNext.push_back(newCoord);
 
+				if (!vertices[(int)newCoord.x][(int)newCoord.y].visited)
+					if (newNewCoord.x > 0 && newNewCoord.x < size && newNewCoord.y > 0 && newNewCoord.y < size)
 						if (vertices[(int)newNewCoord.x][(int)newNewCoord.y].vertex != NULL)
 							if (length(vertices[(int)newCoord.x][(int)newCoord.y].vertex->position - vertices[(int)coordinates.x][(int)coordinates.y].vertex->position) < distanceCutOff)
 								if (length(vertices[(int)newNewCoord.x][(int)newNewCoord.y].vertex->position - vertices[(int)coordinates.x][(int)coordinates.y].vertex->position) < distanceCutOff)
@@ -442,8 +475,12 @@ void resolveMesh(NodeInfo** vertices, int size, Rigidbody* rigidbody, vec2 coord
 										rigidbody->indices.push_back(vertices[(int)newNewCoord.x][(int)newNewCoord.y].index);
 										rigidbody->indices.push_back(vertices[(int)newCoord.x][(int)newCoord.y].index);
 									}
-					}
-				}
+			}
+	}
+
+	for (int i = 0; i < visitNext.size(); i++)
+	{
+		resolveMesh(vertices, size, rigidbody, visitNext[i], distanceCutOff);
 	}
 }
 
