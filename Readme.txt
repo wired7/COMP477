@@ -35,5 +35,31 @@ for Visual Studio 2015. Replace the Freetype lib file in both the Release folder
 $(SolutionDir)\Resources\Freetype\lib. Make sure you are running Visual Studio in Release 32bit (x86).
 
 
+USING THE PROGRAM
+-----------------
+
+Creation of a simulation
+1- Window popup will prompt you to choose a system parameters txt file which should contain: volume, radius, search radius and other properties as such,
+
+volume: 1
+particle radius: 0.1
+search radius: 0.4
+viscocity: 6.0
+stiffness: 4.427
+rest density: 1000
+gravity: -9.81
+time step: 0.001
+max time step: 0.001
+
+2- The second window popup will ask you to choose a Rigid body txt file which should contain information about rigidbodies as such,
+
+Sphere: 0.0 0.0 0.0 4.0 6.0 4.0 0.0 0.0 1.0 0.3 20
+
+Please refer to 'Rigidbodies format.txt' for more information
+
+3- Console will ask you for the number of particles in the simulation and the simulation time
+
+4- Window popup will ask you to save the .anim file in a directory. Choose your path and enjoy the simulation! (Once the loading is done...)
+
 
 
